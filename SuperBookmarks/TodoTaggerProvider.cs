@@ -22,7 +22,7 @@ namespace Konamiman.SuperBookmarks
                 throw new ArgumentNullException("buffer");
             }
 
-            return new TodoTagger(AggregatorService.GetClassifier(buffer)) as ITagger<T>;
+            return (ITagger<T>)buffer.Properties.GetOrCreateSingletonProperty(() => new SimpleTagger<TodoTag>(buffer));
         }
     }
 }

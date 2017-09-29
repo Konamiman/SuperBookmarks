@@ -17,4 +17,8 @@ namespace Konamiman.SuperBookmarks
             return new TodoGlyphFactory();
         }
     }
+
+    internal class TodoTag : IGlyphTag
+    {
+    }
 }

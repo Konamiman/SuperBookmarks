@@ -1,8 +1,16 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.ComponentModel.Design;
 using System.Globalization;
+using EnvDTE;
+using EnvDTE80;
+using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Tagging;
+using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -11,6 +19,9 @@ namespace Konamiman.SuperBookmarks
     /// </summary>
     internal sealed class SetBookmarkCommand
     {
+        [Import]
+        public IVsEditorAdaptersFactoryService editorAdaptersFactoryService { get; } = null;
+
         /// <summary>
         /// Command ID.
         /// </summary>
@@ -87,17 +98,55 @@ namespace Konamiman.SuperBookmarks
         /// <param name="e">Event args.</param>
         private void MenuItemCallback(object sender, EventArgs e)
         {
-            string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-            string title = "SetBookmarkCommand";
+            var dte = (DTE2)ServiceProvider.GetService(typeof(DTE));
+            var activeDocument = dte.ActiveDocument;
 
-            // Show a message box to prove we were here
-            VsShellUtilities.ShowMessageBox(
-                this.ServiceProvider,
-                message,
-                title,
-                OLEMSGICON.OLEMSGICON_INFO,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            var selection = activeDocument.Selection as TextSelection;
+            int row = selection.ActivePoint.Line;
+            
+            var textView = GetWpfTextView(GetIVsTextView(activeDocument.FullName));
+            var textBuffer = textView.TextBuffer;
+
+            var tagger = textBuffer.Properties.GetOrCreateSingletonProperty(() => new SimpleTagger<TodoTag>(textBuffer));
+            var snapshot = textView.TextBuffer.CurrentSnapshot;
+            var line = snapshot.GetLineFromLineNumber(row - 1);
+            var span = snapshot.CreateTrackingSpan(new SnapshotSpan(line.Start, 0), SpanTrackingMode.EdgeExclusive);
+            tagger.CreateTagSpan(span, new TodoTag());
+        }
+
+        internal static IVsTextView GetIVsTextView(string filePath)
+        {
+            var dte2 = (EnvDTE80.DTE2)Package.GetGlobalService(typeof(Microsoft.VisualStudio.Shell.Interop.SDTE));
+            Microsoft.VisualStudio.OLE.Interop.IServiceProvider sp = (Microsoft.VisualStudio.OLE.Interop.IServiceProvider)dte2;
+            ServiceProvider serviceProvider = new ServiceProvider(sp);
+
+            if (VsShellUtilities.IsDocumentOpen(serviceProvider, filePath, Guid.Empty,
+                                            out var uiHierarchy, out var itemID, out var windowFrame))
+            {
+                // Get the IVsTextView from the windowFrame.
+                return VsShellUtilities.GetTextView(windowFrame);
+            }
+
+            return null;
+        }
+
+        //https://stackoverflow.com/a/6603233/4574
+        private IWpfTextView GetWpfTextView(IVsTextView vTextView)
+        {
+            IWpfTextView view = null;
+            IVsUserData userData = vTextView as IVsUserData;
+
+            if (null != userData)
+            {
+                IWpfTextViewHost viewHost;
+                object holder;
+                Guid guidViewHost = DefGuidList.guidIWpfTextViewHost;
+                userData.GetData(ref guidViewHost, out holder);
+                viewHost = (IWpfTextViewHost)holder;
+                view = viewHost.TextView;
+            }
+
+            return view;
         }
     }
 }
