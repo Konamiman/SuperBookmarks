@@ -54,12 +54,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BookmarksManager.cs" />
+    <Compile Include="Helpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SetBookmarkCommand.cs" />
     <Compile Include="SuperBookmarksPackage.cs" />
-    <Compile Include="TodoGlyphFactory.cs" />
-    <Compile Include="TodoGlyphFactoryProvider.cs" />
-    <Compile Include="TodoTaggerProvider.cs" />
+    <Compile Include="BookmarkGlyphFactory.cs" />
+    <Compile Include="BookmarkGlyphFactoryProvider.cs" />
+    <Compile Include="BookmarkTaggerProvider.cs" />
+    <Compile Include="WpfTextViewCreationListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />

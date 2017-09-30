@@ -34,6 +34,7 @@ namespace Konamiman.SuperBookmarks
     [Guid(SuperBookmarksPackage.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)]
     public sealed class SuperBookmarksPackage : Package
     {
         /// <summary>
@@ -50,6 +51,9 @@ namespace Konamiman.SuperBookmarks
             // any Visual Studio service because at this point the package object is created but
             // not sited yet inside Visual Studio environment. The place to do all the other
             // initialization is the Initialize method.
+
+            Instance = this;
+            BookmarksManager = new BookmarksManager(this);
         }
 
         #region Package Members
@@ -61,8 +65,15 @@ namespace Konamiman.SuperBookmarks
         protected override void Initialize()
         {
             base.Initialize();
-            Konamiman.SuperBookmarks.SetBookmarkCommand.Initialize(this);
+            SetBookmarkCommand.Initialize(this);
+
+            //VsShellUtilities.ShowMessageBox(this, "Initialized!", "eeeh", OLEMSGICON.OLEMSGICON_INFO,
+            //    OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }
+
+        public static SuperBookmarksPackage Instance { get; private set; }
+
+        internal BookmarksManager BookmarksManager { get; private set; }
 
         #endregion
     }

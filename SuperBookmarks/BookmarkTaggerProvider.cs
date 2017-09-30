@@ -9,8 +9,8 @@ namespace Konamiman.SuperBookmarks
 {
     [Export(typeof(ITaggerProvider))]
     [ContentType("code")]
-    [TagType(typeof(TodoTag))]
-    class TodoTaggerProvider : ITaggerProvider
+    [TagType(typeof(BookmarkTag))]
+    class BookmarkTaggerProvider : ITaggerProvider
     {
         [Import]
         internal IClassifierAggregatorService AggregatorService;
@@ -22,7 +22,7 @@ namespace Konamiman.SuperBookmarks
                 throw new ArgumentNullException("buffer");
             }
 
-            return (ITagger<T>)buffer.Properties.GetOrCreateSingletonProperty(() => new SimpleTagger<TodoTag>(buffer));
+            return (ITagger<T>)buffer.Properties.GetOrCreateSingletonProperty(() => new SimpleTagger<BookmarkTag>(buffer));
         }
     }
 }

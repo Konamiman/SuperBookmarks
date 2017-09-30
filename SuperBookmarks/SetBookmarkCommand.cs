@@ -98,55 +98,7 @@ namespace Konamiman.SuperBookmarks
         /// <param name="e">Event args.</param>
         private void MenuItemCallback(object sender, EventArgs e)
         {
-            var dte = (DTE2)ServiceProvider.GetService(typeof(DTE));
-            var activeDocument = dte.ActiveDocument;
-
-            var selection = activeDocument.Selection as TextSelection;
-            int row = selection.ActivePoint.Line;
-            
-            var textView = GetWpfTextView(GetIVsTextView(activeDocument.FullName));
-            var textBuffer = textView.TextBuffer;
-
-            var tagger = textBuffer.Properties.GetOrCreateSingletonProperty(() => new SimpleTagger<TodoTag>(textBuffer));
-            var snapshot = textView.TextBuffer.CurrentSnapshot;
-            var line = snapshot.GetLineFromLineNumber(row - 1);
-            var span = snapshot.CreateTrackingSpan(new SnapshotSpan(line.Start, 0), SpanTrackingMode.EdgeExclusive);
-            tagger.CreateTagSpan(span, new TodoTag());
-        }
-
-        internal static IVsTextView GetIVsTextView(string filePath)
-        {
-            var dte2 = (EnvDTE80.DTE2)Package.GetGlobalService(typeof(Microsoft.VisualStudio.Shell.Interop.SDTE));
-            Microsoft.VisualStudio.OLE.Interop.IServiceProvider sp = (Microsoft.VisualStudio.OLE.Interop.IServiceProvider)dte2;
-            ServiceProvider serviceProvider = new ServiceProvider(sp);
-
-            if (VsShellUtilities.IsDocumentOpen(serviceProvider, filePath, Guid.Empty,
-                                            out var uiHierarchy, out var itemID, out var windowFrame))
-            {
-                // Get the IVsTextView from the windowFrame.
-                return VsShellUtilities.GetTextView(windowFrame);
-            }
-
-            return null;
-        }
-
-        //https://stackoverflow.com/a/6603233/4574
-        private IWpfTextView GetWpfTextView(IVsTextView vTextView)
-        {
-            IWpfTextView view = null;
-            IVsUserData userData = vTextView as IVsUserData;
-
-            if (null != userData)
-            {
-                IWpfTextViewHost viewHost;
-                object holder;
-                Guid guidViewHost = DefGuidList.guidIWpfTextViewHost;
-                userData.GetData(ref guidViewHost, out holder);
-                viewHost = (IWpfTextViewHost)holder;
-                view = viewHost.TextView;
-            }
-
-            return view;
+            SuperBookmarksPackage.Instance.BookmarksManager.SetBookmarkInCurrentLineOfActiveDocument();
         }
     }
 }

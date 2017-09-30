@@ -9,16 +9,16 @@ namespace Konamiman.SuperBookmarks
     [Name("TodoGlyph")]
     [Order(After = "VsTextMarker")]
     [ContentType("code")]
-    [TagType(typeof(TodoTag))]
-    internal sealed class TodoGlyphFactoryProvider : IGlyphFactoryProvider
+    [TagType(typeof(BookmarkTag))]
+    internal sealed class BookmarkGlyphFactoryProvider : IGlyphFactoryProvider
     {
         public IGlyphFactory GetGlyphFactory(IWpfTextView view, IWpfTextViewMargin margin)
         {
-            return new TodoGlyphFactory();
+            return new BookmarkGlyphFactory();
         }
     }
 
-    internal class TodoTag : IGlyphTag
+    internal class BookmarkTag : IGlyphTag
     {
     }
 }

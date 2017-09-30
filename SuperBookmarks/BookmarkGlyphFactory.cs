@@ -6,14 +6,14 @@ using Microsoft.VisualStudio.Text.Formatting;
 
 namespace Konamiman.SuperBookmarks
 {
-    internal class TodoGlyphFactory : IGlyphFactory
+    internal class BookmarkGlyphFactory : IGlyphFactory
     {
         const double m_glyphSize = 16.0;
 
         public UIElement GenerateGlyph(IWpfTextViewLine line, IGlyphTag tag)
         {
             // Ensure we can draw a glyph for this marker.
-            if (tag == null || !(tag is TodoTag))
+            if (tag == null || !(tag is BookmarkTag))
             {
                 return null;
             }
