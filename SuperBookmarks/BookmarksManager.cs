@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -10,21 +11,21 @@ namespace Konamiman.SuperBookmarks
     {
         class Bookmark
         {
-            private TrackingTagSpan<BookmarkTag> span { get; set; }
+            public TrackingTagSpan<BookmarkTag> TrackingSpan { get; private set; }
 
-            public Bookmark(TrackingTagSpan<BookmarkTag> span)
+            public Bookmark(TrackingTagSpan<BookmarkTag> trackingSpan)
             {
-                this.span = span;
+                this.TrackingSpan = trackingSpan;
             }
 
             public void UpdateSpan(TrackingTagSpan<BookmarkTag> span)
             {
-                this.span = span;
+                this.TrackingSpan = span;
             }
 
             public int GetRow(ITextBuffer buffer)
             {
-                return span.Span
+                return TrackingSpan.Span
                   .GetStartPoint(buffer.CurrentSnapshot)
                   .GetContainingLine()
                   .LineNumber + 1;
@@ -69,15 +70,26 @@ namespace Konamiman.SuperBookmarks
             }   
         }
         
-        public void SetBookmarkInCurrentLineOfActiveDocument()
+        public void SetOrRemoveBookmarkInCurrentDocument()
         {
             var currentView = Helpers.GetTextViewForActiveDocument();
             var currentBuffer = currentView.TextBuffer;
-
             var lineNumber = currentView.Selection.ActivePoint.Position.GetContainingLine().LineNumber + 1;
-            var trackingSpan = Helpers.CreateTagSpan(currentBuffer, lineNumber);
 
-            bookmarksByView[currentView].Add(new Bookmark(trackingSpan));
+            var existingBookmark = bookmarksByView[currentView].SingleOrDefault(b => b.GetRow(currentBuffer) == lineNumber);
+            if (existingBookmark == null)
+            {
+                //Create new bookmark
+                var trackingSpan = Helpers.CreateTagSpan(currentBuffer, lineNumber);
+                bookmarksByView[currentView].Add(new Bookmark(trackingSpan));
+            }
+            else
+            {
+                //Remove existing bookmark
+                var tagger = currentBuffer.Properties.GetOrCreateSingletonProperty(() => new SimpleTagger<BookmarkTag>(currentBuffer));
+                tagger.RemoveTagSpan(existingBookmark.TrackingSpan); // s => s.Span == existingBookmark.TrackingSpan.Span);
+                bookmarksByView[currentView].Remove(existingBookmark);
+            }
         }
     }
 }

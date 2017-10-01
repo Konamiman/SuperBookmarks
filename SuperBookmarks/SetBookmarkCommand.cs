@@ -98,7 +98,7 @@ namespace Konamiman.SuperBookmarks
         /// <param name="e">Event args.</param>
         private void MenuItemCallback(object sender, EventArgs e)
         {
-            SuperBookmarksPackage.Instance.BookmarksManager.SetBookmarkInCurrentLineOfActiveDocument();
+            SuperBookmarksPackage.Instance.BookmarksManager.SetOrRemoveBookmarkInCurrentDocument();
         }
     }
 }
