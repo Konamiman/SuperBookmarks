@@ -1,0 +1,1 @@
+This is a WIP project for developing a state-of-the-art bookmarks manager for Visual studio. More details as soon as a MVP is available.
