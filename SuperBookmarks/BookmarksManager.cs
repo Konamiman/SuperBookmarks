@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Microsoft.Internal.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.Text.Editor;
@@ -46,9 +48,27 @@ namespace Konamiman.SuperBookmarks
         private readonly Dictionary<ITextView, List<Bookmark>> bookmarksByView =
             new Dictionary<ITextView, List<Bookmark>>();
 
+        //key is filename, value is line number
+        private readonly Dictionary<string, int[]> bookmarksPendingCreation =
+            new Dictionary<string, int[]>();
+
         public void RegisterTextView(string fileName, ITextView newView)
         {
-            if (viewsByFilename.ContainsKey(fileName))
+            if (bookmarksPendingCreation.ContainsKey(fileName))
+            {
+                var buffer = newView.TextBuffer;
+                var bookmarks = new List<Bookmark>();
+                foreach (var lineNumber in bookmarksPendingCreation[fileName])
+                {
+                    var trackingSpan = Helpers.CreateTagSpan(buffer, lineNumber);
+                    bookmarks.Add(new Bookmark(trackingSpan));
+                }
+
+                viewsByFilename[fileName] = newView;
+                bookmarksByView[newView] = bookmarks;
+                bookmarksPendingCreation.Remove(fileName);
+            }
+            else if (viewsByFilename.ContainsKey(fileName))
             {
                 //Recreate the existing bookmarks in the new view
                 var oldView = viewsByFilename[fileName];
@@ -138,6 +158,64 @@ namespace Konamiman.SuperBookmarks
                 var tagger = currentBuffer.Properties.GetOrCreateSingletonProperty(() => new SimpleTagger<BookmarkTag>(currentBuffer));
                 tagger.RemoveTagSpan(existingBookmark.TrackingSpan); // s => s.Span == existingBookmark.TrackingSpan.Span);
                 bookmarksByView[currentView].Remove(existingBookmark);
+            }
+        }
+
+        public void ClearAllBookmarks()
+        {
+            foreach (var fileName in viewsByFilename.Keys)
+            {
+                var view = viewsByFilename[fileName];
+                foreach (var bookmark in bookmarksByView[view])
+                {
+                    var tagger = view.TextBuffer.Properties.GetOrCreateSingletonProperty(() => new SimpleTagger<BookmarkTag>(view.TextBuffer));
+                    tagger.RemoveTagSpan(bookmark.TrackingSpan);
+                }
+            }
+            bookmarksByView.Clear();
+            viewsByFilename.Clear();
+            bookmarksPendingCreation.Clear();
+        }
+
+        public bool HasBookmarks =>
+            bookmarksByView.SelectMany(b => b.Value).Any();
+
+        public PersistableBookmarksInfo GetPersistableInfo()
+        {
+            var info = new PersistableBookmarksInfo();
+            foreach (var fileName in viewsByFilename.Keys)
+            {
+                var view = viewsByFilename[fileName];
+                if (bookmarksByView[view].Count == 0) continue;
+                var persistableBookmarks = new List<PersistableBookmarksInfo.Bookmark>();
+                foreach (var bookmark in bookmarksByView[view])
+                {
+                    persistableBookmarks.Add(new PersistableBookmarksInfo.Bookmark
+                    {
+                        LineNumber = bookmark.GetRow(view.TextBuffer)
+                    });
+                }
+                info.BookmarksByFilename[fileName] = persistableBookmarks.ToArray();
+            }
+            foreach (var filename in bookmarksPendingCreation.Keys)
+            {
+                var persistableBookmarks = 
+                    bookmarksPendingCreation[filename]
+                    .Select(l => new PersistableBookmarksInfo.Bookmark {LineNumber = l});
+                info.BookmarksByFilename[filename] = persistableBookmarks.ToArray();
+            }
+            return info;
+        }
+
+        public void RecreateBookmarksFromPersistableInfo(PersistableBookmarksInfo info)
+        {
+            ClearAllBookmarks();
+            bookmarksPendingCreation.Clear();
+
+            foreach (var fileName in info.BookmarksByFilename.Keys)
+            {
+                var lineNumbers = info.BookmarksByFilename[fileName].Select(b => b.LineNumber).ToArray();
+                bookmarksPendingCreation[fileName] = lineNumbers;
             }
         }
     }

@@ -35,7 +35,9 @@ namespace Konamiman.SuperBookmarks
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)]
-    public sealed class SuperBookmarksPackage : Package
+    public sealed partial class SuperBookmarksPackage : Package,
+        IVsPersistSolutionOpts,
+        IVsSolutionEvents
     {
         /// <summary>
         /// SuperBookmarksPackage GUID string.
@@ -58,6 +60,8 @@ namespace Konamiman.SuperBookmarks
 
         #region Package Members
 
+        private IVsSolution solutionService;
+
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
@@ -65,6 +69,10 @@ namespace Konamiman.SuperBookmarks
         protected override void Initialize()
         {
             base.Initialize();
+
+            solutionService = (IVsSolution) GetService(typeof(SVsSolution));
+            solutionService.AdviseSolutionEvents(this, out var cookie);
+
             SetBookmarkCommand.Initialize(this);
 
             //VsShellUtilities.ShowMessageBox(this, "Initialized!", "eeeh", OLEMSGICON.OLEMSGICON_INFO,
@@ -73,7 +81,7 @@ namespace Konamiman.SuperBookmarks
 
         public static SuperBookmarksPackage Instance { get; private set; }
 
-        internal BookmarksManager BookmarksManager { get; private set; }
+        internal BookmarksManager BookmarksManager { get; }
 
         #endregion
     }
