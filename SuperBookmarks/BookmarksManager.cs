@@ -91,6 +91,18 @@ namespace Konamiman.SuperBookmarks
 
             newView.TextBuffer.Properties.AddProperty("key", newView);
             newView.TextBuffer.Changed += TextBufferChanged;
+            newView.TextBuffer.Changing += TextBufferOnChanging;
+        }
+
+        private void TextBufferOnChanging(object sender, TextContentChangingEventArgs eventArgs)
+        {
+            var buffer = eventArgs.Before.TextBuffer;
+            var view = buffer.Properties["key"] as ITextView;
+            var bookmarks = bookmarksByView[view];
+            foreach (var bookmark in bookmarks)
+            {
+                bookmark.LineNumberBeforeChanging = bookmark.GetRow(buffer);
+            }
         }
 
         private void TextBufferChanged(object sender, TextContentChangedEventArgs eventArgs)
@@ -128,7 +140,7 @@ namespace Konamiman.SuperBookmarks
 
                 foreach (var deletedLineNumber in deletedLineNumbers)
                 {
-                    var matchingBookmark = bookmarks.SingleOrDefault(b => b.GetRow(buffer) == deletedLineNumber);
+                    var matchingBookmark = bookmarks.SingleOrDefault(b => b.LineNumberBeforeChanging == deletedLineNumber);
                     if (matchingBookmark != null)
                     {
                         var tagger = Helpers.GetTaggerFor(buffer);
