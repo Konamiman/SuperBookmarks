@@ -98,6 +98,9 @@ namespace Konamiman.SuperBookmarks
 
         private void TextBufferChanged(object sender, TextContentChangedEventArgs eventArgs)
         {
+            if (!deletingALineDeletesTheBookmark)
+                return;
+
             bool LineIsEntirelyContainedInChange(ITextSnapshotLine line, ITextChange change)
             {
                 return (
@@ -139,6 +142,19 @@ namespace Konamiman.SuperBookmarks
                     }
                 }
             }            
+        }
+
+        private bool deletingALineDeletesTheBookmark;
+
+        internal void InitializeAfterPackageInitialization()
+        {
+            var options = SuperBookmarksPackage.Instance.Options;
+            deletingALineDeletesTheBookmark = options.DeletingALineDeletesTheBookmark;
+
+            options.DeletingALineDeletesTheBookmarkChanged += (sender, args) =>
+            {
+                deletingALineDeletesTheBookmark = ((OptionsPage) sender).DeletingALineDeletesTheBookmark;
+            };
         }
 
         public void SetOrRemoveBookmarkInCurrentDocument()

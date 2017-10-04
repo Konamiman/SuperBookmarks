@@ -6,8 +6,10 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Shell.Settings;
 using Microsoft.Win32;
 
 namespace Konamiman.SuperBookmarks
@@ -35,6 +37,7 @@ namespace Konamiman.SuperBookmarks
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)]
+    [ProvideOptionPage(typeof(OptionsPage), "SuperBookmarks", "General", 0, 0, true)]
     public sealed partial class SuperBookmarksPackage : Package,
         IVsPersistSolutionOpts,
         IVsSolutionEvents
@@ -43,6 +46,8 @@ namespace Konamiman.SuperBookmarks
         /// SuperBookmarksPackage GUID string.
         /// </summary>
         public const string PackageGuidString = "b634341b-bb5b-463e-9886-f11c4391941e";
+
+        private const string SettingsStoreName = "Konamiman.SuperBookmarks";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SuperBookmarksPackage"/> class.
@@ -62,6 +67,13 @@ namespace Konamiman.SuperBookmarks
 
         private IVsSolution solutionService;
 
+        public OptionsPage Options { get; private set; }
+
+        private WritableSettingsStore settingsStore;
+
+        private const int intFalse = 0;
+        private const int intTrue = 1;
+
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
@@ -73,10 +85,26 @@ namespace Konamiman.SuperBookmarks
             solutionService = (IVsSolution) GetService(typeof(SVsSolution));
             solutionService.AdviseSolutionEvents(this, out var cookie);
 
-            SetBookmarkCommand.Initialize(this);
+            var settingsManager = new ShellSettingsManager(this);
+            settingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
+            if(!settingsStore.CollectionExists(SettingsStoreName))
+                settingsStore.CreateCollection(SettingsStoreName);
 
-            //VsShellUtilities.ShowMessageBox(this, "Initialized!", "eeeh", OLEMSGICON.OLEMSGICON_INFO,
-            //    OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            Options = (OptionsPage)GetDialogPage(typeof(OptionsPage));
+            Options.DeletingALineDeletesTheBookmark =
+                settingsStore.GetInt32(SettingsStoreName, "DeletingALineDeletesTheBookmark", intTrue) == intTrue;
+            Options.OptionsChanged += OnOptionsChanged;
+
+            BookmarksManager.InitializeAfterPackageInitialization();
+
+            SetBookmarkCommand.Initialize(this);
+        }
+
+        private void OnOptionsChanged(object sender, EventArgs eventArgs)
+        {
+            settingsStore.SetInt32(SettingsStoreName,
+                "DeletingALineDeletesTheBookmark",
+                Options.DeletingALineDeletesTheBookmark ? intTrue : intFalse);
         }
 
         public static SuperBookmarksPackage Instance { get; private set; }
