@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
 using Microsoft.Internal.VisualStudio.Shell;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -42,11 +40,8 @@ namespace Konamiman.SuperBookmarks
                 throw new InvalidOperationException("SuperBookmarks: ReadUserOptions was called for unknown key " + pszKey);
 
             var stream = new DataStreamFromComStream(pOptionsStream);
-            if (stream.Length > 0)
-            {
-                var info = PersistableBookmarksInfo.DeserializeFrom(stream);
-                this.BookmarksManager.RecreateBookmarksFromPersistableInfo(info);
-            }
+            var info = PersistableBookmarksInfo.DeserializeFrom(stream);
+            this.BookmarksManager.RecreateBookmarksFromPersistableInfo(info);
 
             return VSConstants.S_OK;
         }

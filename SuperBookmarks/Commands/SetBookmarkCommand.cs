@@ -1,16 +1,8 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Design;
-using System.Globalization;
-using EnvDTE;
-using EnvDTE80;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Tagging;
-using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace Konamiman.SuperBookmarks
 {

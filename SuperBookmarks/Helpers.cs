@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.Editor;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -55,9 +50,14 @@ namespace Konamiman.SuperBookmarks
             var snapshot = buffer.CurrentSnapshot;
             var line = snapshot.GetLineFromLineNumber(lineNumber - 1);
             var span = snapshot.CreateTrackingSpan(new SnapshotSpan(line.Start, 0), SpanTrackingMode.EdgeExclusive);
-            var tagger = buffer.Properties.GetOrCreateSingletonProperty(() => new SimpleTagger<BookmarkTag>(buffer));
+            var tagger = GetTaggerFor(buffer);
             var trackingSpan = tagger.CreateTagSpan(span, new BookmarkTag());
             return trackingSpan;
+        }
+        
+        public static SimpleTagger<BookmarkTag> GetTaggerFor(ITextBuffer buffer)
+        {
+            return buffer.Properties.GetOrCreateSingletonProperty("tagger", () => new SimpleTagger<BookmarkTag>(buffer));
         }
     }
 }

@@ -1,16 +1,8 @@
-﻿using System;
-using System.ComponentModel.Design;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.OLE.Interop;
-using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Shell.Settings;
-using Microsoft.Win32;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -67,12 +59,7 @@ namespace Konamiman.SuperBookmarks
 
         private IVsSolution solutionService;
 
-        public OptionsPage Options { get; private set; }
 
-        private WritableSettingsStore settingsStore;
-
-        private const int intFalse = 0;
-        private const int intTrue = 1;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -85,26 +72,11 @@ namespace Konamiman.SuperBookmarks
             solutionService = (IVsSolution) GetService(typeof(SVsSolution));
             solutionService.AdviseSolutionEvents(this, out var cookie);
 
-            var settingsManager = new ShellSettingsManager(this);
-            settingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
-            if(!settingsStore.CollectionExists(SettingsStoreName))
-                settingsStore.CreateCollection(SettingsStoreName);
-
-            Options = (OptionsPage)GetDialogPage(typeof(OptionsPage));
-            Options.DeletingALineDeletesTheBookmark =
-                settingsStore.GetInt32(SettingsStoreName, "DeletingALineDeletesTheBookmark", intTrue) == intTrue;
-            Options.OptionsChanged += OnOptionsChanged;
+            InitializeOptionsStorage();
 
             BookmarksManager.InitializeAfterPackageInitialization();
 
             SetBookmarkCommand.Initialize(this);
-        }
-
-        private void OnOptionsChanged(object sender, EventArgs eventArgs)
-        {
-            settingsStore.SetInt32(SettingsStoreName,
-                "DeletingALineDeletesTheBookmark",
-                Options.DeletingALineDeletesTheBookmark ? intTrue : intFalse);
         }
 
         public static SuperBookmarksPackage Instance { get; private set; }

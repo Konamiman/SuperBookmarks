@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Microsoft.VisualStudio;
+﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Konamiman.SuperBookmarks

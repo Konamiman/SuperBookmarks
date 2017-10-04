@@ -1,46 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Microsoft.Internal.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Tagging;
 
 namespace Konamiman.SuperBookmarks
 {
-    class BookmarksManager
+    partial class BookmarksManager
     {
-        class Bookmark
-        {
-            public TrackingTagSpan<BookmarkTag> TrackingSpan { get; private set; }
-
-            public Bookmark(TrackingTagSpan<BookmarkTag> trackingSpan)
-            {
-                this.TrackingSpan = trackingSpan;
-            }
-
-            public void UpdateSpan(TrackingTagSpan<BookmarkTag> span)
-            {
-                this.TrackingSpan = span;
-            }
-
-            public int GetRow(ITextBuffer buffer)
-            {
-                return TrackingSpan.Span
-                  .GetStartPoint(buffer.CurrentSnapshot)
-                  .GetContainingLine()
-                  .LineNumber + 1;
-            }
-        }
-
         private readonly IServiceProvider serviceProvider;
-
-        public BookmarksManager(IServiceProvider serviceProvider)
-        {
-            this.serviceProvider = serviceProvider;
-        }
+        private bool deletingALineDeletesTheBookmark;
 
         public string SolutionPath { get; set; }
 
@@ -50,14 +19,36 @@ namespace Konamiman.SuperBookmarks
         private readonly Dictionary<ITextView, List<Bookmark>> bookmarksByView =
             new Dictionary<ITextView, List<Bookmark>>();
 
-        //key is filename, value is line number
+        //Files whose bookmarks have been retrieved from storage
+        //but have not been yet open since the solution was loaded.
+        //Key is filename, value is line number.
         private readonly Dictionary<string, int[]> bookmarksPendingCreation =
             new Dictionary<string, int[]>();
 
+        public BookmarksManager(IServiceProvider serviceProvider)
+        {
+            this.serviceProvider = serviceProvider;
+        }
+
+        internal void InitializeAfterPackageInitialization()
+        {
+            var options = SuperBookmarksPackage.Instance.Options;
+            deletingALineDeletesTheBookmark = options.DeletingALineDeletesTheBookmark;
+
+            options.DeletingALineDeletesTheBookmarkChanged += (sender, args) =>
+            {
+                deletingALineDeletesTheBookmark = ((OptionsPage)sender).DeletingALineDeletesTheBookmark;
+            };
+        }
+
         public void RegisterTextView(string fileName, ITextView newView)
         {
+            Helpers.GetTaggerFor(newView.TextBuffer); //ensure tagger exists
+
             if (bookmarksPendingCreation.ContainsKey(fileName))
             {
+                //First time that a file having saved bookmarks is open
+
                 var buffer = newView.TextBuffer;
                 var bookmarks = new List<Bookmark>();
                 foreach (var lineNumber in bookmarksPendingCreation[fileName])
@@ -72,22 +63,28 @@ namespace Konamiman.SuperBookmarks
             }
             else if (viewsByFilename.ContainsKey(fileName))
             {
-                //Recreate the existing bookmarks in the new view
+                //File with bookmarks was closed and reopen, 
+                //recreate the existing bookmarks in the new view
+
                 var oldView = viewsByFilename[fileName];
                 var bookmarks = bookmarksByView[oldView];
                 var currentBuffer = newView.TextBuffer;
+
                 foreach (var bookmark in bookmarks)
                 {
                     var lineNumber = bookmark.GetRow(oldView.TextBuffer);
                     var trackingSpan = Helpers.CreateTagSpan(currentBuffer, lineNumber);
                     bookmark.UpdateSpan(trackingSpan);
                 }
+
                 viewsByFilename[fileName] = newView;
                 bookmarksByView.Remove(oldView);
                 bookmarksByView[newView] = bookmarks;
             }
             else
             {
+                //File had no previous bookmarks
+
                 viewsByFilename[fileName] = newView;
                 bookmarksByView[newView] = new List<Bookmark>();
             }
@@ -107,9 +104,7 @@ namespace Konamiman.SuperBookmarks
                     line.Start.Position >= change.OldPosition &&
                     line.EndIncludingLineBreak.Position <= change.OldEnd) ||
                 
-                //When a blank line is deleted, the change actually reports
-                //that the line break *of the previous line* was deleted.
-                //This must be handled as a special case.
+                //This is needed for handling the deletion of blank lines
 
                 (change.OldText == "\r\n" && change.NewText == "" &&
                     change.OldEnd == line.EndIncludingLineBreak.Position);
@@ -136,25 +131,12 @@ namespace Konamiman.SuperBookmarks
                     var matchingBookmark = bookmarks.SingleOrDefault(b => b.GetRow(buffer) == deletedLineNumber);
                     if (matchingBookmark != null)
                     {
-                        var tagger = buffer.Properties.GetOrCreateSingletonProperty(() => new SimpleTagger<BookmarkTag>(buffer));
+                        var tagger = Helpers.GetTaggerFor(buffer);
                         tagger.RemoveTagSpan(matchingBookmark.TrackingSpan);
                         bookmarksByView[view].Remove(matchingBookmark);
                     }
                 }
             }            
-        }
-
-        private bool deletingALineDeletesTheBookmark;
-
-        internal void InitializeAfterPackageInitialization()
-        {
-            var options = SuperBookmarksPackage.Instance.Options;
-            deletingALineDeletesTheBookmark = options.DeletingALineDeletesTheBookmark;
-
-            options.DeletingALineDeletesTheBookmarkChanged += (sender, args) =>
-            {
-                deletingALineDeletesTheBookmark = ((OptionsPage) sender).DeletingALineDeletesTheBookmark;
-            };
         }
 
         public void SetOrRemoveBookmarkInCurrentDocument()
@@ -167,14 +149,16 @@ namespace Konamiman.SuperBookmarks
             if (existingBookmark == null)
             {
                 //Create new bookmark
+
                 var trackingSpan = Helpers.CreateTagSpan(currentBuffer, lineNumber);
                 bookmarksByView[currentView].Add(new Bookmark(trackingSpan));
             }
             else
             {
-                //Remove existing bookmark
-                var tagger = currentBuffer.Properties.GetOrCreateSingletonProperty(() => new SimpleTagger<BookmarkTag>(currentBuffer));
-                tagger.RemoveTagSpan(existingBookmark.TrackingSpan); // s => s.Span == existingBookmark.TrackingSpan.Span);
+                //Line had bookmark, remove it
+
+                var tagger = Helpers.GetTaggerFor(currentBuffer);
+                tagger.RemoveTagSpan(existingBookmark.TrackingSpan);
                 bookmarksByView[currentView].Remove(existingBookmark);
             }
         }
@@ -186,7 +170,7 @@ namespace Konamiman.SuperBookmarks
                 var view = viewsByFilename[fileName];
                 foreach (var bookmark in bookmarksByView[view])
                 {
-                    var tagger = view.TextBuffer.Properties.GetOrCreateSingletonProperty(() => new SimpleTagger<BookmarkTag>(view.TextBuffer));
+                    var tagger = Helpers.GetTaggerFor(view.TextBuffer);
                     tagger.RemoveTagSpan(bookmark.TrackingSpan);
                 }
             }
@@ -197,47 +181,5 @@ namespace Konamiman.SuperBookmarks
 
         public bool HasBookmarks =>
             bookmarksByView.SelectMany(b => b.Value).Any();
-
-        public PersistableBookmarksInfo GetPersistableInfo()
-        {
-            string RelativePath(string fullPath) =>
-                fullPath.Substring(SolutionPath.Length);
-
-            var info = new PersistableBookmarksInfo();
-            foreach (var fileName in viewsByFilename.Keys)
-            {
-                var view = viewsByFilename[fileName];
-                if (bookmarksByView[view].Count == 0) continue;
-                var persistableBookmarks = new List<PersistableBookmarksInfo.Bookmark>();
-                foreach (var bookmark in bookmarksByView[view])
-                {
-                    persistableBookmarks.Add(new PersistableBookmarksInfo.Bookmark
-                    {
-                        LineNumber = bookmark.GetRow(view.TextBuffer)
-                    });
-                }
-                info.BookmarksByFilename[RelativePath(fileName)] = persistableBookmarks.ToArray();
-            }
-            foreach (var filename in bookmarksPendingCreation.Keys)
-            {
-                var persistableBookmarks = 
-                    bookmarksPendingCreation[filename]
-                    .Select(l => new PersistableBookmarksInfo.Bookmark {LineNumber = l});
-                info.BookmarksByFilename[RelativePath(filename)] = persistableBookmarks.ToArray();
-            }
-            return info;
-        }
-
-        public void RecreateBookmarksFromPersistableInfo(PersistableBookmarksInfo info)
-        {
-            ClearAllBookmarks();
-            bookmarksPendingCreation.Clear();
-
-            foreach (var fileName in info.BookmarksByFilename.Keys)
-            {
-                var lineNumbers = info.BookmarksByFilename[fileName].Select(b => b.LineNumber).ToArray();
-                bookmarksPendingCreation[Path.Combine(SolutionPath, fileName)] = lineNumbers;
-            }
-        }
     }
 }
