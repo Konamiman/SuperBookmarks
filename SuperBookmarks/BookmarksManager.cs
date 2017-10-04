@@ -42,6 +42,8 @@ namespace Konamiman.SuperBookmarks
             this.serviceProvider = serviceProvider;
         }
 
+        public string SolutionPath { get; set; }
+
         private readonly Dictionary<string, ITextView> viewsByFilename =
             new Dictionary<string, ITextView>();
 
@@ -182,6 +184,9 @@ namespace Konamiman.SuperBookmarks
 
         public PersistableBookmarksInfo GetPersistableInfo()
         {
+            string RelativePath(string fullPath) =>
+                fullPath.Substring(SolutionPath.Length);
+
             var info = new PersistableBookmarksInfo();
             foreach (var fileName in viewsByFilename.Keys)
             {
@@ -195,14 +200,14 @@ namespace Konamiman.SuperBookmarks
                         LineNumber = bookmark.GetRow(view.TextBuffer)
                     });
                 }
-                info.BookmarksByFilename[fileName] = persistableBookmarks.ToArray();
+                info.BookmarksByFilename[RelativePath(fileName)] = persistableBookmarks.ToArray();
             }
             foreach (var filename in bookmarksPendingCreation.Keys)
             {
                 var persistableBookmarks = 
                     bookmarksPendingCreation[filename]
                     .Select(l => new PersistableBookmarksInfo.Bookmark {LineNumber = l});
-                info.BookmarksByFilename[filename] = persistableBookmarks.ToArray();
+                info.BookmarksByFilename[RelativePath(filename)] = persistableBookmarks.ToArray();
             }
             return info;
         }
@@ -215,7 +220,7 @@ namespace Konamiman.SuperBookmarks
             foreach (var fileName in info.BookmarksByFilename.Keys)
             {
                 var lineNumbers = info.BookmarksByFilename[fileName].Select(b => b.LineNumber).ToArray();
-                bookmarksPendingCreation[fileName] = lineNumbers;
+                bookmarksPendingCreation[Path.Combine(SolutionPath, fileName)] = lineNumbers;
             }
         }
     }

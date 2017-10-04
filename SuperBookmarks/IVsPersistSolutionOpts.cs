@@ -19,6 +19,8 @@ namespace Konamiman.SuperBookmarks
 
         public int LoadUserOptions(IVsSolutionPersistence pPersistence, uint grfLoadOpts)
         {
+            solutionService.GetSolutionInfo(out string solutionPath, out string solutionFilePath, out string suoPath);
+            this.BookmarksManager.SolutionPath = solutionPath;
             return pPersistence.LoadPackageUserOpts(this, persistenceKey);
         }
 
