@@ -48,6 +48,12 @@ namespace Konamiman.SuperBookmarks
         public static TrackingTagSpan<BookmarkTag> CreateTagSpan(ITextBuffer buffer, int lineNumber)
         {
             var snapshot = buffer.CurrentSnapshot;
+
+            //This can happen if the file is edited outside Visual Studio
+            //while the solution is closed
+            if (lineNumber > snapshot.LineCount)
+                return null;
+
             var line = snapshot.GetLineFromLineNumber(lineNumber - 1);
             var span = snapshot.CreateTrackingSpan(new SnapshotSpan(line.Start, 0), SpanTrackingMode.EdgeExclusive);
             var tagger = GetTaggerFor(buffer);

@@ -32,7 +32,8 @@ namespace Konamiman.SuperBookmarks
     [ProvideOptionPage(typeof(OptionsPage), "SuperBookmarks", "General", 0, 0, true)]
     public sealed partial class SuperBookmarksPackage : Package,
         IVsPersistSolutionOpts,
-        IVsSolutionEvents
+        IVsSolutionEvents,
+        IVsTrackProjectDocumentsEvents2
     {
         /// <summary>
         /// SuperBookmarksPackage GUID string.
@@ -71,6 +72,9 @@ namespace Konamiman.SuperBookmarks
 
             solutionService = (IVsSolution) GetService(typeof(SVsSolution));
             solutionService.AdviseSolutionEvents(this, out var cookie);
+
+            var tpdService = (IVsTrackProjectDocuments2)GetService(typeof(SVsTrackProjectDocuments));
+            tpdService.AdviseTrackProjectDocumentsEvents(this, out var pdwCookie);
 
             InitializeOptionsStorage();
 

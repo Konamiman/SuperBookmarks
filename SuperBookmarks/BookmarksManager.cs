@@ -54,7 +54,8 @@ namespace Konamiman.SuperBookmarks
                 foreach (var lineNumber in bookmarksPendingCreation[fileName])
                 {
                     var trackingSpan = Helpers.CreateTagSpan(buffer, lineNumber);
-                    bookmarks.Add(new Bookmark(trackingSpan));
+                    if(trackingSpan != null)
+                        bookmarks.Add(new Bookmark(trackingSpan));
                 }
 
                 viewsByFilename[fileName] = newView;
@@ -74,7 +75,10 @@ namespace Konamiman.SuperBookmarks
                 {
                     var lineNumber = bookmark.GetRow(oldView.TextBuffer);
                     var trackingSpan = Helpers.CreateTagSpan(currentBuffer, lineNumber);
-                    bookmark.UpdateSpan(trackingSpan);
+                    if (trackingSpan == null)
+                        bookmarksByView[oldView].Remove(bookmark);
+                    else
+                        bookmark.UpdateSpan(trackingSpan);
                 }
 
                 viewsByFilename[fileName] = newView;
@@ -163,7 +167,8 @@ namespace Konamiman.SuperBookmarks
                 //Create new bookmark
 
                 var trackingSpan = Helpers.CreateTagSpan(currentBuffer, lineNumber);
-                bookmarksByView[currentView].Add(new Bookmark(trackingSpan));
+                if(trackingSpan != null)
+                    bookmarksByView[currentView].Add(new Bookmark(trackingSpan));
             }
             else
             {
@@ -193,5 +198,30 @@ namespace Konamiman.SuperBookmarks
 
         public bool HasBookmarks =>
             bookmarksByView.SelectMany(b => b.Value).Any();
+
+        public void OnFileDeleted(string filePath)
+        {
+            bookmarksPendingCreation.Remove(filePath);
+            if (viewsByFilename.ContainsKey(filePath))
+            {
+                bookmarksByView.Remove(viewsByFilename[filePath]);
+                viewsByFilename.Remove(filePath);
+            }
+        }
+
+        public void OnFileRenamed(string oldPath, string newPath)
+        {
+            if (viewsByFilename.ContainsKey(oldPath))
+            {
+                viewsByFilename[newPath] = viewsByFilename[oldPath];
+                viewsByFilename.Remove(oldPath);
+            }
+
+            if (bookmarksPendingCreation.ContainsKey(oldPath))
+            {
+                bookmarksPendingCreation[newPath] = bookmarksPendingCreation[oldPath];
+                bookmarksPendingCreation.Remove(newPath);
+            }
+        }
     }
 }

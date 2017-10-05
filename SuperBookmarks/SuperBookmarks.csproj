@@ -62,6 +62,9 @@
     <Compile Include="IVsSolutionEvents.cs">
       <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
     </Compile>
+    <Compile Include="IVsTrackProjectDocumentsEvents2.cs">
+      <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
+    </Compile>
     <Compile Include="OptionsStorage.cs">
       <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
     </Compile>
