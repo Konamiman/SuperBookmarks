@@ -111,9 +111,6 @@ namespace Konamiman.SuperBookmarks
 
         private void TextBufferChanged(object sender, TextContentChangedEventArgs eventArgs)
         {
-            if (!deletingALineDeletesTheBookmark)
-                return;
-
             bool LineIsEntirelyContainedInChange(ITextSnapshotLine line, ITextChange change)
             {
                 return (
@@ -132,11 +129,28 @@ namespace Konamiman.SuperBookmarks
             var lineDeletionChanges = eventArgs.Changes.Where(ch => ch.LineCountDelta < 0).ToArray();
             if (lineDeletionChanges.Length == 0)
                 return;
-
-            var lines = eventArgs.Before.Lines;
+            
+            var lines = eventArgs.Before.Lines.ToArray();
             var buffer = (ITextBuffer) sender;
             var view = buffer.Properties["key"] as ITextView;
             var bookmarks = bookmarksByView[view];
+
+            if (!deletingALineDeletesTheBookmark)
+            {
+                // If "deleting a line deletes the bookmark" is off, we will end up
+                // with duplicate bookmakrs when lines are deleted
+                // (e.g. you have bookmarks in lines 3 and 4, you delete line 3,
+                // now you have two bookmarks for line 3).
+                var duplicateBookmarkGroup = bookmarks.GroupBy(b => b.GetRow(buffer)).Where(g => g.Count() > 1);
+                foreach (var group in duplicateBookmarkGroup)
+                {
+                    var bookmarksInGroup = group.ToArray();
+                    for (int i = 1; i < bookmarksInGroup.Length; i++)
+                        bookmarks.Remove(bookmarksInGroup[i]);
+                }
+                return;
+            }
+
             foreach (var change in lineDeletionChanges)
             {
                 var deletedLines = lines.Where(l => LineIsEntirelyContainedInChange(l, change));
@@ -145,12 +159,12 @@ namespace Konamiman.SuperBookmarks
                 foreach (var deletedLineNumber in deletedLineNumbers)
                 {
                     var matchingBookmark = bookmarks.SingleOrDefault(b => b.LineNumberBeforeChanging == deletedLineNumber);
-                    if (matchingBookmark != null)
-                    {
-                        var tagger = Helpers.GetTaggerFor(buffer);
-                        tagger.RemoveTagSpan(matchingBookmark.TrackingSpan);
-                        bookmarksByView[view].Remove(matchingBookmark);
-                    }
+                    if (matchingBookmark == null)
+                        continue;
+
+                    var tagger = Helpers.GetTaggerFor(buffer);
+                    tagger.RemoveTagSpan(matchingBookmark.TrackingSpan);
+                    bookmarksByView[view].Remove(matchingBookmark);
                 }
             }            
         }
@@ -161,8 +175,8 @@ namespace Konamiman.SuperBookmarks
             var currentBuffer = currentView.TextBuffer;
             var lineNumber = currentView.Selection.ActivePoint.Position.GetContainingLine().LineNumber + 1;
 
-            var existingBookmark = bookmarksByView[currentView].SingleOrDefault(b => b.GetRow(currentBuffer) == lineNumber);
-            if (existingBookmark == null)
+            var existingBookmarks = bookmarksByView[currentView].Where(b => b.GetRow(currentBuffer) == lineNumber).ToArray();
+            if (existingBookmarks.Length == 0)
             {
                 //Create new bookmark
 
@@ -172,11 +186,15 @@ namespace Konamiman.SuperBookmarks
             }
             else
             {
-                //Line had bookmark, remove it
+                foreach (var existingBookmark in existingBookmarks)
+                {
+                    //Line had bookmark, remove it
+                    //(we can have multiple entries if "deleting line deletes bookmark" option is off)
 
-                var tagger = Helpers.GetTaggerFor(currentBuffer);
-                tagger.RemoveTagSpan(existingBookmark.TrackingSpan);
-                bookmarksByView[currentView].Remove(existingBookmark);
+                    var tagger = Helpers.GetTaggerFor(currentBuffer);
+                    tagger.RemoveTagSpan(existingBookmark.TrackingSpan);
+                    bookmarksByView[currentView].Remove(existingBookmark);
+                }
             }
         }
 
@@ -195,9 +213,6 @@ namespace Konamiman.SuperBookmarks
             viewsByFilename.Clear();
             bookmarksPendingCreation.Clear();
         }
-
-        public bool HasBookmarks =>
-            bookmarksByView.SelectMany(b => b.Value).Any();
 
         public void OnFileDeleted(string filePath)
         {
