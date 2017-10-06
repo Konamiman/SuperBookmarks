@@ -12,14 +12,21 @@ namespace Konamiman.SuperBookmarks
 
         public int SaveUserOptions(IVsSolutionPersistence pPersistence)
         {
-            return pPersistence.SavePackageUserOpts(this, persistenceKey);
+            return
+                StorageOptions.SaveBookmarksToOwnFile ?
+                VSConstants.S_OK :
+                pPersistence.SavePackageUserOpts(this, persistenceKey);
         }
 
         public int LoadUserOptions(IVsSolutionPersistence pPersistence, uint grfLoadOpts)
         {
             solutionService.GetSolutionInfo(out string solutionPath, out string solutionFilePath, out string suoPath);
             this.BookmarksManager.SolutionPath = solutionPath;
-            return pPersistence.LoadPackageUserOpts(this, persistenceKey);
+
+            return
+                StorageOptions.SaveBookmarksToOwnFile ?
+                VSConstants.S_OK :
+                pPersistence.LoadPackageUserOpts(this, persistenceKey);
         }
 
         public int WriteUserOptions(IStream pOptionsStream, string pszKey)

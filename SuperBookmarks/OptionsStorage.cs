@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Settings;
+﻿using System;
+using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell.Settings;
 
 namespace Konamiman.SuperBookmarks
@@ -6,6 +7,7 @@ namespace Konamiman.SuperBookmarks
     public partial class SuperBookmarksPackage
     {
         public OptionsPage Options { get; private set; }
+        public StorageOptionsPage StorageOptions { get; private set; }
 
         private WritableSettingsStore settingsStore;
 
@@ -22,6 +24,10 @@ namespace Konamiman.SuperBookmarks
             Options = (OptionsPage)GetDialogPage(typeof(OptionsPage));
             SetOptionsFromStorage();
             Options.OptionsChanged += (sender, args) => SaveOptionsToStorage();
+
+            StorageOptions = (StorageOptionsPage) GetDialogPage(typeof(StorageOptionsPage));
+            SetPersistenceOptionsFromStorage();
+            StorageOptions.OptionsChanged += SavePersistenceOptionsToStorage;
         }
 
         private void SetOptionsFromStorage()
@@ -35,6 +41,26 @@ namespace Konamiman.SuperBookmarks
             settingsStore.SetInt32(SettingsStoreName,
                 "DeletingALineDeletesTheBookmark",
                 Options.DeletingALineDeletesTheBookmark ? intTrue : intFalse);
+        }
+
+        private void SetPersistenceOptionsFromStorage()
+        {
+            StorageOptions.SaveBookmarksToOwnFile =
+                settingsStore.GetInt32(SettingsStoreName, "SaveBookmarksToOwnFile", intFalse) == intTrue;
+
+            StorageOptions.AutoIncludeInGitignore =
+                settingsStore.GetInt32(SettingsStoreName, "AutoIncludeInGitignore", intFalse) == intTrue;
+        }
+
+        private void SavePersistenceOptionsToStorage(object sender, EventArgs eventArgs)
+        {
+            settingsStore.SetInt32(SettingsStoreName,
+                "SaveBookmarksToOwnFile",
+                StorageOptions.SaveBookmarksToOwnFile ? intTrue : intFalse);
+
+            settingsStore.SetInt32(SettingsStoreName,
+                "AutoIncludeInGitignore",
+                StorageOptions.AutoIncludeInGitignore ? intTrue : intFalse);
         }
     }
 }

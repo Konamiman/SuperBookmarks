@@ -30,6 +30,7 @@ namespace Konamiman.SuperBookmarks
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)]
     [ProvideOptionPage(typeof(OptionsPage), "SuperBookmarks", "General", 0, 0, true)]
+    [ProvideOptionPage(typeof(StorageOptionsPage), "SuperBookmarks", "Storage", 0, 0, true)]
     public sealed partial class SuperBookmarksPackage : Package,
         IVsPersistSolutionOpts,
         IVsSolutionEvents,
@@ -60,8 +61,12 @@ namespace Konamiman.SuperBookmarks
 
         private IVsSolution solutionService;
 
+        public bool SolutionIsCurrentlyOpen { get; private set; }
+        public string CurrentSolutionPath { get; private set; }
+        public string CurrentSolutionSuoPath { get; private set; }
 
-
+        public bool CurrentSolutionIsInGitRepo { get; private set; }
+        
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.

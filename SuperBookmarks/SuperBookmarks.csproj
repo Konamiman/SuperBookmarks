@@ -77,6 +77,15 @@
     <Compile Include="Options\OptionsControl.Designer.cs">
       <DependentUpon>OptionsControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Options\StorageOptionsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\StorageOptionsControl.Designer.cs">
+      <DependentUpon>StorageOptionsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\StorageOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="PersistableBookmarksInfo.cs">
       <DependentUpon>BookmarksManager.cs</DependentUpon>
     </Compile>
@@ -92,6 +101,11 @@
     <Compile Include="BookmarkGlyphFactory.cs" />
     <Compile Include="BookmarkGlyphFactoryProvider.cs" />
     <Compile Include="BookmarkTaggerProvider.cs" />
+    <Compile Include="VSPackage.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VSPackage.resx</DependentUpon>
+    </Compile>
     <Compile Include="WpfTextViewCreationListener.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -239,9 +253,14 @@
     <EmbeddedResource Include="Options\OptionsControl.resx">
       <DependentUpon>OptionsControl.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Options\StorageOptionsControl.resx">
+      <DependentUpon>StorageOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>VSPackage.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
