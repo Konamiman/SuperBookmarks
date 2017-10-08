@@ -14,12 +14,27 @@ namespace Konamiman.SuperBookmarks
 
         public void Initialize()
         {
+            pnlRequiresRestaring.Visible = false;
+
             chkDeletingLineDeletesBookmark.Checked = Options.DeletingALineDeletesTheBookmark;
+            if (Options.ShowCommandsInTopLevelMenu)
+                rbInTopLevel.Checked = true;
+            else
+                rbInEdit.Checked = true;
+
+            chkDeletingLineDeletesBookmark.CheckedChanged += chkDeletingLineDeletesBookmark_CheckedChanged;
+            rbInTopLevel.CheckedChanged += rbInTopLevelMenu_CheckedChanged;
         }
 
         private void chkDeletingLineDeletesBookmark_CheckedChanged(object sender, EventArgs e)
         {
             Options.DeletingALineDeletesTheBookmark = chkDeletingLineDeletesBookmark.Checked;
+        }
+
+        private void rbInTopLevelMenu_CheckedChanged(object sender, EventArgs e)
+        {
+            Options.ShowCommandsInTopLevelMenu = rbInTopLevel.Checked;
+            pnlRequiresRestaring.Visible = true;
         }
     }
 }

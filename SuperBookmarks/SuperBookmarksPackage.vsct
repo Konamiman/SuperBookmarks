@@ -36,10 +36,47 @@
          group as the part of a menu contained between two lines. The parent of a group
          must be a menu. -->
     <Groups>
-      <Group guid="guidSuperBookmarksPackageCmdSet" id="MyMenuGroup" priority="0x0600">
-        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
+
+      <Group guid="guidGroups" id="ToggleGroup_TopLevel" priority="0x0600">
+        <Parent guid="guidMenus" id="TopLevelMenu" />
+      </Group>
+      <Group guid="guidGroups" id="ToggleGroup_InEdit" priority="0x0600">
+        <Parent guid="guidMenus" id="SubmenuInEditMenu" />
+      </Group>
+      
+      <Group guid="guidGroups" id="OptionsGroup_TopLevel" priority="0x0600">
+        <Parent guid="guidMenus" id="TopLevelMenu" />
+      </Group>
+      <Group guid="guidGroups" id="OptionsGroup_InEdit" priority="0x0600">
+        <Parent guid="guidMenus" id="SubmenuInEditMenu" />
+      </Group>
+
+      <Group guid="guidGroups" id="GroupForSubmenuInEditMenu" priority="9999">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_EDIT" />
       </Group>
     </Groups>
+
+    <Menus>
+      <Menu guid="guidMenus" id="TopLevelMenu" priority="0x700" type="Menu">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
+        <Strings>
+          <ButtonText>SuperBookmarks</ButtonText>
+          <CommandName>SuperBookmarks</CommandName>
+        </Strings>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+      </Menu>
+
+      <Menu guid="guidMenus" id="SubmenuInEditMenu" priority="0x700" type="Menu">
+        <Parent guid="guidGroups" id="GroupForSubmenuInEditMenu" />
+        <Strings>
+          <ButtonText>SuperBookmarks</ButtonText>
+          <CommandName>SuperBookmarks</CommandName>
+        </Strings>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+      </Menu>
+    </Menus>
 
     <!--Buttons section. -->
     <!--This section defines the elements the user can interact with, like a menu command or a button
@@ -52,11 +89,16 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node /> -->
-      <Button guid="guidSuperBookmarksPackageCmdSet" id="SetBookmarkCommandId" priority="0x0100" type="Button">
-        <Parent guid="guidSuperBookmarksPackageCmdSet" id="MyMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
+      <Button guid="guidCmds" id="ToggleBookmarkCommandId" priority="0x0100" type="Button">
+        <Icon guid="guidImages" id="bmpToggle" />
         <Strings>
-          <ButtonText>Invoke SetBookmarkCommand</ButtonText>
+          <ButtonText>Toggle Bookmark</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidCmds" id="ShowOptionsPageCommandId" priority="0x0100" type="Button">
+        <Strings>
+          <ButtonText>Options...</ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -68,7 +110,7 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used
             inside a button definition. An important aspect of this declaration is that the element id
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\SetBookmarkCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough"/>
+      <Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpToggle, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough"/>
     </Bitmaps>
   </Commands>
 
@@ -77,13 +119,26 @@
     <GuidSymbol name="guidSuperBookmarksPackage" value="{b634341b-bb5b-463e-9886-f11c4391941e}" />
 
     <!-- This is the guid used to group the menu commands together -->
-    <GuidSymbol name="guidSuperBookmarksPackageCmdSet" value="{ce119b9b-9a23-444f-80cb-945bd56d9b6e}">
-      <IDSymbol name="MyMenuGroup" value="0x1020" />
-      <IDSymbol name="SetBookmarkCommandId" value="0x0100" />
+    <GuidSymbol name="guidCmds" value="{ce119b9b-9a23-444f-80cb-945bd56d9b6e}">
+      <IDSymbol name="ToggleBookmarkCommandId" value="1" />
+      <IDSymbol name="ShowOptionsPageCommandId" value="100" />
     </GuidSymbol>
 
+    <GuidSymbol name="guidGroups" value="{DFE52B19-633C-4E01-9581-671A8DE3A0B0}">
+      <IDSymbol name="ToggleGroup_TopLevel" value="1" />
+      <IDSymbol name="ToggleGroup_InEdit" value="2" />
+      <IDSymbol name="OptionsGroup_TopLevel" value="3" />
+      <IDSymbol name="OptionsGroup_InEdit" value="4" />
+      <IDSymbol name="GroupForSubmenuInEditMenu" value="100" />
+    </GuidSymbol>
+    
+    <GuidSymbol name="guidMenus" value="{391D1519-100C-4656-AC82-F3DA9998E55B}">
+      <IDSymbol name="TopLevelMenu" value="1"/>
+      <IDSymbol name="SubmenuInEditMenu" value="2"/>
+    </GuidSymbol>
+      
     <GuidSymbol name="guidImages" value="{1c3ed7c8-e761-4067-a59c-bfe3de369896}" >
-      <IDSymbol name="bmpPic1" value="1" />
+      <IDSymbol name="bmpToggle" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
       <IDSymbol name="bmpPicSearch" value="3" />
       <IDSymbol name="bmpPicX" value="4" />
@@ -91,4 +146,20 @@
       <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
   </Symbols>
+
+  <CommandPlacements>
+    <CommandPlacement guid="guidCmds" id="ToggleBookmarkCommandId" priority="1">
+      <Parent guid="guidGroups" id="ToggleGroup_InEdit"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="ToggleBookmarkCommandId" priority="1">
+      <Parent guid="guidGroups" id="ToggleGroup_TopLevel" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidCmds" id="ShowOptionsPageCommandId" priority="2">
+      <Parent guid="guidGroups" id="OptionsGroup_InEdit"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="ShowOptionsPageCommandId" priority="2">
+      <Parent guid="guidGroups" id="OptionsGroup_TopLevel" />
+    </CommandPlacement>
+  </CommandPlacements>
 </CommandTable>

@@ -55,6 +55,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BookmarksManager.cs" />
+    <Compile Include="CommandsInitialization.cs">
+      <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Commands\CommandBase.cs" />
+    <Compile Include="Commands\OpenOptionsCommand.cs" />
+    <Compile Include="Commands\ToggleBookmarkCommand.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="IVsPersistSolutionOpts.cs">
       <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
@@ -96,7 +102,6 @@
     <Compile Include="RuntimeBookmark.cs">
       <DependentUpon>BookmarksManager.cs</DependentUpon>
     </Compile>
-    <Compile Include="Commands\SetBookmarkCommand.cs" />
     <Compile Include="SuperBookmarksPackage.cs" />
     <Compile Include="BookmarkGlyphFactory.cs" />
     <Compile Include="BookmarkGlyphFactoryProvider.cs" />
@@ -111,12 +116,13 @@
   <ItemGroup>
     <None Include="Key.snk" />
     <None Include="packages.config" />
+    <None Include="Resources\CommandIcons.pfi" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\SetBookmarkCommand.png" />
+    <Content Include="Resources\CommandIcons.png" />
     <Content Include="Resources\SuperBookmarksPackage.ico" />
     <VSCTCompile Include="SuperBookmarksPackage.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>

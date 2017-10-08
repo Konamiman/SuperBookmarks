@@ -18,6 +18,7 @@ namespace Konamiman.SuperBookmarks
         private bool deletingALineDeletesTheBookmark = true;
         private bool optionsChanged = false;
         private bool deletingALineDeletesTheBookmarkChanged = false;
+        private bool showCommandsInTopLevelMenu = false;
 
         public OptionsPage()
         {
@@ -35,6 +36,19 @@ namespace Konamiman.SuperBookmarks
             {
                 deletingALineDeletesTheBookmark = value;
                 deletingALineDeletesTheBookmarkChanged = true;
+                optionsChanged = true;
+            }
+        }
+
+        public bool ShowCommandsInTopLevelMenu
+        {
+            get
+            {
+                return showCommandsInTopLevelMenu;
+            }
+            set
+            {
+                showCommandsInTopLevelMenu = value;
                 optionsChanged = true;
             }
         }

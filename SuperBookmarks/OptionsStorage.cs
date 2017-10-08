@@ -34,6 +34,9 @@ namespace Konamiman.SuperBookmarks
         {
             Options.DeletingALineDeletesTheBookmark =
                 settingsStore.GetInt32(SettingsStoreName, "DeletingALineDeletesTheBookmark", intTrue) == intTrue;
+
+            Options.ShowCommandsInTopLevelMenu =
+                settingsStore.GetInt32(SettingsStoreName, "ShowCommandsInTopLevelMenu", intFalse) == intTrue;
         }
 
         private void SaveOptionsToStorage()
@@ -41,6 +44,10 @@ namespace Konamiman.SuperBookmarks
             settingsStore.SetInt32(SettingsStoreName,
                 "DeletingALineDeletesTheBookmark",
                 Options.DeletingALineDeletesTheBookmark ? intTrue : intFalse);
+
+            settingsStore.SetInt32(SettingsStoreName,
+                "ShowCommandsInTopLevelMenu",
+                Options.ShowCommandsInTopLevelMenu ? intTrue : intFalse);
         }
 
         private void SetPersistenceOptionsFromStorage()

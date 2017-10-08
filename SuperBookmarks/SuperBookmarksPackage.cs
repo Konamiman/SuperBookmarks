@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using Konamiman.SuperBookmarks.Commands;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -66,7 +67,7 @@ namespace Konamiman.SuperBookmarks
         public string CurrentSolutionSuoPath { get; private set; }
 
         public bool CurrentSolutionIsInGitRepo { get; private set; }
-        
+
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
@@ -85,7 +86,8 @@ namespace Konamiman.SuperBookmarks
 
             BookmarksManager.InitializeAfterPackageInitialization();
 
-            SetBookmarkCommand.Initialize(this);
+            InitializeMenu();
+            InitializeCommands();
         }
 
         public static SuperBookmarksPackage Instance { get; private set; }
