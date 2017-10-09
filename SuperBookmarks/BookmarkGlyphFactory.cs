@@ -10,6 +10,8 @@ namespace Konamiman.SuperBookmarks
     {
         const double m_glyphSize = 16.0;
 
+        private static PointCollection points = PointCollection.Parse("0,1 12,1 12,14 6,10 0,14");
+
         public UIElement GenerateGlyph(IWpfTextViewLine line, IGlyphTag tag)
         {
             // Ensure we can draw a glyph for this marker.
@@ -18,14 +20,12 @@ namespace Konamiman.SuperBookmarks
                 return null;
             }
 
-            System.Windows.Shapes.Ellipse ellipse = new Ellipse();
-            ellipse.Fill = Brushes.LightBlue;
-            ellipse.StrokeThickness = 2;
-            ellipse.Stroke = Brushes.DarkBlue;
-            ellipse.Height = m_glyphSize;
-            ellipse.Width = m_glyphSize;
-
-            return ellipse;
+            var p = new Polyline();
+            p.Points = points;
+            p.Fill = Brushes.LightBlue;
+            p.StrokeThickness = 0;
+            p.Stroke = Brushes.DarkBlue;
+            return p;
         }
     }
 }
