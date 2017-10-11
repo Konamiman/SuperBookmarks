@@ -20,12 +20,12 @@ namespace Konamiman.SuperBookmarks
                 return null;
             }
 
-            var p = new Polyline();
-            p.Points = points;
-            p.Fill = Brushes.LightBlue;
-            p.StrokeThickness = 0;
-            p.Stroke = Brushes.DarkBlue;
-            return p;
+            var shape = new Polyline();
+            shape.Points = points;
+            shape.Fill = Brushes.LightBlue;
+            shape.StrokeThickness = 0;
+            shape.Stroke = Brushes.DarkBlue;
+            return shape;
         }
     }
 }

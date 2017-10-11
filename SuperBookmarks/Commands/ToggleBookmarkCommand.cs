@@ -6,6 +6,8 @@ namespace Konamiman.SuperBookmarks.Commands
     {
         protected override int CommandId => 1;
 
+        protected override bool RequiresOpenTextDocument => true;
+
         protected override void CommandCallback(OleMenuCommand command)
         {
             BookmarksManager.SetOrRemoveBookmarkInCurrentDocument();

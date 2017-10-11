@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel.Design;
+using Microsoft.VisualStudio.Text;
 
 namespace Konamiman.SuperBookmarks.Commands
 {
@@ -13,6 +14,8 @@ namespace Konamiman.SuperBookmarks.Commands
         protected BookmarksManager BookmarksManager { get; }
 
         protected SuperBookmarksPackage Package { get; }
+
+        protected virtual bool RequiresOpenTextDocument => false;
 
         public CommandBase()
         {
@@ -27,7 +30,26 @@ namespace Konamiman.SuperBookmarks.Commands
 
             var menuCommandID = new CommandID(CommandsGuid, CommandId);
             var menuItem = new OleMenuCommand((sender, eventArgs) => CommandCallback((OleMenuCommand)sender), menuCommandID);
+            menuItem.BeforeQueryStatus += MenuItemOnBeforeQueryStatus;
             commandService.AddCommand(menuItem);
+        }
+
+        private void MenuItemOnBeforeQueryStatus(object sender, EventArgs eventArgs)
+        {
+            var command = (OleMenuCommand) sender;
+
+            if (RequiresOpenTextDocument && (!Package.SolutionIsCurrentlyOpen || !Package.ActiveDocumentIsText))
+            {
+                command.Enabled = false;
+                return;
+            }
+
+            command.Enabled = true;
+            QueryStatusCallback(command);
+        }
+
+        protected virtual void QueryStatusCallback(OleMenuCommand command)
+        {
         }
 
         protected abstract void CommandCallback(OleMenuCommand command);

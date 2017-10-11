@@ -20,6 +20,7 @@ namespace Konamiman.SuperBookmarks
 
             this.BookmarksManager.ClearAllBookmarks();
             SolutionIsCurrentlyOpen = false;
+            ActiveDocumentIsText = false;
 
             return VSConstants.S_OK;
         }

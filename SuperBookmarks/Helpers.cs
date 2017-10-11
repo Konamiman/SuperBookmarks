@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Text;
@@ -7,8 +8,13 @@ using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.TextManager.Interop;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Utilities;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.VisualStudio.Text.Projection;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -25,29 +31,15 @@ namespace Konamiman.SuperBookmarks
             IVsTextManager txtMgr = (IVsTextManager)ServiceProvider.GetService(typeof(SVsTextManager));
             IVsTextView vTextView = null;
             int mustHaveFocus = 1;
-            txtMgr.GetActiveView(mustHaveFocus, null, out vTextView);
+            var x = txtMgr.GetActiveView(mustHaveFocus, null, out vTextView);
             IVsUserData userData = vTextView as IVsUserData;
             if (userData == null)
-            {
-                throw new InvalidOperationException("No text view is currently open");
-            }
+                return null;
 
             Guid guidViewHost = DefGuidList.guidIWpfTextViewHost;
             userData.GetData(ref guidViewHost, out var holder);
             IWpfTextViewHost viewHost = (IWpfTextViewHost)holder;
             return viewHost.TextView;
-        }
-
-        //https://social.msdn.microsoft.com/Forums/en-US/0f6ef03a-df6b-4670-856e-f4a539fbfbe1/how-get-document-name-of-an-iwpftextview?forum=vseditor
-        public static ITextDocument GetTextDocumentFor(ITextBuffer TextBuffer)
-        {
-            ITextDocument textDoc;
-            var rc = TextBuffer.Properties.TryGetProperty<ITextDocument>(
-              typeof(ITextDocument), out textDoc);
-            if (rc == true)
-                return textDoc;
-            else
-                return null;
         }
 
         public static TrackingTagSpan<BookmarkTag> CreateTagSpan(ITextBuffer buffer, int lineNumber)
@@ -163,6 +155,37 @@ namespace Konamiman.SuperBookmarks
                 OLEMSGICON.OLEMSGICON_QUERY,
                 OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST) == YesButton;
+        }
+
+        public static void ShowErrorMessage(string message)
+        {
+            VsShellUtilities.ShowMessageBox(
+                SuperBookmarksPackage.Instance,
+                "Something went wrong. The ugly details:\r\n\r\n" + message,
+                "SuperBookmarks",
+                OLEMSGICON.OLEMSGICON_CRITICAL,
+                OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+        }
+
+        public static bool IsTextDocument(ITextBuffer buffer)
+        {
+            return buffer.ContentType.IsOfType("text");
+        }
+
+        public static ITextBuffer GetRootTextBuffer(ITextBuffer buffer)
+        {
+            if (buffer.ContentType.TypeName == "HTMLXProjection")
+            {
+                var projectionBuffer = buffer as IProjectionBuffer;
+                return projectionBuffer == null
+                    ? buffer
+                    : projectionBuffer.SourceBuffers.FirstOrDefault(b => Helpers.IsTextDocument(b));
+            }
+            else
+            {
+                return Helpers.IsTextDocument(buffer) ? buffer : null;
+            }
         }
     }
 }

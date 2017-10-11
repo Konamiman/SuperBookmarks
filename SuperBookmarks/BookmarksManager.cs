@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Projection;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -43,17 +44,17 @@ namespace Konamiman.SuperBookmarks
 
         public void RegisterTextView(string fileName, ITextView newView)
         {
-            Helpers.GetTaggerFor(newView.TextBuffer); //ensure tagger exists
+            var currentBuffer = Helpers.GetRootTextBuffer(newView.TextBuffer);
+            Helpers.GetTaggerFor(currentBuffer); //ensure tagger exists
 
             if (bookmarksPendingCreation.ContainsKey(fileName))
             {
                 //First time that a file having saved bookmarks is open
 
-                var buffer = newView.TextBuffer;
                 var bookmarks = new List<Bookmark>();
                 foreach (var lineNumber in bookmarksPendingCreation[fileName])
                 {
-                    var trackingSpan = Helpers.CreateTagSpan(buffer, lineNumber);
+                    var trackingSpan = Helpers.CreateTagSpan(currentBuffer, lineNumber);
                     if(trackingSpan != null)
                         bookmarks.Add(new Bookmark(trackingSpan));
                 }
@@ -69,11 +70,10 @@ namespace Konamiman.SuperBookmarks
 
                 var oldView = viewsByFilename[fileName];
                 var bookmarks = bookmarksByView[oldView];
-                var currentBuffer = newView.TextBuffer;
 
                 foreach (var bookmark in bookmarks)
                 {
-                    var lineNumber = bookmark.GetRow(oldView.TextBuffer);
+                    var lineNumber = bookmark.GetRow(Helpers.GetRootTextBuffer(oldView.TextBuffer));
                     var trackingSpan = Helpers.CreateTagSpan(currentBuffer, lineNumber);
                     if (trackingSpan == null)
                         bookmarksByView[oldView].Remove(bookmark);
@@ -93,14 +93,14 @@ namespace Konamiman.SuperBookmarks
                 bookmarksByView[newView] = new List<Bookmark>();
             }
 
-            newView.TextBuffer.Properties.AddProperty("key", newView);
-            newView.TextBuffer.Changed += TextBufferChanged;
-            newView.TextBuffer.Changing += TextBufferOnChanging;
+            currentBuffer.Properties.AddProperty("key", newView);
+            currentBuffer.Changed += TextBufferChanged;
+            currentBuffer.Changing += TextBufferOnChanging;
         }
 
         private void TextBufferOnChanging(object sender, TextContentChangingEventArgs eventArgs)
         {
-            var buffer = eventArgs.Before.TextBuffer;
+            var buffer = Helpers.GetRootTextBuffer(eventArgs.Before.TextBuffer);
             var view = buffer.Properties["key"] as ITextView;
             var bookmarks = bookmarksByView[view];
             foreach (var bookmark in bookmarks)
@@ -172,7 +172,14 @@ namespace Konamiman.SuperBookmarks
         public void SetOrRemoveBookmarkInCurrentDocument()
         {
             var currentView = Helpers.GetTextViewForActiveDocument();
-            var currentBuffer = currentView.TextBuffer;
+            if (currentView == null)
+            {
+                Helpers.ShowErrorMessage("I don't have a TextView registered for the active document.");
+                return;
+            }
+
+            ITextBuffer currentBuffer = Helpers.GetRootTextBuffer(currentView.TextBuffer);
+
             var lineNumber = currentView.Selection.ActivePoint.Position.GetContainingLine().LineNumber + 1;
 
             var existingBookmarks = bookmarksByView[currentView].Where(b => b.GetRow(currentBuffer) == lineNumber).ToArray();
@@ -205,7 +212,7 @@ namespace Konamiman.SuperBookmarks
                 var view = viewsByFilename[fileName];
                 foreach (var bookmark in bookmarksByView[view])
                 {
-                    var tagger = Helpers.GetTaggerFor(view.TextBuffer);
+                    var tagger = Helpers.GetTaggerFor(Helpers.GetRootTextBuffer(view.TextBuffer));
                     tagger.RemoveTagSpan(bookmark.TrackingSpan);
                 }
             }

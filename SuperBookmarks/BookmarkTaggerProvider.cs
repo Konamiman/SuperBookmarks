@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.Utilities;
 namespace Konamiman.SuperBookmarks
 {
     [Export(typeof(ITaggerProvider))]
-    [ContentType("code")]
+    [ContentType("text")]
     [TagType(typeof(BookmarkTag))]
     class BookmarkTaggerProvider : ITaggerProvider
     {

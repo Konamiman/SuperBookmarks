@@ -1,9 +1,17 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using EnvDTE;
 using Konamiman.SuperBookmarks.Commands;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.FindAllReferences;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.TextManager.Interop;
+using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Text.Editor;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -88,6 +96,24 @@ namespace Konamiman.SuperBookmarks
 
             InitializeMenu();
             InitializeCommands();
+
+            var dte = Package.GetGlobalService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+            dte.Events.WindowEvents.WindowActivated += WindowEventsOnWindowActivated;
+        }
+
+        public bool ActiveDocumentIsText { get; private set; } = false;
+
+        public ITextDocumentFactoryService TextDocumentFactoryService { get; set; }
+
+        private void WindowEventsOnWindowActivated(Window gotFocus, Window lostFocus)
+        {
+            //TODO: Find a better way to do this. Currently it's returning false positives when a designer window is open.
+
+            if (gotFocus.Kind != "Document")
+                return; //It's not a document (e.g. a tool window)
+
+            var j = gotFocus.Document.Object("Document") as Document;
+            ActiveDocumentIsText = gotFocus.Document.Object("TextDocument") != null;
         }
 
         public static SuperBookmarksPackage Instance { get; private set; }

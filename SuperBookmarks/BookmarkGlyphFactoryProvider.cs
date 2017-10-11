@@ -8,7 +8,7 @@ namespace Konamiman.SuperBookmarks
     [Export(typeof(IGlyphFactoryProvider))]
     [Name("TodoGlyph")]
     [Order(After = "VsTextMarker")]
-    [ContentType("code")]
+    [ContentType("text")]
     [TagType(typeof(BookmarkTag))]
     internal sealed class BookmarkGlyphFactoryProvider : IGlyphFactoryProvider
     {
