@@ -22,7 +22,7 @@ namespace Konamiman.SuperBookmarks
 
             var shape = new Polyline();
             shape.Points = points;
-            shape.Fill = Brushes.LightBlue;
+            shape.Fill = Brushes.DodgerBlue;
             shape.StrokeThickness = 0;
             shape.Stroke = Brushes.DarkBlue;
             return shape;

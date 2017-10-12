@@ -169,27 +169,58 @@ namespace Konamiman.SuperBookmarks
             }            
         }
 
-        public void SetOrRemoveBookmarkInCurrentDocument()
+        class CurrentDocumentData
+        {
+            public ITextView TextView { get; set; }
+            public ITextBuffer TextBuffer { get; set; }
+            public List<Bookmark> Bookmarks { get; set; }
+            public int CurrentLineNumber { get; set; }
+        }
+
+        CurrentDocumentData GetViewAndBookmarksForCurrentDocument()
         {
             var currentView = Helpers.GetTextViewForActiveDocument();
             if (currentView == null)
             {
-                Helpers.ShowErrorMessage("I don't have a TextView registered for the active document.");
-                return;
+                Helpers.ShowErrorMessage("I couldn't get a text view for the active document.");
+                return null;
             }
 
             ITextBuffer currentBuffer = Helpers.GetRootTextBuffer(currentView.TextBuffer);
 
+            if (!bookmarksByView.ContainsKey(currentView))
+            {
+                Helpers.ShowErrorMessage("I don't have a TextView registered for the active document.");
+                return null;
+            }
+
             var lineNumber = currentView.Selection.ActivePoint.Position.GetContainingLine().LineNumber + 1;
 
-            var existingBookmarks = bookmarksByView[currentView].Where(b => b.GetRow(currentBuffer) == lineNumber).ToArray();
+            return new CurrentDocumentData
+            {
+                TextView = currentView,
+                TextBuffer = currentBuffer,
+                Bookmarks = bookmarksByView[currentView],
+                CurrentLineNumber = lineNumber
+            };
+        }
+
+        public void SetOrRemoveBookmarkInCurrentDocument()
+        {
+            var docData = GetViewAndBookmarksForCurrentDocument();
+            if (docData == null)
+                return;
+
+            var lineNumber = docData.TextView.Selection.ActivePoint.Position.GetContainingLine().LineNumber + 1;
+
+            var existingBookmarks = docData.Bookmarks.Where(b => b.GetRow(docData.TextBuffer) == lineNumber).ToArray();
             if (existingBookmarks.Length == 0)
             {
                 //Create new bookmark
 
-                var trackingSpan = Helpers.CreateTagSpan(currentBuffer, lineNumber);
+                var trackingSpan = Helpers.CreateTagSpan(docData.TextBuffer, lineNumber);
                 if(trackingSpan != null)
-                    bookmarksByView[currentView].Add(new Bookmark(trackingSpan));
+                    docData.Bookmarks.Add(new Bookmark(trackingSpan));
             }
             else
             {
@@ -198,9 +229,9 @@ namespace Konamiman.SuperBookmarks
                     //Line had bookmark, remove it
                     //(we can have multiple entries if "deleting line deletes bookmark" option is off)
 
-                    var tagger = Helpers.GetTaggerFor(currentBuffer);
+                    var tagger = Helpers.GetTaggerFor(docData.TextBuffer);
                     tagger.RemoveTagSpan(existingBookmark.TrackingSpan);
-                    bookmarksByView[currentView].Remove(existingBookmark);
+                    docData.Bookmarks.Remove(existingBookmark);
                 }
             }
         }

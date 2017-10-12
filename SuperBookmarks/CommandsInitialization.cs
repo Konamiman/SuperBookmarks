@@ -38,6 +38,8 @@ namespace Konamiman.SuperBookmarks
             Commands = new CommandBase[]
             {
                 new ToggleBookmarkCommand(),
+                new GoToPrevInDocCommand(),
+                new GoToNextInDocCommand(),
                 new OpenOptionsCommand()
             };
         }
