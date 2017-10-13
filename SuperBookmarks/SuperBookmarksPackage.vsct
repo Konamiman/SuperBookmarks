@@ -95,11 +95,26 @@
       </Button>
 
       <Button guid="guidCmds" id="NavigateToNextInCurrentDocCommandId" priority="0x0100" type="Button">
-        <!--<Icon guid="guidImages" id="bmpNextInDoc" />-->
         <Icon guid="guidImages" id="bmpNextInDoc" />
         <Strings>
           <ButtonText>Next Bookmark in Document</ButtonText>
           <LocCanonicalName>SuperBookmarks.GoToNextInDocument</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidCmds" id="NavigateToPrevInOpenDocsCommandId" priority="0x0100" type="Button">
+        <Icon guid="guidImages" id="bmpPrevInOpen" />
+        <Strings>
+          <ButtonText>Previous Bookmark in Open Documents</ButtonText>
+          <LocCanonicalName>SuperBookmarks.GoToPreviousInOpenDocuments</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidCmds" id="NavigateToNextInOpenDocsCommandId" priority="0x0100" type="Button">
+        <Icon guid="guidImages" id="bmpNextInOpen" />
+        <Strings>
+          <ButtonText>Next Bookmark in Open Documents</ButtonText>
+          <LocCanonicalName>SuperBookmarks.GoToNextInOpenDocuments</LocCanonicalName>
         </Strings>
       </Button>
 
@@ -111,7 +126,7 @@
     </Buttons>
 
     <Bitmaps>
-      <Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpToggle, bmpPrevInDoc, bmpNextInDoc, bmpPicX, bmpPicArrows, bmpPicStrikethrough"/>
+      <Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpToggle, bmpPrevInDoc, bmpNextInDoc, bmpPrevInOpen, bmpNextInOpen, bmpPicStrikethrough"/>
     </Bitmaps>
   </Commands>
 
@@ -123,6 +138,8 @@
       <IDSymbol name="ToggleBookmarkCommandId" value="1" />
       <IDSymbol name="NavigateToPrevInCurrentDocCommandId" value="2" />
       <IDSymbol name="NavigateToNextInCurrentDocCommandId" value="3" />
+      <IDSymbol name="NavigateToPrevInOpenDocsCommandId" value="4" />
+      <IDSymbol name="NavigateToNextInOpenDocsCommandId" value="5" />
       <IDSymbol name="ShowOptionsPageCommandId" value="100" />
     </GuidSymbol>
 
@@ -154,8 +171,8 @@
       <IDSymbol name="bmpToggle" value="1" />
       <IDSymbol name="bmpPrevInDoc" value="2" />
       <IDSymbol name="bmpNextInDoc" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
+      <IDSymbol name="bmpPrevInOpen" value="4" />
+      <IDSymbol name="bmpNextInOpen" value="5" />
       <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
   </Symbols>
@@ -192,6 +209,26 @@
       <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
     </CommandPlacement>
     <CommandPlacement guid="guidCmds" id="NavigateToNextInCurrentDocCommandId" priority="3">
+      <Parent guid="guidGroups" id="GroupForToolbar" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidCmds" id="NavigateToPrevInOpenDocsCommandId" priority="4">
+      <Parent guid="guidGroups" id="NavigationGroup_InEdit"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="NavigateToPrevInOpenDocsCommandId" priority="4">
+      <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="NavigateToPrevInOpenDocsCommandId" priority="4">
+      <Parent guid="guidGroups" id="GroupForToolbar" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidCmds" id="NavigateToNextInOpenDocsCommandId" priority="5">
+      <Parent guid="guidGroups" id="NavigationGroup_InEdit"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="NavigateToNextInOpenDocsCommandId" priority="5">
+      <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="NavigateToNextInOpenDocsCommandId" priority="5">
       <Parent guid="guidGroups" id="GroupForToolbar" />
     </CommandPlacement>
 

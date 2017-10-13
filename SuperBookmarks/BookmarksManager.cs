@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Projection;
+using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -11,11 +13,13 @@ namespace Konamiman.SuperBookmarks
     {
         private readonly IServiceProvider serviceProvider;
         private bool deletingALineDeletesTheBookmark;
+        private IVsEditorAdaptersFactoryService editorAdaptersFactoryService;
+        private IVsTextManager textManager;
 
         public string SolutionPath { get; set; }
 
-        private readonly Dictionary<string, ITextView> viewsByFilename =
-            new Dictionary<string, ITextView>();
+        public readonly Dictionary<string, ITextView> viewsByFilename =
+            new Dictionary<string, ITextView>(StringComparer.OrdinalIgnoreCase);
 
         private readonly Dictionary<ITextView, List<Bookmark>> bookmarksByView =
             new Dictionary<ITextView, List<Bookmark>>();
@@ -24,15 +28,20 @@ namespace Konamiman.SuperBookmarks
         //but have not been yet open since the solution was loaded.
         //Key is filename, value is line number.
         private readonly Dictionary<string, int[]> bookmarksPendingCreation =
-            new Dictionary<string, int[]>();
+            new Dictionary<string, int[]>(StringComparer.OrdinalIgnoreCase);
 
         public BookmarksManager(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
 
-        internal void InitializeAfterPackageInitialization()
+        internal void InitializeAfterPackageInitialization(
+            IVsEditorAdaptersFactoryService editorAdaptersFactoryService,
+            IVsTextManager textManager)
         {
+            this.editorAdaptersFactoryService = editorAdaptersFactoryService;
+            this.textManager = textManager;
+
             var options = SuperBookmarksPackage.Instance.Options;
             deletingALineDeletesTheBookmark = options.DeletingALineDeletesTheBookmark;
 

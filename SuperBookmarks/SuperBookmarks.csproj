@@ -75,11 +75,16 @@
     </Compile>
     <Compile Include="Commands\CommandBase.cs" />
     <Compile Include="Commands\GoToNextInDocCommand.cs" />
+    <Compile Include="Commands\GoToNextInOpenDocsCommand.cs" />
+    <Compile Include="Commands\GoToPrevInOpenDocsCommand.cs" />
     <Compile Include="Commands\GoToPrevInDocCommand.cs" />
     <Compile Include="Commands\OpenOptionsCommand.cs" />
     <Compile Include="Commands\ToggleBookmarkCommand.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="IVsPersistSolutionOpts.cs">
+      <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IVsRunningDocTableEvents.cs">
       <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
     </Compile>
     <Compile Include="IVsSolutionEvents.cs">

@@ -17,6 +17,8 @@ namespace Konamiman.SuperBookmarks.Commands
 
         protected virtual bool RequiresOpenTextDocument => false;
 
+        protected virtual bool RequiresOpenDocuments => false;
+
         public CommandBase()
         {
             this.Package = SuperBookmarksPackage.Instance;
@@ -38,7 +40,13 @@ namespace Konamiman.SuperBookmarks.Commands
         {
             var command = (OleMenuCommand) sender;
 
-            if (RequiresOpenTextDocument && (!Package.SolutionIsCurrentlyOpen || !Package.ActiveDocumentIsText))
+            if (RequiresOpenTextDocument && !Package.ActiveDocumentIsText)
+            {
+                command.Enabled = false;
+                return;
+            }
+
+            if (RequiresOpenDocuments && !Package.ThereAreOpenDocuments)
             {
                 command.Enabled = false;
                 return;

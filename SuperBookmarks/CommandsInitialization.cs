@@ -40,6 +40,9 @@ namespace Konamiman.SuperBookmarks
                 new ToggleBookmarkCommand(),
                 new GoToPrevInDocCommand(),
                 new GoToNextInDocCommand(),
+                new GoToPrevInOpenDocsCommand(),
+                new GoToNextInOpenDocsCommand(), 
+
                 new OpenOptionsCommand()
             };
         }

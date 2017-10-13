@@ -19,8 +19,6 @@ namespace Konamiman.SuperBookmarks
 
         public void TextViewCreated(IWpfTextView textView)
         {
-            SuperBookmarksPackage.Instance.TextDocumentFactoryService = documentService;
-
             var buffer = Helpers.GetRootTextBuffer(textView.TextBuffer);
             if (!documentService.TryGetTextDocument(buffer, out ITextDocument textDocument))
                 return;

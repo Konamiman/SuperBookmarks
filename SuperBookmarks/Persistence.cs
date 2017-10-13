@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.VisualStudio.Editor;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -25,7 +27,7 @@ namespace Konamiman.SuperBookmarks
                 usedLineNumbers.Clear();
                 foreach (var bookmark in bookmarksByView[view])
                 {
-                    var lineNumber = bookmark.GetRow(view.TextBuffer);
+                    var lineNumber = bookmark.GetRow(Helpers.GetRootTextBuffer(view.TextBuffer));
                     if (usedLineNumbers.Contains(lineNumber))
                         continue;
 

@@ -6,6 +6,9 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -37,7 +40,8 @@ namespace Konamiman.SuperBookmarks
     public sealed partial class SuperBookmarksPackage : Package,
         IVsPersistSolutionOpts,
         IVsSolutionEvents,
-        IVsTrackProjectDocumentsEvents2
+        IVsTrackProjectDocumentsEvents2,
+        IVsRunningDocTableEvents
     {
         /// <summary>
         /// SuperBookmarksPackage GUID string.
@@ -61,14 +65,20 @@ namespace Konamiman.SuperBookmarks
         }
 
         #region Package Members
+        public static SuperBookmarksPackage Instance { get; private set; }
 
         private IVsSolution solutionService;
 
         public bool SolutionIsCurrentlyOpen { get; private set; }
         public string CurrentSolutionPath { get; private set; }
         public string CurrentSolutionSuoPath { get; private set; }
-
         public bool CurrentSolutionIsInGitRepo { get; private set; }
+        public bool ThereAreOpenDocuments { get; private set; }
+        public bool ActiveDocumentIsText { get; private set; } = false;
+
+        private IVsRunningDocumentTable runningDocumentTable;
+
+        private IVsUIShellOpenDocument shellOpenDocument;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -82,34 +92,26 @@ namespace Konamiman.SuperBookmarks
             solutionService.AdviseSolutionEvents(this, out var cookie);
 
             var tpdService = (IVsTrackProjectDocuments2)GetService(typeof(SVsTrackProjectDocuments));
-            tpdService.AdviseTrackProjectDocumentsEvents(this, out var pdwCookie);
+            tpdService.AdviseTrackProjectDocumentsEvents(this, out var tpdCookie);
 
             InitializeOptionsStorage();
 
-            BookmarksManager.InitializeAfterPackageInitialization();
+            runningDocumentTable = GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+            runningDocumentTable.AdviseRunningDocTableEvents(this, out var rdtCookie);
+
+            shellOpenDocument = GetService(typeof(SVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
 
             InitializeMenu();
             InitializeCommands();
 
-            var dte = GetGlobalService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
-            dte.Events.WindowEvents.WindowActivated += WindowEventsOnWindowActivated;
+            var componentModel = (IComponentModel)GetService(typeof(SComponentModel));
+            var editorAdaptersFactoryService = componentModel.GetService<IVsEditorAdaptersFactoryService>();
+            var textManager = (IVsTextManager) GetService(typeof(SVsTextManager));
+            BookmarksManager.InitializeAfterPackageInitialization(editorAdaptersFactoryService, textManager);
         }
 
-        public bool ActiveDocumentIsText { get; private set; } = false;
 
-        public ITextDocumentFactoryService TextDocumentFactoryService { get; set; }
-
-        private void WindowEventsOnWindowActivated(Window gotFocus, Window lostFocus)
-        {
-            //TODO: Find a better way to do this. Currently it's returning false positives when a designer window is open.
-
-            if (gotFocus.Kind != "Document")
-                return; //It's not a document (e.g. a tool window)
-
-            ActiveDocumentIsText = gotFocus.Document.Object("TextDocument") != null;
-        }
-
-        public static SuperBookmarksPackage Instance { get; private set; }
+        //public ITextDocumentFactoryService TextDocumentFactoryService { get; set; }
 
         internal BookmarksManager BookmarksManager { get; }
 

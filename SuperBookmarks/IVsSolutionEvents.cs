@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.IO;
+using System.Linq;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -11,54 +12,77 @@ namespace Konamiman.SuperBookmarks
 
         public int OnAfterCloseSolution(object pUnkReserved)
         {
-            if (StorageOptions.SaveBookmarksToOwnFile)
-            {
-                var info = this.BookmarksManager.GetPersistableInfo();
-                using(var stream = File.Create(DataFilePath))
-                    info.SerializeTo(stream);
-            }
-
+            SaveBookmarksToDatFile();
             this.BookmarksManager.ClearAllBookmarks();
+            this.BookmarksManager.OnSolutionClosed();
+
             SolutionIsCurrentlyOpen = false;
             ActiveDocumentIsText = false;
+            ThereAreOpenDocuments = false;
+
+            _openTextDocuments = null;
 
             return VSConstants.S_OK;
         }
 
+        private void SaveBookmarksToDatFile()
+        {
+            if (StorageOptions.SaveBookmarksToOwnFile)
+            {
+                var info = this.BookmarksManager.GetPersistableInfo();
+                using (var stream = File.Create(DataFilePath))
+                    info.SerializeTo(stream);
+            }
+        }
+
         public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
+        {
+            InitializeSolutionInfo();
+            LoadBookmarksFromDatFile();
+            AddDatFileToGitignore();
+
+            return VSConstants.S_OK;
+        }
+
+        private void InitializeSolutionInfo()
         {
             solutionService.GetSolutionInfo(out string solutionPath, out string solutionFilePath, out string suoPath);
             CurrentSolutionPath = solutionPath;
             CurrentSolutionSuoPath = suoPath;
             CurrentSolutionIsInGitRepo = Helpers.PathIsInGitRepository(solutionPath);
             SolutionIsCurrentlyOpen = true;
+        }
 
-            if (StorageOptions.SaveBookmarksToOwnFile)
-            {
-                if (!File.Exists(DataFilePath))
-                {
-                    this.BookmarksManager.ClearAllBookmarks();
-                    return VSConstants.S_OK;
-                }
-
-                using (var stream = File.OpenRead(DataFilePath))
-                {
-                    var info = PersistableBookmarksInfo.DeserializeFrom(stream);
-                    this.BookmarksManager.RecreateBookmarksFromPersistableInfo(info);
-                }
-            }
-
-            if (StorageOptions.AutoIncludeInGitignore && Helpers.PathIsInGitRepository(solutionPath))
+        private void AddDatFileToGitignore()
+        {
+            if (StorageOptions.AutoIncludeInGitignore && Helpers.PathIsInGitRepository(CurrentSolutionPath))
             {
                 var gitignorePath = Path.Combine(
-                    Helpers.GetGitRepositoryRoot(solutionPath),
+                    Helpers.GetGitRepositoryRoot(CurrentSolutionPath),
                     ".gitignore");
                 Helpers.AddFileToGitignore(gitignorePath, DataFilePath, createGitignoreFile: false);
             }
-
-            return VSConstants.S_OK;
         }
 
+        private void LoadBookmarksFromDatFile()
+        {
+            if (StorageOptions.SaveBookmarksToOwnFile)
+            {
+                if (File.Exists(DataFilePath))
+                {
+                    using (var stream = File.OpenRead(DataFilePath))
+                    {
+                        var info = PersistableBookmarksInfo.DeserializeFrom(stream);
+                        this.BookmarksManager.RecreateBookmarksFromPersistableInfo(info);
+                    }
+                }
+                else
+                {
+                    this.BookmarksManager.ClearAllBookmarks();
+                }
+            }
+        }
+        
         #region Unused members
 
         public int OnAfterOpenProject(IVsHierarchy pHierarchy, int fAdded)

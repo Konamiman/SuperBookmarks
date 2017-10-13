@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections;
 using System.IO;
-using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.TextManager.Interop;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Utilities;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.Text.Projection;
+using Microsoft.VisualStudio.Editor;
 
 namespace Konamiman.SuperBookmarks
 {
