@@ -67,8 +67,10 @@ namespace Konamiman.SuperBookmarks
             return VSConstants.S_OK;
         }
 
+        public IVsWindowFrame CurrentWindowFrame { get; private set; }
         public int OnBeforeDocumentWindowShow(uint docCookie, int fFirstShow, IVsWindowFrame pFrame)
         {
+            CurrentWindowFrame = pFrame;
             var path = GetPathOfRunningDocument(docCookie);
             var docIsOpenInTextView = DocIsOpenInTextView(path, out var windowFrameForTextView);
 

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Media;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Projection;
@@ -48,6 +51,20 @@ namespace Konamiman.SuperBookmarks
             options.DeletingALineDeletesTheBookmarkChanged += (sender, args) =>
             {
                 deletingALineDeletesTheBookmark = ((OptionsPage)sender).DeletingALineDeletesTheBookmark;
+            };
+
+            options.GlyphColorChanged += (sender, args) =>
+            {
+                BookmarkGlyphFactory.SetGlyphColor(options.GlyphColor);
+
+                //Force redraw of currently visible bookmarks
+                //(there must be a better way to do this...)
+                var frame = SuperBookmarksPackage.Instance.CurrentWindowFrame;
+                if (frame?.IsVisible() == VSConstants.S_OK)
+                {
+                    frame.Hide();
+                    frame.Show();
+                }
             };
         }
 

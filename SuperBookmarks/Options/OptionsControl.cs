@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace Konamiman.SuperBookmarks
@@ -14,6 +15,9 @@ namespace Konamiman.SuperBookmarks
 
         public void Initialize()
         {
+            colorDialog.Color = Options.GlyphColor;
+            pnlChooseColor.BackColor = colorDialog.Color;
+
             pnlRequiresRestaring.Visible = false;
 
             chkDeletingLineDeletesBookmark.Checked = Options.DeletingALineDeletesTheBookmark;
@@ -35,6 +39,33 @@ namespace Konamiman.SuperBookmarks
         {
             Options.ShowCommandsInTopLevelMenu = rbInTopLevel.Checked;
             pnlRequiresRestaring.Visible = true;
+        }
+
+        private void pnlChooseColor_Click(object sender, EventArgs e)
+        {
+            if (colorDialog.ShowDialog() == DialogResult.OK)
+            {
+                SetGlypColor(colorDialog.Color);
+            }
+        }
+
+        private void lblGlyphColor_Click(object sender, EventArgs e)
+        {
+            if (colorDialog.ShowDialog() == DialogResult.OK)
+            {
+                SetGlypColor(colorDialog.Color);
+            }
+        }
+
+        private void btnResetColor_Click(object sender, EventArgs e)
+        {
+            SetGlypColor(BookmarkGlyphFactory.DefaultColor);
+        }
+
+        private void SetGlypColor(Color color)
+        {
+            pnlChooseColor.BackColor = color;
+            Options.GlyphColor = color;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell.Settings;
 
@@ -37,6 +38,11 @@ namespace Konamiman.SuperBookmarks
 
             Options.ShowCommandsInTopLevelMenu =
                 settingsStore.GetInt32(SettingsStoreName, "ShowCommandsInTopLevelMenu", intFalse) == intTrue;
+
+            var glypColorRgb =
+                settingsStore.GetInt32(SettingsStoreName, "GlyphColor", BookmarkGlyphFactory.DefaultColor.ToArgb());
+            Options.GlyphColor = Color.FromArgb(glypColorRgb);
+            BookmarkGlyphFactory.SetGlyphColor(Options.GlyphColor);
         }
 
         private void SaveOptionsToStorage()
@@ -48,6 +54,10 @@ namespace Konamiman.SuperBookmarks
             settingsStore.SetInt32(SettingsStoreName,
                 "ShowCommandsInTopLevelMenu",
                 Options.ShowCommandsInTopLevelMenu ? intTrue : intFalse);
+
+            settingsStore.SetInt32(SettingsStoreName,
+                "GlyphColor",
+                Options.GlyphColor.ToArgb());
         }
 
         private void SetPersistenceOptionsFromStorage()
