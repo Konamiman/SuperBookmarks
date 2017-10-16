@@ -22,6 +22,7 @@ namespace Konamiman.SuperBookmarks
         private bool glyphColorChanged = false;
         private bool showCommandsInTopLevelMenu = false;
         private Color glyphColor;
+        private int[] customColors;
 
         public OptionsPage()
         {
@@ -66,6 +67,19 @@ namespace Konamiman.SuperBookmarks
             {
                 glyphColor = value;
                 glyphColorChanged = true;
+                optionsChanged = true;
+            }
+        }
+
+        public int[] CustomColors
+        {
+            get
+            {
+                return customColors;
+            }
+            set
+            {
+                customColors = value;
                 optionsChanged = true;
             }
         }

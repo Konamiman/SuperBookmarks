@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell.Settings;
 
@@ -43,6 +44,11 @@ namespace Konamiman.SuperBookmarks
                 settingsStore.GetInt32(SettingsStoreName, "GlyphColor", BookmarkGlyphFactory.DefaultColor.ToArgb());
             Options.GlyphColor = Color.FromArgb(glypColorRgb);
             BookmarkGlyphFactory.SetGlyphColor(Options.GlyphColor);
+
+            var customColorsRgbs =
+                settingsStore.GetString(SettingsStoreName, "CustomColors", null);
+            Options.CustomColors =
+                customColorsRgbs?.Split(',').Select(rgb => int.Parse(rgb)).ToArray();
         }
 
         private void SaveOptionsToStorage()
@@ -58,6 +64,13 @@ namespace Konamiman.SuperBookmarks
             settingsStore.SetInt32(SettingsStoreName,
                 "GlyphColor",
                 Options.GlyphColor.ToArgb());
+
+            if (Options.CustomColors != null)
+            {
+                settingsStore.SetString(SettingsStoreName,
+                    "CustomColors",
+                    string.Join(",", Options.CustomColors.Select(rgb => rgb.ToString())));
+            }
         }
 
         private void SetPersistenceOptionsFromStorage()

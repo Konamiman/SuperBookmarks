@@ -18,6 +18,9 @@ namespace Konamiman.SuperBookmarks
             colorDialog.Color = Options.GlyphColor;
             pnlChooseColor.BackColor = colorDialog.Color;
 
+            if (Options.CustomColors != null)
+                colorDialog.CustomColors = Options.CustomColors;
+
             pnlRequiresRestaring.Visible = false;
 
             chkDeletingLineDeletesBookmark.Checked = Options.DeletingALineDeletesTheBookmark;
@@ -43,17 +46,20 @@ namespace Konamiman.SuperBookmarks
 
         private void pnlChooseColor_Click(object sender, EventArgs e)
         {
-            if (colorDialog.ShowDialog() == DialogResult.OK)
-            {
-                SetGlypColor(colorDialog.Color);
-            }
+            OnColorDialogRequested();
         }
 
         private void lblGlyphColor_Click(object sender, EventArgs e)
         {
+            OnColorDialogRequested();
+        }
+
+        private void OnColorDialogRequested()
+        {
             if (colorDialog.ShowDialog() == DialogResult.OK)
             {
                 SetGlypColor(colorDialog.Color);
+                Options.CustomColors = colorDialog.CustomColors;
             }
         }
 
