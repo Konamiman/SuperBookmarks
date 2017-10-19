@@ -48,10 +48,9 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 17);
-            this.label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label1.Location = new System.Drawing.Point(4, 11);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(484, 32);
+            this.label1.Size = new System.Drawing.Size(269, 20);
             this.label1.TabIndex = 0;
             this.label1.Text = "On solution close, save bookmarks in";
             // 
@@ -59,19 +58,17 @@
             // 
             this.panel1.Controls.Add(this.rbInOwnFile);
             this.panel1.Controls.Add(this.rbInSuo);
-            this.panel1.Location = new System.Drawing.Point(14, 54);
-            this.panel1.Margin = new System.Windows.Forms.Padding(5);
+            this.panel1.Location = new System.Drawing.Point(8, 35);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(837, 105);
+            this.panel1.Size = new System.Drawing.Size(471, 68);
             this.panel1.TabIndex = 1;
             // 
             // rbInOwnFile
             // 
             this.rbInOwnFile.AutoSize = true;
-            this.rbInOwnFile.Location = new System.Drawing.Point(7, 53);
-            this.rbInOwnFile.Margin = new System.Windows.Forms.Padding(5);
+            this.rbInOwnFile.Location = new System.Drawing.Point(4, 34);
             this.rbInOwnFile.Name = "rbInOwnFile";
-            this.rbInOwnFile.Size = new System.Drawing.Size(786, 36);
+            this.rbInOwnFile.Size = new System.Drawing.Size(445, 24);
             this.rbInOwnFile.TabIndex = 1;
             this.rbInOwnFile.TabStop = true;
             this.rbInOwnFile.Text = ".SuperBookmarks.dat file in the same folder of the .suo file";
@@ -80,10 +77,9 @@
             // rbInSuo
             // 
             this.rbInSuo.AutoSize = true;
-            this.rbInSuo.Location = new System.Drawing.Point(7, 6);
-            this.rbInSuo.Margin = new System.Windows.Forms.Padding(5);
+            this.rbInSuo.Location = new System.Drawing.Point(4, 4);
             this.rbInSuo.Name = "rbInSuo";
-            this.rbInSuo.Size = new System.Drawing.Size(442, 36);
+            this.rbInSuo.Size = new System.Drawing.Size(251, 24);
             this.rbInSuo.TabIndex = 0;
             this.rbInSuo.TabStop = true;
             this.rbInSuo.Text = "User solution options file (.suo)";
@@ -93,20 +89,18 @@
             // chkAutoIncludeInGitignore
             // 
             this.chkAutoIncludeInGitignore.AutoSize = true;
-            this.chkAutoIncludeInGitignore.Location = new System.Drawing.Point(75, 153);
-            this.chkAutoIncludeInGitignore.Margin = new System.Windows.Forms.Padding(5);
+            this.chkAutoIncludeInGitignore.Location = new System.Drawing.Point(42, 99);
             this.chkAutoIncludeInGitignore.Name = "chkAutoIncludeInGitignore";
-            this.chkAutoIncludeInGitignore.Size = new System.Drawing.Size(814, 36);
-            this.chkAutoIncludeInGitignore.TabIndex = 3;
+            this.chkAutoIncludeInGitignore.Size = new System.Drawing.Size(456, 24);
+            this.chkAutoIncludeInGitignore.TabIndex = 2;
             this.chkAutoIncludeInGitignore.Text = "Include this file in .gitignore when solution loads if necessary";
             this.chkAutoIncludeInGitignore.UseVisualStyleBackColor = true;
             // 
             // btnIncludeInGitignoreNow
             // 
-            this.btnIncludeInGitignoreNow.Location = new System.Drawing.Point(21, 284);
-            this.btnIncludeInGitignoreNow.Margin = new System.Windows.Forms.Padding(5);
+            this.btnIncludeInGitignoreNow.Location = new System.Drawing.Point(12, 183);
             this.btnIncludeInGitignoreNow.Name = "btnIncludeInGitignoreNow";
-            this.btnIncludeInGitignoreNow.Size = new System.Drawing.Size(594, 54);
+            this.btnIncludeInGitignoreNow.Size = new System.Drawing.Size(334, 35);
             this.btnIncludeInGitignoreNow.TabIndex = 4;
             this.btnIncludeInGitignoreNow.Text = "Include file in .gitignore of current solution";
             this.btnIncludeInGitignoreNow.UseVisualStyleBackColor = true;
@@ -114,10 +108,9 @@
             // 
             // btnOpenSuoFolder
             // 
-            this.btnOpenSuoFolder.Location = new System.Drawing.Point(21, 353);
-            this.btnOpenSuoFolder.Margin = new System.Windows.Forms.Padding(5);
+            this.btnOpenSuoFolder.Location = new System.Drawing.Point(12, 228);
             this.btnOpenSuoFolder.Name = "btnOpenSuoFolder";
-            this.btnOpenSuoFolder.Size = new System.Drawing.Size(594, 54);
+            this.btnOpenSuoFolder.Size = new System.Drawing.Size(334, 35);
             this.btnOpenSuoFolder.TabIndex = 5;
             this.btnOpenSuoFolder.Text = "Open folder of .suo file for current solution";
             this.btnOpenSuoFolder.UseVisualStyleBackColor = true;
@@ -126,46 +119,42 @@
             // lblIfGitignoreExists
             // 
             this.lblIfGitignoreExists.AutoSize = true;
-            this.lblIfGitignoreExists.Location = new System.Drawing.Point(117, 192);
-            this.lblIfGitignoreExists.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.lblIfGitignoreExists.Location = new System.Drawing.Point(66, 124);
             this.lblIfGitignoreExists.Name = "lblIfGitignoreExists";
-            this.lblIfGitignoreExists.Size = new System.Drawing.Size(645, 32);
-            this.lblIfGitignoreExists.TabIndex = 6;
+            this.lblIfGitignoreExists.Size = new System.Drawing.Size(355, 20);
+            this.lblIfGitignoreExists.TabIndex = 3;
             this.lblIfGitignoreExists.Text = "(if .gitignore exists and file is not already included)";
             // 
             // pnlInfoMessage
             // 
             this.pnlInfoMessage.Controls.Add(this.lblInfoMessage);
             this.pnlInfoMessage.Controls.Add(this.pictureBox1);
-            this.pnlInfoMessage.Location = new System.Drawing.Point(21, 432);
-            this.pnlInfoMessage.Margin = new System.Windows.Forms.Padding(5);
+            this.pnlInfoMessage.Location = new System.Drawing.Point(12, 279);
             this.pnlInfoMessage.Name = "pnlInfoMessage";
-            this.pnlInfoMessage.Size = new System.Drawing.Size(960, 59);
-            this.pnlInfoMessage.TabIndex = 7;
+            this.pnlInfoMessage.Size = new System.Drawing.Size(540, 38);
+            this.pnlInfoMessage.TabIndex = 6;
             // 
             // lblInfoMessage
             // 
             this.lblInfoMessage.AutoSize = true;
-            this.lblInfoMessage.Location = new System.Drawing.Point(39, 5);
-            this.lblInfoMessage.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.lblInfoMessage.Location = new System.Drawing.Point(22, 3);
             this.lblInfoMessage.Name = "lblInfoMessage";
-            this.lblInfoMessage.Size = new System.Drawing.Size(542, 32);
-            this.lblInfoMessage.TabIndex = 1;
+            this.lblInfoMessage.Size = new System.Drawing.Size(302, 20);
+            this.lblInfoMessage.TabIndex = 0;
             this.lblInfoMessage.Text = "Ooops, you shouldn\'t be able to see this...";
             // 
             // pictureBox1
             // 
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(7, 11);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(5);
+            this.pictureBox1.Location = new System.Drawing.Point(4, 7);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(52, 48);
+            this.pictureBox1.Size = new System.Drawing.Size(29, 31);
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
             // StorageOptionsControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.pnlInfoMessage);
             this.Controls.Add(this.lblIfGitignoreExists);
@@ -174,9 +163,8 @@
             this.Controls.Add(this.chkAutoIncludeInGitignore);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.label1);
-            this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "StorageOptionsControl";
-            this.Size = new System.Drawing.Size(1006, 496);
+            this.Size = new System.Drawing.Size(566, 320);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.pnlInfoMessage.ResumeLayout(false);

@@ -29,13 +29,22 @@ namespace Konamiman.SuperBookmarks
             else
                 rbInEdit.Checked = true;
 
+            chkNavInFolderIncludesSubfolders.Checked = Options.NavigateInFolderIncludesSubfolders;
+
             chkDeletingLineDeletesBookmark.CheckedChanged += chkDeletingLineDeletesBookmark_CheckedChanged;
+            chkNavInFolderIncludesSubfolders.CheckedChanged += ChkNavInFolderIncludesSubfoldersOnCheckedChanged;
             rbInTopLevel.CheckedChanged += rbInTopLevelMenu_CheckedChanged;
         }
+
 
         private void chkDeletingLineDeletesBookmark_CheckedChanged(object sender, EventArgs e)
         {
             Options.DeletingALineDeletesTheBookmark = chkDeletingLineDeletesBookmark.Checked;
+        }
+        
+        private void ChkNavInFolderIncludesSubfoldersOnCheckedChanged(object sender, EventArgs eventArgs)
+        {
+            Options.NavigateInFolderIncludesSubfolders = chkNavInFolderIncludesSubfolders.Checked;
         }
 
         private void rbInTopLevelMenu_CheckedChanged(object sender, EventArgs e)

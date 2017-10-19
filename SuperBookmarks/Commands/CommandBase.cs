@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel.Design;
-using Microsoft.VisualStudio.Text;
 
 namespace Konamiman.SuperBookmarks.Commands
 {
@@ -15,9 +14,11 @@ namespace Konamiman.SuperBookmarks.Commands
 
         protected SuperBookmarksPackage Package { get; }
 
-        protected virtual bool RequiresOpenTextDocument => false;
+        protected virtual bool RequiresActiveTextDocument => false;
 
-        protected virtual bool RequiresOpenDocuments => false;
+        protected virtual bool RequiresOpenDocumentsOfAnyKind => false;
+
+        protected virtual bool RequiresOpenTextDocuments => false;
 
         public CommandBase()
         {
@@ -40,13 +41,19 @@ namespace Konamiman.SuperBookmarks.Commands
         {
             var command = (OleMenuCommand) sender;
 
-            if (RequiresOpenTextDocument && !Package.ActiveDocumentIsText)
+            if (RequiresActiveTextDocument && !Package.ActiveDocumentIsText)
             {
                 command.Enabled = false;
                 return;
             }
 
-            if (RequiresOpenDocuments && !Package.ThereAreOpenDocuments)
+            if (RequiresOpenDocumentsOfAnyKind && !Package.ThereAreOpenDocuments)
+            {
+                command.Enabled = false;
+                return;
+            }
+
+            if (RequiresOpenTextDocuments && !Package.ThereAreOpenTextDocuments)
             {
                 command.Enabled = false;
                 return;

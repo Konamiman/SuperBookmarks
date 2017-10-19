@@ -18,9 +18,11 @@ namespace Konamiman.SuperBookmarks
 
             SolutionIsCurrentlyOpen = false;
             ActiveDocumentIsText = false;
-            ThereAreOpenDocuments = false;
+            ThereAreOpenTextDocuments = false;
 
-            _openTextDocuments = null;
+            openTextDocuments = null;
+            InvalidateCountOfOpenDocuments();
+            Helpers.ClearProperlyCasedPathsCache();
 
             return VSConstants.S_OK;
         }
@@ -47,6 +49,7 @@ namespace Konamiman.SuperBookmarks
         private void InitializeSolutionInfo()
         {
             solutionService.GetSolutionInfo(out string solutionPath, out string solutionFilePath, out string suoPath);
+            this.BookmarksManager.SolutionPath = solutionPath;
             CurrentSolutionPath = solutionPath;
             CurrentSolutionSuoPath = suoPath;
             CurrentSolutionIsInGitRepo = Helpers.PathIsInGitRepository(solutionPath);

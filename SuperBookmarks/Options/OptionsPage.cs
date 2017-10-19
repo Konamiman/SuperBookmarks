@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.VisualStudio.Shell;
 using System.Drawing;
@@ -17,6 +13,8 @@ namespace Konamiman.SuperBookmarks
         OptionsControl control;
 
         private bool deletingALineDeletesTheBookmark = true;
+        private bool navigateInFolderIncludesSubfolders = false;
+        private bool navigateInFolderIncludesSubfoldersChanged = false;
         private bool optionsChanged = false;
         private bool deletingALineDeletesTheBookmarkChanged = false;
         private bool glyphColorChanged = false;
@@ -40,6 +38,20 @@ namespace Konamiman.SuperBookmarks
             {
                 deletingALineDeletesTheBookmark = value;
                 deletingALineDeletesTheBookmarkChanged = true;
+                optionsChanged = true;
+            }
+        }
+        
+        public bool NavigateInFolderIncludesSubfolders
+        {
+            get
+            {
+                return navigateInFolderIncludesSubfolders;
+            }
+            set
+            {
+                navigateInFolderIncludesSubfolders = value;
+                navigateInFolderIncludesSubfoldersChanged = true;
                 optionsChanged = true;
             }
         }
@@ -86,6 +98,7 @@ namespace Konamiman.SuperBookmarks
 
         public event EventHandler DeletingALineDeletesTheBookmarkChanged;
         public event EventHandler GlyphColorChanged;
+        public event EventHandler NavigateInFolderIncludesSubfoldersChanged;
         public event EventHandler OptionsChanged;
 
         protected override void OnApply(PageApplyEventArgs e)
@@ -95,6 +108,9 @@ namespace Konamiman.SuperBookmarks
 
             if(glyphColorChanged)
                 GlyphColorChanged?.Invoke(this, EventArgs.Empty);
+
+            if(navigateInFolderIncludesSubfoldersChanged)
+                NavigateInFolderIncludesSubfoldersChanged?.Invoke(this, EventArgs.Empty);
 
             if(optionsChanged)
                 OptionsChanged?.Invoke(this, EventArgs.Empty);
@@ -120,6 +136,7 @@ namespace Konamiman.SuperBookmarks
         {
             optionsChanged = false;
             deletingALineDeletesTheBookmarkChanged = false;
+            navigateInFolderIncludesSubfoldersChanged = false;
             glyphColorChanged = false;
         }
 

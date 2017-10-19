@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.TextManager.Interop;
+using Microsoft.VisualStudio.OLE.Interop;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -74,6 +75,7 @@ namespace Konamiman.SuperBookmarks
         public string CurrentSolutionSuoPath { get; private set; }
         public bool CurrentSolutionIsInGitRepo { get; private set; }
         public bool ThereAreOpenDocuments { get; private set; }
+        public bool ThereAreOpenTextDocuments { get; private set; }
         public bool ActiveDocumentIsText { get; private set; } = false;
 
         private IVsRunningDocumentTable runningDocumentTable;

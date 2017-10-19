@@ -22,7 +22,7 @@ namespace Konamiman.SuperBookmarks
         public string SolutionPath { get; set; }
 
         public readonly Dictionary<string, ITextView> viewsByFilename =
-            new Dictionary<string, ITextView>(StringComparer.OrdinalIgnoreCase);
+            new Dictionary<string, ITextView>();
 
         private readonly Dictionary<ITextView, List<Bookmark>> bookmarksByView =
             new Dictionary<ITextView, List<Bookmark>>();
@@ -31,7 +31,7 @@ namespace Konamiman.SuperBookmarks
         //but have not been yet open since the solution was loaded.
         //Key is filename, value is line number.
         private readonly Dictionary<string, int[]> bookmarksPendingCreation =
-            new Dictionary<string, int[]>(StringComparer.OrdinalIgnoreCase);
+            new Dictionary<string, int[]>();
 
         public BookmarksManager(IServiceProvider serviceProvider)
         {
@@ -47,10 +47,16 @@ namespace Konamiman.SuperBookmarks
 
             var options = SuperBookmarksPackage.Instance.Options;
             deletingALineDeletesTheBookmark = options.DeletingALineDeletesTheBookmark;
+            folderNavigationIsRecursive = options.NavigateInFolderIncludesSubfolders;
 
             options.DeletingALineDeletesTheBookmarkChanged += (sender, args) =>
             {
                 deletingALineDeletesTheBookmark = ((OptionsPage)sender).DeletingALineDeletesTheBookmark;
+            };
+
+            options.NavigateInFolderIncludesSubfoldersChanged += (sender, args) =>
+            {
+                folderNavigationIsRecursive = ((OptionsPage) sender).NavigateInFolderIncludesSubfolders;
             };
 
             options.GlyphColorChanged += (sender, args) =>
@@ -119,9 +125,16 @@ namespace Konamiman.SuperBookmarks
                 bookmarksByView[newView] = new List<Bookmark>();
             }
 
-            currentBuffer.Properties.AddProperty("key", newView);
-            currentBuffer.Changed += TextBufferChanged;
-            currentBuffer.Changing += TextBufferOnChanging;
+            if (currentBuffer.Properties.ContainsProperty("key"))
+            {
+                currentBuffer.Properties["key"] = newView;
+            }
+            else
+            {
+                currentBuffer.Properties.AddProperty("key", newView);
+                currentBuffer.Changed += TextBufferChanged;
+                currentBuffer.Changing += TextBufferOnChanging;
+            }
         }
 
         private void TextBufferOnChanging(object sender, TextContentChangingEventArgs eventArgs)

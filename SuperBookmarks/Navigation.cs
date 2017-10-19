@@ -4,17 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio;
+using System.IO;
 
 namespace Konamiman.SuperBookmarks
 {
     partial class BookmarksManager
     {
         private Dictionary<string, IVsWindowFrame> openDocumentPathsAndFrames =
-            new Dictionary<string, IVsWindowFrame>(StringComparer.OrdinalIgnoreCase);
-        private string currentDocumentPath = null;
+            new Dictionary<string, IVsWindowFrame>();
+        private string currentDocumentFolder = null;
+        private string currentTextDocumentPath = null;
+        private int currentDocumentFolderLength = 0;
         private IWpfTextView currentDocumentView = null;
+        private bool folderNavigationIsRecursive = false;
 
         public void OnTextDocumentOpen(string path, IVsWindowFrame windowFrame)
         {
@@ -31,20 +34,24 @@ namespace Konamiman.SuperBookmarks
         public void OnSolutionClosed()
         {
             openDocumentPathsAndFrames.Clear();
-            currentDocumentPath = null;
+            currentDocumentFolder = null;
+            currentTextDocumentPath = null;
         }
 
         public void OnCurrentDocumentChanged(string path)
         {
+            currentDocumentFolder = Path.GetDirectoryName(path) + Path.DirectorySeparatorChar;
+            currentDocumentFolderLength = currentDocumentFolder.Length;
+
             if (openDocumentPathsAndFrames.ContainsKey(path))
             {
-                currentDocumentPath = path;
+                currentTextDocumentPath = path;
                 var vsTextView = VsShellUtilities.GetTextView(openDocumentPathsAndFrames[path]);
                 currentDocumentView = editorAdaptersFactoryService.GetWpfTextView(vsTextView);
             }
             else
             {
-                currentDocumentPath = null;
+                currentTextDocumentPath = null;
                 currentDocumentView = null;
             }
         }
@@ -80,18 +87,53 @@ namespace Konamiman.SuperBookmarks
             return true;
         }
 
-        public void GoToPrevInOpenFiles()
+        private List<string> GetOpenDocumentsWithBookmarks()
         {
-            var docData = GetViewAndBookmarksForCurrentDocument();
-            if (docData == null)
-                return;
-
-            var openDocumentsWithBookmarks =
+            return 
                 openDocumentPathsAndFrames.Keys.Where(p =>
                     viewsByFilename.ContainsKey(p) ?
                         bookmarksByView[viewsByFilename[p]].Count > 0 :
                         bookmarksPendingCreation.ContainsKey(p)
                 ).ToList();
+        }
+
+        private static char[] directorySeparators = new[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar};
+
+        private List<string> GetOpenDocumentsInCurrentFolder()
+        {
+            bool IsInCurrentFolder(string path) =>
+                path.StartsWith(currentDocumentFolder);
+
+            var openFiles = viewsByFilename.Keys
+                .Where(path => bookmarksByView[viewsByFilename[path]].Count > 0 && IsInCurrentFolder(path));
+            var pendingFiles = bookmarksPendingCreation.Keys
+                .Where(IsInCurrentFolder);
+
+            var allFiles = openFiles.Union(pendingFiles);
+            if (!folderNavigationIsRecursive)
+                allFiles = allFiles
+                    .Where(path => path.IndexOfAny(directorySeparators, currentDocumentFolderLength) == -1);
+
+            return allFiles.ToList();
+        }
+
+        public void GoToPrevInOpenFiles()
+        {
+            GoToPrevIn(GetOpenDocumentsWithBookmarks);
+        }
+
+        public void GoToPrevInFolder()
+        {
+            GoToPrevIn(GetOpenDocumentsInCurrentFolder);
+        }
+
+        public void GoToPrevIn(Func<List<string>> getEligibleDocumentPaths)
+        {
+            var docData = GetViewAndBookmarksForCurrentDocument();
+            if (docData == null)
+                return;
+
+            var openDocumentsWithBookmarks = getEligibleDocumentPaths();
 
             // Try to navigate within the same document; if success, we're done
 
@@ -101,7 +143,7 @@ namespace Konamiman.SuperBookmarks
 
             // Ok, which one is "the previous document"?
 
-            var docIndex = openDocumentsWithBookmarks.IndexOf(currentDocumentPath);
+            var docIndex = openDocumentsWithBookmarks.IndexOf(currentTextDocumentPath);
             int prevDocIndex;
             if (docIndex == 0)
                 prevDocIndex = openDocumentsWithBookmarks.Count - 1;
@@ -172,16 +214,21 @@ namespace Konamiman.SuperBookmarks
 
         public void GoToNextInOpenFiles()
         {
+            GoToNextIn(GetOpenDocumentsWithBookmarks);
+        }
+
+        public void GoToNextInFolder()
+        {
+            GoToNextIn(GetOpenDocumentsInCurrentFolder);
+        }
+
+        public void GoToNextIn(Func<List<string>> getEligibleDocumentPaths)
+        { 
             var docData = GetViewAndBookmarksForCurrentDocument();
             if (docData == null)
                 return;
 
-            var openDocumentsWithBookmarks =
-                openDocumentPathsAndFrames.Keys.Where(p =>
-                    viewsByFilename.ContainsKey(p) ?
-                        bookmarksByView[viewsByFilename[p]].Count > 0 :
-                        bookmarksPendingCreation.ContainsKey(p)
-                ).ToList();
+            var openDocumentsWithBookmarks = getEligibleDocumentPaths();
 
             // Try to navigate within the same document; if success, we're done
 
@@ -191,7 +238,7 @@ namespace Konamiman.SuperBookmarks
 
             // Ok, which one is "the next document"?
 
-            var docIndex = openDocumentsWithBookmarks.IndexOf(currentDocumentPath);
+            var docIndex = openDocumentsWithBookmarks.IndexOf(currentTextDocumentPath);
             int nextDocIndex;
             if (docIndex == openDocumentsWithBookmarks.Count - 1)
                 nextDocIndex = 0;

@@ -11,6 +11,8 @@ using Microsoft.VisualStudio.Shell;
 using System.Linq;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Editor;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -182,6 +184,68 @@ namespace Konamiman.SuperBookmarks
             {
                 return Helpers.IsTextDocument(buffer) ? buffer : null;
             }
+        }
+
+        private static Dictionary<string, string> properlyCasedPaths = new Dictionary<string, string>();
+
+        public static void ClearProperlyCasedPathsCache()
+        {
+            properlyCasedPaths.Clear();
+        }
+
+        public static string GetProperlyCasedPath(string path)
+        {
+            if(properlyCasedPaths.TryGetValue(path, out var properlyCasedPath))
+                return properlyCasedPath;
+
+            properlyCasedPath = GetProperlyCasedPathCore(path);
+
+            if (properlyCasedPath == null)
+            {
+                Helpers.ShowErrorMessage($"I couldn't get the properly cased version of '{path}' - bookmark navigation might not work properly");
+                properlyCasedPath = path;
+            }
+            
+            properlyCasedPaths.Add(path, properlyCasedPath);
+            return properlyCasedPath;
+        }
+
+        //https://stackoverflow.com/a/29578292/4574
+        private static string GetProperlyCasedPathCore(string path)
+        {
+            // DirectoryInfo accepts either a file path or a directory path, and most of its properties work for either.
+            // However, its Exists property only works for a directory path.
+            DirectoryInfo directory = new DirectoryInfo(path);
+            if (!File.Exists(path) && !directory.Exists)
+                return null;
+
+            List<string> parts = new List<string>();
+
+            DirectoryInfo parentDirectory = directory.Parent;
+            while (parentDirectory != null)
+            {
+                FileSystemInfo entry = parentDirectory.EnumerateFileSystemInfos(directory.Name).First();
+                parts.Add(entry.Name);
+
+                directory = parentDirectory;
+                parentDirectory = directory.Parent;
+            }
+
+            // Handle the root part (i.e., drive letter or UNC \\server\share).
+            string root = directory.FullName;
+            if (root.Contains(':'))
+            {
+                root = root.ToUpper();
+            }
+            else
+            {
+                string[] rootParts = root.Split('\\');
+                root = string.Join("\\", rootParts.Select(part => CultureInfo.CurrentCulture.TextInfo.ToTitleCase(part)));
+            }
+
+            parts.Add(root);
+            parts.Reverse();
+            return Path.Combine(parts.ToArray());
         }
     }
 }

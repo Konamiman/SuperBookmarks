@@ -6,7 +6,7 @@ namespace Konamiman.SuperBookmarks.Commands
     {
         protected override int CommandId => 2;
 
-        protected override bool RequiresOpenTextDocument => true;
+        protected override bool RequiresActiveTextDocument => true;
 
         protected override void CommandCallback(OleMenuCommand command)
         {
