@@ -134,6 +134,22 @@
         </Strings>
       </Button>
 
+      <Button guid="guidCmds" id="NavigateToPrevInProjectCommandId" priority="0x0100" type="Button">
+        <Icon guid="guidImages" id="bmpPrevInProject" />
+        <Strings>
+          <ButtonText>Previous Bookmark in Current Project</ButtonText>
+          <LocCanonicalName>SuperBookmarks.GoToPreviousInProject</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidCmds" id="NavigateToNextInProjectCommandId" priority="0x0100" type="Button">
+        <Icon guid="guidImages" id="bmpNextInProject" />
+        <Strings>
+          <ButtonText>Next Bookmark in Current Project</ButtonText>
+          <LocCanonicalName>SuperBookmarks.GoToNextInProject</LocCanonicalName>
+        </Strings>
+      </Button>
+
       <Button guid="guidCmds" id="ShowOptionsPageCommandId" priority="0x0100" type="Button">
         <Strings>
           <ButtonText>Options...</ButtonText>
@@ -142,7 +158,7 @@
     </Buttons>
 
     <Bitmaps>
-      <Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpToggle, bmpPrevInDoc, bmpNextInDoc, bmpPrevInOpen, bmpNextInOpen, bmpPrevInFolder, bmpNextInFolder"/>
+      <Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpToggle, bmpPrevInDoc, bmpNextInDoc, bmpPrevInOpen, bmpNextInOpen, bmpPrevInFolder, bmpNextInFolder, bmpPrevInProject, bmpNextInProject"/>
     </Bitmaps>
   </Commands>
 
@@ -158,6 +174,8 @@
       <IDSymbol name="NavigateToNextInOpenDocsCommandId" value="5" />
       <IDSymbol name="NavigateToPrevInFolderCommandId" value="6" />
       <IDSymbol name="NavigateToNextInFolderCommandId" value="7" />
+      <IDSymbol name="NavigateToPrevInProjectCommandId" value="8" />
+      <IDSymbol name="NavigateToNextInProjectCommandId" value="9" />
       <IDSymbol name="ShowOptionsPageCommandId" value="100" />
     </GuidSymbol>
 
@@ -193,6 +211,8 @@
       <IDSymbol name="bmpNextInOpen" value="5" />
       <IDSymbol name="bmpPrevInFolder" value="6" />
       <IDSymbol name="bmpNextInFolder" value="7" />
+      <IDSymbol name="bmpPrevInProject" value="8" />
+      <IDSymbol name="bmpNextInProject" value="9" />
     </GuidSymbol>
   </Symbols>
 
@@ -268,6 +288,26 @@
       <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
     </CommandPlacement>
     <CommandPlacement guid="guidCmds" id="NavigateToNextInFolderCommandId" priority="7">
+      <Parent guid="guidGroups" id="GroupForToolbar" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidCmds" id="NavigateToPrevInProjectCommandId" priority="8">
+      <Parent guid="guidGroups" id="NavigationGroup_InEdit"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="NavigateToPrevInProjectCommandId" priority="8">
+      <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="NavigateToPrevInProjectCommandId" priority="8">
+      <Parent guid="guidGroups" id="GroupForToolbar" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidCmds" id="NavigateToNextInProjectCommandId" priority="9">
+      <Parent guid="guidGroups" id="NavigationGroup_InEdit"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="NavigateToNextInProjectCommandId" priority="9">
+      <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="NavigateToNextInProjectCommandId" priority="9">
       <Parent guid="guidGroups" id="GroupForToolbar" />
     </CommandPlacement>
 

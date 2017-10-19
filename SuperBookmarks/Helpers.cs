@@ -198,11 +198,18 @@ namespace Konamiman.SuperBookmarks
             if(properlyCasedPaths.TryGetValue(path, out var properlyCasedPath))
                 return properlyCasedPath;
 
-            properlyCasedPath = GetProperlyCasedPathCore(path);
-
-            if (properlyCasedPath == null)
+            try
             {
-                Helpers.ShowErrorMessage($"I couldn't get the properly cased version of '{path}' - bookmark navigation might not work properly");
+                properlyCasedPath = GetProperlyCasedPathCore(path);
+                if (properlyCasedPath == null)
+                {
+                    Helpers.ShowErrorMessage($"I couldn't get the properly cased version of '{path}' - bookmark navigation might not work properly");
+                    properlyCasedPath = path;
+                }
+            }
+            catch (Exception ex)
+            {
+                Helpers.ShowErrorMessage($"Error when trying to get the properly cased version of path '{path}':\r\n\r\n{ex.Message}");
                 properlyCasedPath = path;
             }
             

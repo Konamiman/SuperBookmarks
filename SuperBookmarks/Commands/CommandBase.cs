@@ -20,6 +20,10 @@ namespace Konamiman.SuperBookmarks.Commands
 
         protected virtual bool RequiresOpenTextDocuments => false;
 
+        protected virtual bool RequiresOpenSolution => true;
+
+        protected virtual bool RequiresActiveDocumentToBeInProject => false;
+
         public CommandBase()
         {
             this.Package = SuperBookmarksPackage.Instance;
@@ -41,6 +45,12 @@ namespace Konamiman.SuperBookmarks.Commands
         {
             var command = (OleMenuCommand) sender;
 
+            if (RequiresOpenSolution && !Package.SolutionIsCurrentlyOpen)
+            {
+                command.Enabled = false;
+                return;
+            }
+
             if (RequiresActiveTextDocument && !Package.ActiveDocumentIsText)
             {
                 command.Enabled = false;
@@ -54,6 +64,12 @@ namespace Konamiman.SuperBookmarks.Commands
             }
 
             if (RequiresOpenTextDocuments && !Package.ThereAreOpenTextDocuments)
+            {
+                command.Enabled = false;
+                return;
+            }
+
+            if (RequiresActiveDocumentToBeInProject && !Package.ActiveDocumentIsInProject)
             {
                 command.Enabled = false;
                 return;

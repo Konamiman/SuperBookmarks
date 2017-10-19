@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using EnvDTE;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -47,7 +48,9 @@ namespace Konamiman.SuperBookmarks
             var tempCountOfOpenDocuments = 0;
             foreach (var docCookie in docCookies.Take((int)fetched))
             {
-                var path = GetPathOfRunningDocument(docCookie);
+                var path = GetPathOfRunningDocument(docCookie, false, out var dummyProjectRootFolder);
+                if (path == null)
+                    continue;
                 var docIsOpenInTextView = DocIsOpenInTextView(path, out var windowFrameForTextView);
                 if (docIsOpenInTextView)
                 {
@@ -80,7 +83,9 @@ namespace Konamiman.SuperBookmarks
                 InitializeRunningDocumentsInfo();
 
             CurrentWindowFrame = pFrame;
-            var path = GetPathOfRunningDocument(docCookie);
+            var path = GetPathOfRunningDocument(docCookie, true, out var docProjectFolder);
+            if (path == null)
+                return VSConstants.S_OK;
 
             var docIsOpenInTextView = DocIsOpenInTextView(path, out var windowFrameForTextView);
 
@@ -105,20 +110,40 @@ namespace Konamiman.SuperBookmarks
                     CountOfOpenDocuments++;
             }
 
-            BookmarksManager.OnCurrentDocumentChanged(path);
+            ActiveDocumentIsInProject = docProjectFolder != null;
+            BookmarksManager.OnCurrentDocumentChanged(path, docProjectFolder);
 
             return VSConstants.S_OK;
         }
 
         private Dictionary<string, string> properlyCasedFilenamesCache = 
             new Dictionary<string, string>();
-        private string GetPathOfRunningDocument(uint docCookie)
+        private string GetPathOfRunningDocument(uint docCookie, bool getProjectRootFolder, out string projectRootFolder)
         {
             runningDocumentTable.GetDocumentInfo(docCookie,
-                out var dummyFlags, out var dummyReadLocks,
+                out var flags, out var dummyReadLocks,
                 out var dummyEditLocks, out string path,
                 out var dummyHierarchy,
                 out var dummyItemId, out var dummyData);
+
+            projectRootFolder = null;
+            if (((int)flags & ((int)VsRdtFlags.VirtualDocument | (int)VsRdtFlags.ProjSlnDocument)) != 0)
+                return null;
+
+            if (getProjectRootFolder)
+            {
+                var projectHierarchy = VsShellUtilities.GetProject(this, path);
+                if (projectHierarchy != null)
+                {
+                    projectHierarchy.GetCanonicalName((uint) VSConstants.VSITEMID.Root, out string canonicalName);
+                    if (canonicalName != null &&
+                        //For projectless solution items GetCanonicalName returns a guid
+                        !Guid.TryParse(canonicalName, out var dummyGuid))
+                    {
+                        projectRootFolder = Helpers.GetProperlyCasedPath(canonicalName);
+                    }
+                }
+            }
 
             //We need this because sometimes GetDocumentInfo returns the path lowercased
             return Helpers.GetProperlyCasedPath(path);
@@ -162,7 +187,10 @@ namespace Konamiman.SuperBookmarks
 
             ThereAreOpenTextDocuments = openTextDocuments.Count > 0;
             if (!ThereAreOpenTextDocuments)
+            {
                 ActiveDocumentIsText = false;
+                ActiveDocumentIsInProject = false;
+            }
 
             return VSConstants.S_OK;
         }

@@ -16,6 +16,8 @@ namespace Konamiman.SuperBookmarks
         private string currentDocumentFolder = null;
         private string currentTextDocumentPath = null;
         private int currentDocumentFolderLength = 0;
+        private string currentProjectFolder = null;
+        private int currentProjectFolderLength = 0;
         private IWpfTextView currentDocumentView = null;
         private bool folderNavigationIsRecursive = false;
 
@@ -36,12 +38,15 @@ namespace Konamiman.SuperBookmarks
             openDocumentPathsAndFrames.Clear();
             currentDocumentFolder = null;
             currentTextDocumentPath = null;
+            currentProjectFolder = null;
         }
 
-        public void OnCurrentDocumentChanged(string path)
+        public void OnCurrentDocumentChanged(string path, string projectFolder)
         {
             currentDocumentFolder = Path.GetDirectoryName(path) + Path.DirectorySeparatorChar;
             currentDocumentFolderLength = currentDocumentFolder.Length;
+            currentProjectFolder = projectFolder + Path.DirectorySeparatorChar;
+            currentProjectFolderLength = currentProjectFolder.Length;
 
             if (openDocumentPathsAndFrames.ContainsKey(path))
             {
@@ -99,20 +104,20 @@ namespace Konamiman.SuperBookmarks
 
         private static char[] directorySeparators = new[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar};
 
-        private List<string> GetOpenDocumentsInCurrentFolder()
+        private List<string> GetOpenDocumentsInFolder(string folder, int folderNameLength, bool allowRecursive)
         {
-            bool IsInCurrentFolder(string path) =>
-                path.StartsWith(currentDocumentFolder);
+            bool IsInFolder(string path) =>
+                path.StartsWith(folder);
 
             var openFiles = viewsByFilename.Keys
-                .Where(path => bookmarksByView[viewsByFilename[path]].Count > 0 && IsInCurrentFolder(path));
+                .Where(path => bookmarksByView[viewsByFilename[path]].Count > 0 && IsInFolder(path));
             var pendingFiles = bookmarksPendingCreation.Keys
-                .Where(IsInCurrentFolder);
+                .Where(IsInFolder);
 
             var allFiles = openFiles.Union(pendingFiles);
-            if (!folderNavigationIsRecursive)
+            if (!allowRecursive)
                 allFiles = allFiles
-                    .Where(path => path.IndexOfAny(directorySeparators, currentDocumentFolderLength) == -1);
+                    .Where(path => path.IndexOfAny(directorySeparators, folderNameLength) == -1);
 
             return allFiles.ToList();
         }
@@ -124,7 +129,12 @@ namespace Konamiman.SuperBookmarks
 
         public void GoToPrevInFolder()
         {
-            GoToPrevIn(GetOpenDocumentsInCurrentFolder);
+            GoToPrevIn(() => GetOpenDocumentsInFolder(currentDocumentFolder, currentDocumentFolderLength, folderNavigationIsRecursive));
+        }
+
+        public void GoToPrevInProject()
+        {
+            GoToPrevIn(() => GetOpenDocumentsInFolder(currentProjectFolder, currentProjectFolderLength, true));
         }
 
         public void GoToPrevIn(Func<List<string>> getEligibleDocumentPaths)
@@ -219,7 +229,12 @@ namespace Konamiman.SuperBookmarks
 
         public void GoToNextInFolder()
         {
-            GoToNextIn(GetOpenDocumentsInCurrentFolder);
+            GoToNextIn(() => GetOpenDocumentsInFolder(currentDocumentFolder, currentDocumentFolderLength, folderNavigationIsRecursive));
+        }
+
+        public void GoToNextInProject()
+        {
+            GoToNextIn(() => GetOpenDocumentsInFolder(currentProjectFolder, currentProjectFolderLength, true));
         }
 
         public void GoToNextIn(Func<List<string>> getEligibleDocumentPaths)

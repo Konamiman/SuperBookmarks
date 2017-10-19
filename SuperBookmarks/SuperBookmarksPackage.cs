@@ -77,6 +77,7 @@ namespace Konamiman.SuperBookmarks
         public bool ThereAreOpenDocuments { get; private set; }
         public bool ThereAreOpenTextDocuments { get; private set; }
         public bool ActiveDocumentIsText { get; private set; } = false;
+        public bool ActiveDocumentIsInProject { get; private set; } = false;
 
         private IVsRunningDocumentTable runningDocumentTable;
 

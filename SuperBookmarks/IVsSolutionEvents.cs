@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.Shell.Interop;
 using System.IO;
 using System.Linq;
+using Microsoft.VisualStudio.Shell;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -19,6 +20,7 @@ namespace Konamiman.SuperBookmarks
             SolutionIsCurrentlyOpen = false;
             ActiveDocumentIsText = false;
             ThereAreOpenTextDocuments = false;
+            ActiveDocumentIsInProject = false;
 
             openTextDocuments = null;
             InvalidateCountOfOpenDocuments();
@@ -105,6 +107,15 @@ namespace Konamiman.SuperBookmarks
 
         public int OnAfterLoadProject(IVsHierarchy pStubHierarchy, IVsHierarchy pRealHierarchy)
         {
+            var itemid = VSConstants.VSITEMID_ROOT;
+
+            object objProj;
+            pRealHierarchy.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_ProjectDir, out objProj);
+
+            //var projectItem = objProj as EnvDTE.ProjectItem;
+            //// ... or ...
+            //var project = objProj as EnvDTE.Project;
+
             return VSConstants.S_OK;
         }
 
