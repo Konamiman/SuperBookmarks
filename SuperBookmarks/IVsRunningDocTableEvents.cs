@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using EnvDTE;
 
 namespace Konamiman.SuperBookmarks
 {
     public partial class SuperBookmarksPackage
     {
-        private Dictionary<IVsWindowFrame, string> openTextDocuments = null;
+        private Dictionary<uint, string> openTextDocuments = null;
 
         private int _countOfOpenDocuments = 0;
         private int CountOfOpenDocuments
@@ -38,7 +35,7 @@ namespace Konamiman.SuperBookmarks
         {
             const int reasonableMaxOpenDocuments = 10000;
 
-            openTextDocuments = new Dictionary<IVsWindowFrame, string>();
+            openTextDocuments = new Dictionary<uint, string>();
             runningDocumentTable.GetRunningDocumentsEnum(out var rdEnum);
             var docCookies = new uint[reasonableMaxOpenDocuments];
             rdEnum.Reset();
@@ -54,8 +51,8 @@ namespace Konamiman.SuperBookmarks
                 var docIsOpenInTextView = DocIsOpenInTextView(path, out var windowFrameForTextView);
                 if (docIsOpenInTextView)
                 {
-                    openTextDocuments.Add(windowFrameForTextView, path);
-                    BookmarksManager.OnTextDocumentOpen(path, windowFrameForTextView);
+                    openTextDocuments.Add(docCookie, path);
+                    BookmarksManager.OnTextDocumentOpen(path);
                     tempCountOfOpenDocuments++;
                     initialListOfOpenDocuments.Add(path);
                 }
@@ -76,13 +73,14 @@ namespace Konamiman.SuperBookmarks
         public IVsWindowFrame CurrentWindowFrame { get; private set; }
         public int OnBeforeDocumentWindowShow(uint docCookie, int fFirstShow, IVsWindowFrame pFrame)
         {
+            CurrentWindowFrame = pFrame;
+
             //Need to check count==0 because sometimes in the first initialization
             //all the documents are reported as closed if they were open
             //together with the solution
             if (openTextDocuments == null || openTextDocuments.Count == 0)
                 InitializeRunningDocumentsInfo();
 
-            CurrentWindowFrame = pFrame;
             var path = GetPathOfRunningDocument(docCookie, true, out var docProjectFolder);
             if (path == null)
                 return VSConstants.S_OK;
@@ -94,10 +92,10 @@ namespace Konamiman.SuperBookmarks
             if (ActiveDocumentIsText)
             {
                 ThereAreOpenTextDocuments = true;
-                if (!openTextDocuments.ContainsKey(pFrame))
-                    openTextDocuments.Add(pFrame, path);
+                if (!openTextDocuments.ContainsKey(docCookie))
+                    openTextDocuments.Add(docCookie, path);
                 if(fFirstShow != 0)
-                    BookmarksManager.OnTextDocumentOpen(path, windowFrameForTextView);
+                    BookmarksManager.OnTextDocumentOpen(path);
             }
 
             //We need this extra check to prevent counting twice
@@ -174,16 +172,25 @@ namespace Konamiman.SuperBookmarks
                 out var dummyHierarchy2, out var dummyItemId2, out var dummyWindowFrame);
         }
 
-        public int OnAfterDocumentWindowHide(uint docCookie, IVsWindowFrame pFrame)
+        public int OnBeforeLastDocumentUnlock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining)
         {
-            CountOfOpenDocuments--;
+            //We need to hook on this, and NOT on OnAfterDocumentWindowHide,
+            //because the later doesn't fire for documents that were loaded
+            //together with the solution but were never activated
+            //before being closed.
 
-            if (!openTextDocuments.ContainsKey(pFrame))
+            if (openTextDocuments == null ||
+                dwReadLocksRemaining != 0 || dwEditLocksRemaining != 0)
                 return VSConstants.S_OK;
 
-            BookmarksManager.OnTextDocumentClosed(openTextDocuments[pFrame]);
+            CountOfOpenDocuments--;
 
-            openTextDocuments.Remove(pFrame);
+            if (!openTextDocuments.ContainsKey(docCookie))
+                return VSConstants.S_OK;
+
+            BookmarksManager.OnTextDocumentClosed(openTextDocuments[docCookie]);
+
+            openTextDocuments.Remove(docCookie);
 
             ThereAreOpenTextDocuments = openTextDocuments.Count > 0;
             if (!ThereAreOpenTextDocuments)
@@ -197,12 +204,12 @@ namespace Konamiman.SuperBookmarks
 
         #region Unused members
 
-        public int OnAfterFirstDocumentLock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining)
+        public int OnAfterDocumentWindowHide(uint docCookie, IVsWindowFrame pFrame)
         {
             return VSConstants.S_OK;
         }
 
-        public int OnBeforeLastDocumentUnlock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining)
+        public int OnAfterFirstDocumentLock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining)
         {
             return VSConstants.S_OK;
         }

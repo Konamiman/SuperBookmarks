@@ -11,31 +11,27 @@ namespace Konamiman.SuperBookmarks
 {
     partial class BookmarksManager
     {
-        private Dictionary<string, IVsWindowFrame> openDocumentPathsAndFrames =
-            new Dictionary<string, IVsWindowFrame>();
+        private List<string> openDocumentPaths = new List<string>();
         private string currentDocumentFolder = null;
         private string currentTextDocumentPath = null;
-        private int currentDocumentFolderLength = 0;
         private string currentProjectFolder = null;
-        private int currentProjectFolderLength = 0;
-        private IWpfTextView currentDocumentView = null;
         private bool folderNavigationIsRecursive = false;
 
-        public void OnTextDocumentOpen(string path, IVsWindowFrame windowFrame)
+        public void OnTextDocumentOpen(string path)
         {
-            if (!openDocumentPathsAndFrames.ContainsKey(path))
-                openDocumentPathsAndFrames.Add(path, windowFrame);
+            if (!openDocumentPaths.Contains(path))
+                openDocumentPaths.Add(path);
         }
 
         public void OnTextDocumentClosed(string path)
         {
-            if (openDocumentPathsAndFrames.ContainsKey(path))
-                openDocumentPathsAndFrames.Remove(path);
+            if (openDocumentPaths.Contains(path))
+                openDocumentPaths.Remove(path);
         }
 
         public void OnSolutionClosed()
         {
-            openDocumentPathsAndFrames.Clear();
+            openDocumentPaths.Clear();
             currentDocumentFolder = null;
             currentTextDocumentPath = null;
             currentProjectFolder = null;
@@ -44,20 +40,15 @@ namespace Konamiman.SuperBookmarks
         public void OnCurrentDocumentChanged(string path, string projectFolder)
         {
             currentDocumentFolder = Path.GetDirectoryName(path) + Path.DirectorySeparatorChar;
-            currentDocumentFolderLength = currentDocumentFolder.Length;
             currentProjectFolder = projectFolder + Path.DirectorySeparatorChar;
-            currentProjectFolderLength = currentProjectFolder.Length;
 
-            if (openDocumentPathsAndFrames.ContainsKey(path))
+            if (openDocumentPaths.Contains(path))
             {
                 currentTextDocumentPath = path;
-                var vsTextView = VsShellUtilities.GetTextView(openDocumentPathsAndFrames[path]);
-                currentDocumentView = editorAdaptersFactoryService.GetWpfTextView(vsTextView);
             }
             else
             {
                 currentTextDocumentPath = null;
-                currentDocumentView = null;
             }
         }
 
@@ -95,16 +86,24 @@ namespace Konamiman.SuperBookmarks
         private List<string> GetOpenDocumentsWithBookmarks()
         {
             return 
-                openDocumentPathsAndFrames.Keys.Where(p =>
+                openDocumentPaths.Where(p =>
                     viewsByFilename.ContainsKey(p) ?
                         bookmarksByView[viewsByFilename[p]].Count > 0 :
                         bookmarksPendingCreation.ContainsKey(p)
                 ).ToList();
         }
 
+        private List<string> GetDocumentsWithBookmarks()
+        {
+            return
+                viewsByFilename.Keys.Where(p => bookmarksByView[viewsByFilename[p]].Count > 0)
+                .Union(bookmarksPendingCreation.Keys)
+                .ToList();
+        }
+
         private static char[] directorySeparators = new[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar};
 
-        private List<string> GetOpenDocumentsInFolder(string folder, int folderNameLength, bool allowRecursive)
+        private List<string> GetDocumentsInFolder(string folder, bool allowRecursive)
         {
             bool IsInFolder(string path) =>
                 path.StartsWith(folder);
@@ -117,7 +116,7 @@ namespace Konamiman.SuperBookmarks
             var allFiles = openFiles.Union(pendingFiles);
             if (!allowRecursive)
                 allFiles = allFiles
-                    .Where(path => path.IndexOfAny(directorySeparators, folderNameLength) == -1);
+                    .Where(path => path.IndexOfAny(directorySeparators, folder.Length) == -1);
 
             return allFiles.ToList();
         }
@@ -129,46 +128,52 @@ namespace Konamiman.SuperBookmarks
 
         public void GoToPrevInFolder()
         {
-            GoToPrevIn(() => GetOpenDocumentsInFolder(currentDocumentFolder, currentDocumentFolderLength, folderNavigationIsRecursive));
+            GoToPrevIn(() => GetDocumentsInFolder(currentDocumentFolder, folderNavigationIsRecursive));
+        }
+
+        public void GoToPrevInSolution()
+        {
+            GoToPrevIn(GetDocumentsWithBookmarks, allowNoOpenFiles: true);
         }
 
         public void GoToPrevInProject()
         {
-            GoToPrevIn(() => GetOpenDocumentsInFolder(currentProjectFolder, currentProjectFolderLength, true));
+            GoToPrevIn(() => GetDocumentsInFolder(currentProjectFolder, true));
         }
 
-        public void GoToPrevIn(Func<List<string>> getEligibleDocumentPaths)
+        public void GoToPrevIn(Func<List<string>> getEligibleDocumentPaths, bool allowNoOpenFiles = false)
         {
-            var docData = GetViewAndBookmarksForCurrentDocument();
-            if (docData == null)
+            var docData = GetViewAndBookmarksForCurrentDocument(allowNoOpenFiles);
+            if (docData == null && !allowNoOpenFiles)
                 return;
 
-            var openDocumentsWithBookmarks = getEligibleDocumentPaths();
+            var targetDocuments = getEligibleDocumentPaths();
 
-            // Try to navigate within the same document; if success, we're done
+            var docIndex = -1;
+            if (docData != null)
+            {
+                // Try to navigate within the same document; if success, we're done
 
-            var success = GoToPrevInCurrentDocument(docData, cycle: openDocumentsWithBookmarks.Count < 2);
-            if (success)
-                return;
+                var success = GoToPrevInCurrentDocument(docData, cycle: targetDocuments.Count < 2);
+                if (success)
+                    return;
 
-            // Ok, which one is "the previous document"?
+                // Locate the current document in the list so that we can determine "the previous one"
 
-            var docIndex = openDocumentsWithBookmarks.IndexOf(currentTextDocumentPath);
+                docIndex = targetDocuments.IndexOf(currentTextDocumentPath);
+            }
             int prevDocIndex;
             if (docIndex == 0)
-                prevDocIndex = openDocumentsWithBookmarks.Count - 1;
+                prevDocIndex = targetDocuments.Count - 1;
             else if (docIndex == -1)
                 prevDocIndex = 0;
             else
                 prevDocIndex = docIndex - 1;
 
-            var prevDocPath = openDocumentsWithBookmarks[prevDocIndex];
+            var prevDocPath = targetDocuments[prevDocIndex];
 
-            // The document could never have been displayed since the solution was open
-            // (that is, it's still in the "pending bookmarks" list)
-            // if it was open when the solution was closed the last time
-
-            if (!viewsByFilename.ContainsKey(prevDocPath))
+            if (!viewsByFilename.ContainsKey(prevDocPath) || //Doc is still in the "pending bookmarks" list...
+                !openDocumentPaths.Contains(prevDocPath))    //...or doc was once open but now is closed?
             {
                 VsShellUtilities.OpenDocument(this.serviceProvider,
                     prevDocPath,
@@ -229,46 +234,52 @@ namespace Konamiman.SuperBookmarks
 
         public void GoToNextInFolder()
         {
-            GoToNextIn(() => GetOpenDocumentsInFolder(currentDocumentFolder, currentDocumentFolderLength, folderNavigationIsRecursive));
+            GoToNextIn(() => GetDocumentsInFolder(currentDocumentFolder, folderNavigationIsRecursive));
         }
 
         public void GoToNextInProject()
         {
-            GoToNextIn(() => GetOpenDocumentsInFolder(currentProjectFolder, currentProjectFolderLength, true));
+            GoToNextIn(() => GetDocumentsInFolder(currentProjectFolder, true));
         }
 
-        public void GoToNextIn(Func<List<string>> getEligibleDocumentPaths)
+        public void GoToNextInSolution()
+        {
+            GoToNextIn(GetDocumentsWithBookmarks, allowNoOpenFiles: true);
+        }
+
+        public void GoToNextIn(Func<List<string>> getEligibleDocumentPaths, bool allowNoOpenFiles = false)
         { 
-            var docData = GetViewAndBookmarksForCurrentDocument();
-            if (docData == null)
+            var docData = GetViewAndBookmarksForCurrentDocument(allowNoOpenFiles);
+            if (docData == null && !allowNoOpenFiles)
                 return;
 
-            var openDocumentsWithBookmarks = getEligibleDocumentPaths();
+            var targetDocuments = getEligibleDocumentPaths();
 
-            // Try to navigate within the same document; if success, we're done
+            var docIndex = -1;
+            if (docData != null)
+            {
+                // Try to navigate within the same document; if success, we're done
 
-            var success = GoToNextInCurrentDocument(docData, cycle: openDocumentsWithBookmarks.Count < 2);
-            if (success)
-                return;
+                var success = GoToNextInCurrentDocument(docData, cycle: targetDocuments.Count < 2);
+                if (success)
+                    return;
 
-            // Ok, which one is "the next document"?
+                // Locate the current document in the list so that we can determine "the next one"
 
-            var docIndex = openDocumentsWithBookmarks.IndexOf(currentTextDocumentPath);
+                docIndex = targetDocuments.IndexOf(currentTextDocumentPath);
+            }
             int nextDocIndex;
-            if (docIndex == openDocumentsWithBookmarks.Count - 1)
+            if (docIndex == targetDocuments.Count - 1)
                 nextDocIndex = 0;
             else if (docIndex == -1)
-                nextDocIndex = openDocumentsWithBookmarks.Count - 1;
+                nextDocIndex = targetDocuments.Count - 1;
             else
                 nextDocIndex = docIndex + 1;
 
-            var nextDocPath = openDocumentsWithBookmarks[nextDocIndex];
+            var nextDocPath = targetDocuments[nextDocIndex];
 
-            // The document could never have been displayed since the solution was open
-            // (that is, it's still in the "pending bookmarks" list)
-            // if it was open when the solution was closed the last time
-
-            if (!viewsByFilename.ContainsKey(nextDocPath))
+            if (!viewsByFilename.ContainsKey(nextDocPath) || //Doc is still in the "pending bookmarks" list...
+                !openDocumentPaths.Contains(nextDocPath))    //...or doc was once open but now is closed?
             {
                 VsShellUtilities.OpenDocument(this.serviceProvider,
                     nextDocPath,

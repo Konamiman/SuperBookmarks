@@ -46,6 +46,8 @@ namespace Konamiman.SuperBookmarks
                 new GoToNextInFolderCommand(),
                 new GoToPrevInProjectCommand(),
                 new GoToNextInProjectCommand(),
+                new GoToPrevInSolutionCommand(),
+                new GoToNextInSolutionCommand(),
 
                 new OpenOptionsCommand()
             };

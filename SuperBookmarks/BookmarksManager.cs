@@ -216,12 +216,13 @@ namespace Konamiman.SuperBookmarks
             public int CurrentLineNumber { get; set; }
         }
 
-        CurrentDocumentData GetViewAndBookmarksForCurrentDocument()
+        CurrentDocumentData GetViewAndBookmarksForCurrentDocument(bool allowNoOpenFiles = false)
         {
             var currentView = Helpers.GetTextViewForActiveDocument();
             if (currentView == null)
             {
-                Helpers.ShowErrorMessage("I couldn't get a text view for the active document.");
+                if(!allowNoOpenFiles)
+                    Helpers.ShowErrorMessage("I couldn't get a text view for the active document.");
                 return null;
             }
 

@@ -77,6 +77,8 @@
     <Compile Include="Commands\GoToNextInDocCommand.cs" />
     <Compile Include="Commands\GoToNextInFolderCommand.cs" />
     <Compile Include="Commands\GoToNextInProjectCommand.cs" />
+    <Compile Include="Commands\GoToNextInSolutionCommand.cs" />
+    <Compile Include="Commands\GoToPrevInSolutionCommand.cs" />
     <Compile Include="Commands\GoToPrevInProjectCommand.cs" />
     <Compile Include="Commands\GoToPrevInFolderCommand.cs" />
     <Compile Include="Commands\GoToNextInOpenDocsCommand.cs" />
