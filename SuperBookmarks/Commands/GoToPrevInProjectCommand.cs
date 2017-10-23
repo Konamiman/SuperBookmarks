@@ -10,7 +10,7 @@ namespace Konamiman.SuperBookmarks.Commands
 
         protected override void CommandCallback(OleMenuCommand command)
         {
-            BookmarksManager.GoToPrevInProject();
+            BookmarksManager.GoToPrevIn(BookmarkActionTarget.Project);
         }
     }
 }

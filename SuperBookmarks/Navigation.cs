@@ -3,7 +3,6 @@ using Microsoft.VisualStudio.Text.Editor;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio;
 using System.IO;
 
@@ -16,6 +15,26 @@ namespace Konamiman.SuperBookmarks
         private string currentTextDocumentPath = null;
         private string currentProjectFolder = null;
         private bool folderNavigationIsRecursive = false;
+        private List<string> currentTextDocumentPathCollection;
+        private Dictionary<BookmarkActionTarget, Func<List<string>>> filesSelectors;
+
+        private static char[] directorySeparators = new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
+
+        private void InitializeNavigation()
+        {
+            filesSelectors =
+            new Dictionary<BookmarkActionTarget, Func<List<string>>>
+            {
+                {BookmarkActionTarget.Document, () => currentTextDocumentPathCollection},
+                {BookmarkActionTarget.OpenDocuments, GetOpenDocumentsWithBookmarks },
+                {BookmarkActionTarget.Folder, () => GetDocumentsInFolder(currentDocumentFolder, folderNavigationIsRecursive) },
+                {BookmarkActionTarget.Project, () => GetDocumentsInFolder(currentProjectFolder, true) },
+                {BookmarkActionTarget.Solution, GetDocumentsWithBookmarks }
+            };
+
+            currentTextDocumentPathCollection = new List<string>(1);
+            currentTextDocumentPathCollection.Add(null); //must always contain 1 item
+        }
 
         public void OnTextDocumentOpen(string path)
         {
@@ -50,37 +69,7 @@ namespace Konamiman.SuperBookmarks
             {
                 currentTextDocumentPath = null;
             }
-        }
-
-        public void GoToPrevInCurrentDocument()
-        {
-            var docData = GetViewAndBookmarksForCurrentDocument();
-            if (docData == null)
-                return;
-
-            GoToPrevInCurrentDocument(docData, cycle: true);
-        }
-
-        //Returns false when no cycling is allowed and there are no more bookmarks
-        //from the current point to the start of the document
-        private bool GoToPrevInCurrentDocument(CurrentDocumentData docData, bool cycle)
-        {
-            if (docData.Bookmarks.Count == 0)
-                return true;
-
-            var lineNumbers = docData.Bookmarks.Select(b => b.GetRow(docData.TextBuffer)).OrderByDescending(x => x).ToList();
-            var prevLine = lineNumbers.FirstOrDefault(l => l < docData.CurrentLineNumber);
-
-            if (prevLine == 0 && !cycle)
-                return false;
-
-            var targetLineNumber =
-                prevLine == 0
-                    ? lineNumbers.First()
-                    : prevLine;
-
-            MoveToLineNumber(docData.TextView, targetLineNumber);
-            return true;
+            currentTextDocumentPathCollection[0] = currentTextDocumentPath;
         }
 
         private List<string> GetOpenDocumentsWithBookmarks()
@@ -101,8 +90,6 @@ namespace Konamiman.SuperBookmarks
                 .ToList();
         }
 
-        private static char[] directorySeparators = new[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar};
-
         private List<string> GetDocumentsInFolder(string folder, bool allowRecursive)
         {
             bool IsInFolder(string path) =>
@@ -121,27 +108,17 @@ namespace Konamiman.SuperBookmarks
             return allFiles.ToList();
         }
 
-        public void GoToPrevInOpenFiles()
+        public void GoToPrevIn(BookmarkActionTarget target)
         {
-            GoToPrevIn(GetOpenDocumentsWithBookmarks);
+            GoToPrevIn(filesSelectors[target], NoOpenFilesAreAllowedFor(target));
         }
 
-        public void GoToPrevInFolder()
-        {
-            GoToPrevIn(() => GetDocumentsInFolder(currentDocumentFolder, folderNavigationIsRecursive), allowNoOpenFiles: true);
-        }
+        private bool NoOpenFilesAreAllowedFor(BookmarkActionTarget target) =>
+            target == BookmarkActionTarget.Solution ||
+            target == BookmarkActionTarget.Project ||
+            target == BookmarkActionTarget.Folder;
 
-        public void GoToPrevInSolution()
-        {
-            GoToPrevIn(GetDocumentsWithBookmarks, allowNoOpenFiles: true);
-        }
-
-        public void GoToPrevInProject()
-        {
-            GoToPrevIn(() => GetDocumentsInFolder(currentProjectFolder, true), allowNoOpenFiles: true);
-        }
-
-        public void GoToPrevIn(Func<List<string>> getEligibleDocumentPaths, bool allowNoOpenFiles = false)
+        private void GoToPrevIn(Func<List<string>> getEligibleDocumentPaths, bool allowNoOpenFiles = false)
         {
             var docData = GetViewAndBookmarksForCurrentDocument(allowNoOpenFiles);
             if (docData == null && !allowNoOpenFiles)
@@ -196,58 +173,34 @@ namespace Konamiman.SuperBookmarks
                 lastBookmarkLine - 1, 0, lastBookmarkLine - 1, 0);
         }
 
-        public void GoToNextInCurrentDocument()
-        {
-            var docData = GetViewAndBookmarksForCurrentDocument();
-            if (docData == null)
-                return;
-
-            GoToNextInCurrentDocument(docData, cycle: true);
-        }
-
         //Returns false when no cycling is allowed and there are no more bookmarks
-        //from the current point to the end of the document
-        private bool GoToNextInCurrentDocument(CurrentDocumentData docData, bool cycle)
+        //from the current point to the start of the document
+        private bool GoToPrevInCurrentDocument(CurrentDocumentData docData, bool cycle)
         {
             if (docData.Bookmarks.Count == 0)
                 return true;
 
-            var lineNumbers = docData.Bookmarks.Select(b => b.GetRow(docData.TextBuffer)).OrderBy(x => x).ToList();
-            var nextLine = lineNumbers.FirstOrDefault(l => l > docData.CurrentLineNumber);
+            var lineNumbers = docData.Bookmarks.Select(b => b.GetRow(docData.TextBuffer)).OrderByDescending(x => x).ToList();
+            var prevLine = lineNumbers.FirstOrDefault(l => l < docData.CurrentLineNumber);
 
-            if (nextLine == 0 && !cycle)
+            if (prevLine == 0 && !cycle)
                 return false;
 
             var targetLineNumber =
-                nextLine == 0
+                prevLine == 0
                     ? lineNumbers.First()
-                    : nextLine;
+                    : prevLine;
 
             MoveToLineNumber(docData.TextView, targetLineNumber);
             return true;
         }
 
-        public void GoToNextInOpenFiles()
+        public void GoToNextIn(BookmarkActionTarget target)
         {
-            GoToNextIn(GetOpenDocumentsWithBookmarks);
+            GoToNextIn(filesSelectors[target], NoOpenFilesAreAllowedFor(target));
         }
 
-        public void GoToNextInFolder()
-        {
-            GoToNextIn(() => GetDocumentsInFolder(currentDocumentFolder, folderNavigationIsRecursive), allowNoOpenFiles: true);
-        }
-
-        public void GoToNextInProject()
-        {
-            GoToNextIn(() => GetDocumentsInFolder(currentProjectFolder, true), allowNoOpenFiles: true);
-        }
-
-        public void GoToNextInSolution()
-        {
-            GoToNextIn(GetDocumentsWithBookmarks, allowNoOpenFiles: true);
-        }
-
-        public void GoToNextIn(Func<List<string>> getEligibleDocumentPaths, bool allowNoOpenFiles = false)
+        private void GoToNextIn(Func<List<string>> getEligibleDocumentPaths, bool allowNoOpenFiles = false)
         { 
             var docData = GetViewAndBookmarksForCurrentDocument(allowNoOpenFiles);
             if (docData == null && !allowNoOpenFiles)
@@ -300,6 +253,28 @@ namespace Konamiman.SuperBookmarks
                 vsBuffer,
                 VSConstants.LOGVIEWID_TextView,
                 lastBookmarkLine - 1, 0, lastBookmarkLine - 1, 0);
+        }
+
+        //Returns false when no cycling is allowed and there are no more bookmarks
+        //from the current point to the end of the document
+        private bool GoToNextInCurrentDocument(CurrentDocumentData docData, bool cycle)
+        {
+            if (docData.Bookmarks.Count == 0)
+                return true;
+
+            var lineNumbers = docData.Bookmarks.Select(b => b.GetRow(docData.TextBuffer)).OrderBy(x => x).ToList();
+            var nextLine = lineNumbers.FirstOrDefault(l => l > docData.CurrentLineNumber);
+
+            if (nextLine == 0 && !cycle)
+                return false;
+
+            var targetLineNumber =
+                nextLine == 0
+                    ? lineNumbers.First()
+                    : nextLine;
+
+            MoveToLineNumber(docData.TextView, targetLineNumber);
+            return true;
         }
 
         private void MoveToLineNumber(ITextView textView, int lineNumber)

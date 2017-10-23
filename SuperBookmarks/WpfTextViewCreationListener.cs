@@ -1,11 +1,7 @@
 ﻿using System.ComponentModel.Composition;
-using System.Linq;
-using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace Konamiman.SuperBookmarks
 {

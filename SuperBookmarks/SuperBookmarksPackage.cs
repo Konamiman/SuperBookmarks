@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using EnvDTE;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.TextManager.Interop;
-using Microsoft.VisualStudio.OLE.Interop;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -70,18 +67,11 @@ namespace Konamiman.SuperBookmarks
 
         private IVsSolution solutionService;
 
-        public bool SolutionIsCurrentlyOpen { get; private set; }
-        public string CurrentSolutionPath { get; private set; }
-        public string CurrentSolutionSuoPath { get; private set; }
-        public bool CurrentSolutionIsInGitRepo { get; private set; }
-        public bool ThereAreOpenDocuments { get; private set; }
-        public bool ThereAreOpenTextDocuments { get; private set; }
-        public bool ActiveDocumentIsText { get; private set; } = false;
-        public bool ActiveDocumentIsInProject { get; private set; } = false;
-
         private IVsRunningDocumentTable runningDocumentTable;
 
         private IVsUIShellOpenDocument shellOpenDocument;
+        
+        internal BookmarksManager BookmarksManager { get; }
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -115,8 +105,6 @@ namespace Konamiman.SuperBookmarks
 
 
         //public ITextDocumentFactoryService TextDocumentFactoryService { get; set; }
-
-        internal BookmarksManager BookmarksManager { get; }
 
         #endregion
     }

@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Media;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace Konamiman.SuperBookmarks
@@ -36,6 +33,8 @@ namespace Konamiman.SuperBookmarks
         public BookmarksManager(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
+
+            InitializeNavigation();
         }
 
         internal void InitializeAfterPackageInitialization(

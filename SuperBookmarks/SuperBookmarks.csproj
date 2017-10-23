@@ -69,6 +69,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BookmarkActionTarget.cs" />
     <Compile Include="BookmarksManager.cs" />
     <Compile Include="CommandsInitialization.cs">
       <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
@@ -130,6 +131,9 @@
       <DependentUpon>BookmarksManager.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PublicState.cs">
+      <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
+    </Compile>
     <Compile Include="RuntimeBookmark.cs">
       <DependentUpon>BookmarksManager.cs</DependentUpon>
     </Compile>
