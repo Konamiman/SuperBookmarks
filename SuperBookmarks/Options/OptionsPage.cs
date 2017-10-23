@@ -101,8 +101,13 @@ namespace Konamiman.SuperBookmarks
         public event EventHandler NavigateInFolderIncludesSubfoldersChanged;
         public event EventHandler OptionsChanged;
 
+        private bool applyClicked = false;
+        private Color initialGlyphColor;
+
         protected override void OnApply(PageApplyEventArgs e)
         {
+            applyClicked = true;
+
             if(deletingALineDeletesTheBookmarkChanged)
                 DeletingALineDeletesTheBookmarkChanged?.Invoke(this, EventArgs.Empty);
 
@@ -115,12 +120,13 @@ namespace Konamiman.SuperBookmarks
             if(optionsChanged)
                 OptionsChanged?.Invoke(this, EventArgs.Empty);
 
-            SetAsUnchanged();
+            //SetAsUnchanged(); --> OnClosed will take care of that
             base.OnApply(e);
         }
 
         protected override void OnActivate(CancelEventArgs e)
         {
+            initialGlyphColor = GlyphColor;
             control.Initialize();
             SetAsUnchanged();
             base.OnActivate(e);
@@ -128,6 +134,9 @@ namespace Konamiman.SuperBookmarks
 
         protected override void OnClosed(EventArgs e)
         {
+            if (!applyClicked)
+                glyphColor = initialGlyphColor;
+
             SetAsUnchanged();
             base.OnClosed(e);
         }
@@ -138,6 +147,7 @@ namespace Konamiman.SuperBookmarks
             deletingALineDeletesTheBookmarkChanged = false;
             navigateInFolderIncludesSubfoldersChanged = false;
             glyphColorChanged = false;
+            applyClicked = false;
         }
 
         protected override IWin32Window Window => control;
