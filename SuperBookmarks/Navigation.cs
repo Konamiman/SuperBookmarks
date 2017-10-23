@@ -128,7 +128,7 @@ namespace Konamiman.SuperBookmarks
 
         public void GoToPrevInFolder()
         {
-            GoToPrevIn(() => GetDocumentsInFolder(currentDocumentFolder, folderNavigationIsRecursive));
+            GoToPrevIn(() => GetDocumentsInFolder(currentDocumentFolder, folderNavigationIsRecursive), allowNoOpenFiles: true);
         }
 
         public void GoToPrevInSolution()
@@ -138,7 +138,7 @@ namespace Konamiman.SuperBookmarks
 
         public void GoToPrevInProject()
         {
-            GoToPrevIn(() => GetDocumentsInFolder(currentProjectFolder, true));
+            GoToPrevIn(() => GetDocumentsInFolder(currentProjectFolder, true), allowNoOpenFiles: true);
         }
 
         public void GoToPrevIn(Func<List<string>> getEligibleDocumentPaths, bool allowNoOpenFiles = false)
@@ -234,12 +234,12 @@ namespace Konamiman.SuperBookmarks
 
         public void GoToNextInFolder()
         {
-            GoToNextIn(() => GetDocumentsInFolder(currentDocumentFolder, folderNavigationIsRecursive));
+            GoToNextIn(() => GetDocumentsInFolder(currentDocumentFolder, folderNavigationIsRecursive), allowNoOpenFiles: true);
         }
 
         public void GoToNextInProject()
         {
-            GoToNextIn(() => GetDocumentsInFolder(currentProjectFolder, true));
+            GoToNextIn(() => GetDocumentsInFolder(currentProjectFolder, true), allowNoOpenFiles: true);
         }
 
         public void GoToNextInSolution()

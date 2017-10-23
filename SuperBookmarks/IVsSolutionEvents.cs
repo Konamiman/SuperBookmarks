@@ -22,8 +22,7 @@ namespace Konamiman.SuperBookmarks
             ThereAreOpenTextDocuments = false;
             ActiveDocumentIsInProject = false;
 
-            openTextDocuments = null;
-            InvalidateCountOfOpenDocuments();
+            TearDownRunningDocumentsInfo();
             Helpers.ClearProperlyCasedPathsCache();
 
             return VSConstants.S_OK;
@@ -107,15 +106,6 @@ namespace Konamiman.SuperBookmarks
 
         public int OnAfterLoadProject(IVsHierarchy pStubHierarchy, IVsHierarchy pRealHierarchy)
         {
-            var itemid = VSConstants.VSITEMID_ROOT;
-
-            object objProj;
-            pRealHierarchy.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_ProjectDir, out objProj);
-
-            //var projectItem = objProj as EnvDTE.ProjectItem;
-            //// ... or ...
-            //var project = objProj as EnvDTE.Project;
-
             return VSConstants.S_OK;
         }
 

@@ -142,6 +142,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>VSPackage.resx</DependentUpon>
     </Compile>
+    <Compile Include="WindowFrameEventsNotifier.cs" />
     <Compile Include="WpfTextViewCreationListener.cs" />
   </ItemGroup>
   <ItemGroup>

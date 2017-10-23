@@ -4,205 +4,250 @@ using System.Linq;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using System.IO;
+using System.Diagnostics;
 
 namespace Konamiman.SuperBookmarks
 {
+    /*
+     Managing the running documents table is somewhat tricky.
+     Here are a few things to consider:
+     
+     - Each physical document appears only once in the table, with a unique doc cookie;
+       but some types of documents can be open simultaneously in two window frames,
+       one for the code view and one for the design view.
+       
+     - Documents that were open together with the solution (because they were open
+       when the solution was last closed) don't trigger OnBeforeDocumentWindowShow
+       until they are first activated. That's why we do an initial manual
+       filling of the list of open documents.
+
+     - Also for documents that were open together with the solution: if they are
+       never given focus after the solution has loaded, they won't trigger 
+       OnAfterDocumentWindowHide when they are closed. That's why we use
+       IWindowFrameEventsNotifier instead to detect closures - 
+       more complex, but bulletproof.
+       
+     - GetRunningDocumentsEnum won't give reliable values if called right after
+       the solution finishes loading, because of the async project loading thing
+       (presumably). So we invoke it in OnBeforeDocumentWindowShow instead -
+       and yet, the first time it won't give reliable values (it will report
+       only the active document, and with no proper window frame available yet).
+       That's why we invoke it on each OnBeforeDocumentWindowShow if there are
+       no registered documents. Less than ideal but it works.
+     */
+
     public partial class SuperBookmarksPackage
     {
-        private Dictionary<uint, string> openTextDocuments = null;
-
-        private int _countOfOpenDocuments = 0;
-        private int CountOfOpenDocuments
+        //We keep one of these for each window frame open
+        //(NOT for each physical document open),
+        //so don't rely on paths being unique
+        class OpenDocumentFrameInfo
         {
-            get
+            public OpenDocumentFrameInfo(string path, string projectRoot, IVsWindowFrame frame, bool isTextView)
             {
-                return _countOfOpenDocuments;
+                Path = path;
+                ProjectRoot = projectRoot;
+                IsTextView = isTextView;
+                FrameEventsNotifier = new WindowFrameEventsNotifier(frame);
             }
-            set
-            {
-                _countOfOpenDocuments = value;
-                ThereAreOpenDocuments = CountOfOpenDocuments > 0;
-            }
+
+            public string Path { get; }
+            public string ProjectRoot { get; }
+            public bool IsTextView { get; }
+            public IWindowFrameEventsNotifier FrameEventsNotifier { get; }
         }
 
-        private void InvalidateCountOfOpenDocuments()
+        private Dictionary<IVsWindowFrame, OpenDocumentFrameInfo> openDocumentFrames =
+            new Dictionary<IVsWindowFrame, OpenDocumentFrameInfo>();
+
+        public IVsWindowFrame CurrentWindowFrame { get; private set; }
+
+        private void TearDownRunningDocumentsInfo()
         {
-            CountOfOpenDocuments = 0;
+            foreach (var frame in openDocumentFrames.Keys)
+            {
+                openDocumentFrames[frame].FrameEventsNotifier.FrameClosed -= OnFrameClosed;
+            }
+
+            openDocumentFrames.Clear();
+            UpdateOpenDocumentsState();
         }
 
-        private List<string> initialListOfOpenDocuments;
         private void InitializeRunningDocumentsInfo()
         {
             const int reasonableMaxOpenDocuments = 10000;
 
-            openTextDocuments = new Dictionary<uint, string>();
             runningDocumentTable.GetRunningDocumentsEnum(out var rdEnum);
             var docCookies = new uint[reasonableMaxOpenDocuments];
             rdEnum.Reset();
             rdEnum.Next(reasonableMaxOpenDocuments, docCookies, out var fetched);
 
-            initialListOfOpenDocuments = new List<string>();
-            var tempCountOfOpenDocuments = 0;
             foreach (var docCookie in docCookies.Take((int)fetched))
             {
-                var path = GetPathOfRunningDocument(docCookie, false, out var dummyProjectRootFolder);
-                if (path == null)
-                    continue;
-                var docIsOpenInTextView = DocIsOpenInTextView(path, out var windowFrameForTextView);
-                if (docIsOpenInTextView)
-                {
-                    openTextDocuments.Add(docCookie, path);
-                    BookmarksManager.OnTextDocumentOpen(path);
-                    tempCountOfOpenDocuments++;
-                    initialListOfOpenDocuments.Add(path);
-                }
-
-                //We need to check this because .sln and .*proj files count as running documents
-                //(but are not considered open documents, fortunately)
-                else if (DocIsOpenInAnyView(path))
-                {
-                    tempCountOfOpenDocuments++;
-                    initialListOfOpenDocuments.Add(path);
-                }
+                RegisterOpenDocument(docCookie);
             }
-
-            CountOfOpenDocuments = tempCountOfOpenDocuments;
-            ThereAreOpenTextDocuments = openTextDocuments.Count > 0;
         }
 
-        public IVsWindowFrame CurrentWindowFrame { get; private set; }
+        private void RegisterOpenDocument(uint docCookie, IVsWindowFrame frame = null)
+        {
+            if (frame != null && openDocumentFrames.ContainsKey(frame))
+                return;
+
+            (string documentPath, string projectRoot) = GetRunningDocumentPaths(docCookie);
+            if (documentPath == null)
+                return;
+
+            void RegisterOpenFrame(IVsWindowFrame currentFrame, bool isTextDocument)
+            {
+                var docInfo = new OpenDocumentFrameInfo(documentPath, projectRoot, currentFrame, isTextDocument);
+                if(!openDocumentFrames.ContainsKey(currentFrame))
+                    openDocumentFrames.Add(currentFrame, docInfo);
+
+                docInfo.FrameEventsNotifier.FrameClosed += OnFrameClosed;
+
+                if(isTextDocument)
+                    BookmarksManager.OnTextDocumentOpen(documentPath);
+
+                Debug.WriteLine($"Frame Registered: {Path.GetFileName(documentPath)}, isText: {isTextDocument}, total open: {openDocumentFrames.Count}", ">>> SuperBookmarks");
+            }
+
+            var frameForTextView = GetFrameForTextView(documentPath);
+            var frameForDesignView = GetFrameForDesignerView(documentPath);
+
+            if (frame == null)
+            {
+                if (frameForTextView != null)
+                    RegisterOpenFrame(frameForTextView, true);
+
+                if (frameForDesignView != null)
+                    RegisterOpenFrame(frameForDesignView, false);
+            }
+            else
+            {
+                if(frameForTextView == frame)
+                    RegisterOpenFrame(frame, true);
+                else if(frameForDesignView == frame)
+                    RegisterOpenFrame(frame, false);
+            }
+
+            UpdateOpenDocumentsState();
+        }
+
+        private void OnFrameClosed(object sender, EventArgs eventArgs)
+        {
+            var frame = ((IWindowFrameEventsNotifier)sender).Frame;
+            if (!openDocumentFrames.ContainsKey(frame))
+                return;
+
+            var document = openDocumentFrames[frame];
+            if(document.IsTextView)
+                BookmarksManager.OnTextDocumentClosed(document.Path);
+
+            document.FrameEventsNotifier.FrameClosed -= OnFrameClosed;
+
+            openDocumentFrames.Remove(frame);
+            UpdateOpenDocumentsState();
+
+            Debug.WriteLine($"Frame Closed: {Path.GetFileName(document.Path)}, isText: {document.IsTextView}, total open: {openDocumentFrames.Count}", ">>> SuperBookmarks");
+        }
+
+        void UpdateOpenDocumentsState()
+        {
+            ThereAreOpenDocuments = openDocumentFrames.Count > 0;
+            ThereAreOpenTextDocuments = openDocumentFrames.Values.Any(doc => doc.IsTextView);
+            if (!ThereAreOpenDocuments)
+            {
+                ActiveDocumentIsText = false;
+                ActiveDocumentIsInProject = false;
+                CurrentWindowFrame = null;
+            }
+        }
+
         public int OnBeforeDocumentWindowShow(uint docCookie, int fFirstShow, IVsWindowFrame pFrame)
         {
-            CurrentWindowFrame = pFrame;
-
-            //Need to check count==0 because sometimes in the first initialization
-            //all the documents are reported as closed if they were open
-            //together with the solution
-            if (openTextDocuments == null || openTextDocuments.Count == 0)
+            if(openDocumentFrames.Count == 0)
                 InitializeRunningDocumentsInfo();
 
-            var path = GetPathOfRunningDocument(docCookie, true, out var docProjectFolder);
-            if (path == null)
+            var isFirstShow = fFirstShow != 0;
+            if (isFirstShow && !openDocumentFrames.ContainsKey(pFrame))
+                RegisterOpenDocument(docCookie, pFrame);
+
+            if (!openDocumentFrames.ContainsKey(pFrame))
                 return VSConstants.S_OK;
 
-            var docIsOpenInTextView = DocIsOpenInTextView(path, out var windowFrameForTextView);
+            if (!isFirstShow && CurrentWindowFrame == pFrame)
+                return VSConstants.S_OK;
 
-            ActiveDocumentIsText = docIsOpenInTextView && pFrame == windowFrameForTextView;
-            
-            if (ActiveDocumentIsText)
-            {
-                ThereAreOpenTextDocuments = true;
-                if (!openTextDocuments.ContainsKey(docCookie))
-                    openTextDocuments.Add(docCookie, path);
-                if(fFirstShow != 0)
-                    BookmarksManager.OnTextDocumentOpen(path);
-            }
+            CurrentWindowFrame = pFrame;
 
-            //We need this extra check to prevent counting twice
-            //the documents that were open together with the solution
-            if (fFirstShow != 0)
-            {
-                if (initialListOfOpenDocuments.Contains(path))
-                    initialListOfOpenDocuments.Remove(path);
-                else
-                    CountOfOpenDocuments++;
-            }
+            var document = openDocumentFrames[pFrame];
+            BookmarksManager.OnCurrentDocumentChanged(document.Path, document.ProjectRoot);
+            ActiveDocumentIsText = document.IsTextView;
+            ActiveDocumentIsInProject = document.ProjectRoot != null;
 
-            ActiveDocumentIsInProject = docProjectFolder != null;
-            BookmarksManager.OnCurrentDocumentChanged(path, docProjectFolder);
+            Debug.WriteLine($"Frame Shown: {Path.GetFileName(document.Path)}, isText: {document.IsTextView}, total open: {openDocumentFrames.Count}", ">>> SuperBookmarks");
 
             return VSConstants.S_OK;
         }
 
-        private Dictionary<string, string> properlyCasedFilenamesCache = 
-            new Dictionary<string, string>();
-        private string GetPathOfRunningDocument(uint docCookie, bool getProjectRootFolder, out string projectRootFolder)
+        private (string documentPath, string projectRootPath) GetRunningDocumentPaths(uint docCookie)
         {
             runningDocumentTable.GetDocumentInfo(docCookie,
                 out var flags, out var dummyReadLocks,
-                out var dummyEditLocks, out string path,
+                out var dummyEditLocks, out string documentPath,
                 out var dummyHierarchy,
                 out var dummyItemId, out var dummyData);
 
-            projectRootFolder = null;
             if (((int)flags & ((int)VsRdtFlags.VirtualDocument | (int)VsRdtFlags.ProjSlnDocument)) != 0)
-                return null;
+                return (null, null);
 
-            if (getProjectRootFolder)
+            string projectRootFolder = null;
+            var projectHierarchy = VsShellUtilities.GetProject(this, documentPath);
+            if (projectHierarchy != null)
             {
-                var projectHierarchy = VsShellUtilities.GetProject(this, path);
-                if (projectHierarchy != null)
+                projectHierarchy.GetCanonicalName((uint) VSConstants.VSITEMID.Root, out string canonicalName);
+                if (canonicalName != null &&
+                    //For projectless solution items GetCanonicalName returns a guid
+                    !Guid.TryParse(canonicalName, out var dummyGuid))
                 {
-                    projectHierarchy.GetCanonicalName((uint) VSConstants.VSITEMID.Root, out string canonicalName);
-                    if (canonicalName != null &&
-                        //For projectless solution items GetCanonicalName returns a guid
-                        !Guid.TryParse(canonicalName, out var dummyGuid))
-                    {
-                        projectRootFolder = Helpers.GetProperlyCasedPath(canonicalName);
-                    }
+                    projectRootFolder = Helpers.GetProperlyCasedPath(canonicalName);
                 }
             }
 
             //We need this because sometimes GetDocumentInfo returns the path lowercased
-            return Helpers.GetProperlyCasedPath(path);
+            documentPath = Helpers.GetProperlyCasedPath(documentPath);
+
+            return (documentPath, projectRootFolder);
         }
 
-        private bool DocIsOpenInTextView(string path, out IVsWindowFrame windowFrame)
+        private IVsWindowFrame GetFrameForTextView(string path)
         {
-            return DocIsOpenInLogicalView(path, VSConstants.LOGVIEWID_Code, out windowFrame) ||
-                   DocIsOpenInLogicalView(path, VSConstants.LOGVIEWID_TextView, out windowFrame);
+            return GetFrameForLogicalView(path, VSConstants.LOGVIEWID_Code) ??
+                   GetFrameForLogicalView(path, VSConstants.LOGVIEWID_TextView);
         }
 
-        private bool DocIsOpenInLogicalView(string path, Guid logicalView, out IVsWindowFrame windowFrame)
+        private IVsWindowFrame GetFrameForDesignerView(string path)
+        {
+            return GetFrameForLogicalView(path, VSConstants.LOGVIEWID_Designer);
+        }
+
+        private IVsWindowFrame GetFrameForLogicalView(string path, Guid logicalView)
         {
             return VsShellUtilities.IsDocumentOpen(
                 this,
                 path,
-                VSConstants.LOGVIEWID_TextView,
+                logicalView,
                 out var dummyHierarchy2, out var dummyItemId2,
-                out windowFrame);
-        }
-
-        private bool DocIsOpenInAnyView(string path)
-        {
-            return VsShellUtilities.IsDocumentOpen(
-                this,
-                path,
-                Guid.Empty,
-                out var dummyHierarchy2, out var dummyItemId2, out var dummyWindowFrame);
-        }
-
-        public int OnBeforeLastDocumentUnlock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining)
-        {
-            //We need to hook on this, and NOT on OnAfterDocumentWindowHide,
-            //because the later doesn't fire for documents that were loaded
-            //together with the solution but were never activated
-            //before being closed.
-
-            if (openTextDocuments == null ||
-                dwReadLocksRemaining != 0 || dwEditLocksRemaining != 0)
-                return VSConstants.S_OK;
-
-            CountOfOpenDocuments--;
-
-            if (!openTextDocuments.ContainsKey(docCookie))
-                return VSConstants.S_OK;
-
-            BookmarksManager.OnTextDocumentClosed(openTextDocuments[docCookie]);
-
-            openTextDocuments.Remove(docCookie);
-
-            ThereAreOpenTextDocuments = openTextDocuments.Count > 0;
-            if (!ThereAreOpenTextDocuments)
-            {
-                ActiveDocumentIsText = false;
-                ActiveDocumentIsInProject = false;
-            }
-
-            return VSConstants.S_OK;
+                out var windowFrame) ? windowFrame : null;
         }
 
         #region Unused members
+
+        public int OnBeforeLastDocumentUnlock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining)
+        {
+            return VSConstants.S_OK;
+        }
 
         public int OnAfterDocumentWindowHide(uint docCookie, IVsWindowFrame pFrame)
         {

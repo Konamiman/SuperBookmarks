@@ -218,7 +218,7 @@ namespace Konamiman.SuperBookmarks
 
         CurrentDocumentData GetViewAndBookmarksForCurrentDocument(bool allowNoOpenFiles = false)
         {
-            var currentView = Helpers.GetTextViewForActiveDocument();
+            ITextView currentView = openDocumentPaths.Count == 0 ? null : Helpers.GetTextViewForActiveDocument();
             if (currentView == null)
             {
                 if(!allowNoOpenFiles)
