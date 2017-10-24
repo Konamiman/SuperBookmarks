@@ -113,10 +113,13 @@ namespace Konamiman.SuperBookmarks
                 OnItemAddedOrRemoved(NotifyCollectionChangedAction.Remove, path);
             }
 
-            bool IsItemForFile(IVsHierarchyItem item, string filePath) =>
-                HierarchyUtilities.IsPhysicalFile(item.HierarchyIdentity) &&
-                item.CanonicalName.Equals(filePath, StringComparison.OrdinalIgnoreCase);
-            
+            bool IsItemForFile(IVsHierarchyItem item, string filePath)
+            {
+                if (item.IsDisposed) return false;
+                return HierarchyUtilities.IsPhysicalFile(item.HierarchyIdentity) &&
+                    item.CanonicalName.Equals(filePath, StringComparison.OrdinalIgnoreCase);
+            }
+
             private void OnItemAddedOrRemoved(NotifyCollectionChangedAction action, string path)
             {
                 var hierarchyItem =

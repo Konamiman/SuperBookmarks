@@ -19,10 +19,10 @@
         <Parent guid="guidMenus" id="SubmenuInEditMenu" />
       </Group>
       
-      <Group guid="guidGroups" id="OptionsGroup_TopLevel" priority="0x0600">
+      <Group guid="guidGroups" id="OptionsGroup_TopLevel" priority="0x9999">
         <Parent guid="guidMenus" id="TopLevelMenu" />
       </Group>
-      <Group guid="guidGroups" id="OptionsGroup_InEdit" priority="0x0600">
+      <Group guid="guidGroups" id="OptionsGroup_InEdit" priority="0x9999">
         <Parent guid="guidMenus" id="SubmenuInEditMenu" />
       </Group>
 
@@ -33,15 +33,33 @@
         <Parent guid="guidMenus" id="SubmenuInEditMenu" />
       </Group>
 
+      <Group guid="guidGroups" id="DeletionGroup_TopLevel" priority="0x0600">
+        <Parent guid="guidMenus" id="DeletionSubmenu_TopLevel" />
+      </Group>
+      <Group guid="guidGroups" id="DeletionGroup_InEdit" priority="0x0600">
+        <Parent guid="guidMenus" id="DeletionSubmenu_InEdit" />
+      </Group>
+
       <!-- This is a special group needed for the submenu under "Edit" itself -->
 
       <Group guid="guidGroups" id="GroupForSubmenuInEditMenu" priority="9999">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_EDIT" />
       </Group>
-    
-      <Group guid="guidGroups" id="GroupForToolbar" priority="0x0000">  
-        <Parent guid="guidMenus" id="Toolbar"/>  
-      </Group>  
+
+      <Group guid="guidGroups" id="GroupForDeletionSubmenuInEditMenu" priority="0x0600">
+        <Parent guid="guidMenus" id="SubmenuInEditMenu" />
+      </Group>
+      <Group guid="guidGroups" id="GroupForDeletionSubmenuInTopbarMenu" priority="0x0600">
+        <Parent guid="guidMenus" id="TopLevelMenu" />
+      </Group>
+
+      <Group guid="guidGroups" id="GroupForNavigationToolbar" priority="0x0000">  
+        <Parent guid="guidMenus" id="NavigationToolbar"/>  
+      </Group>
+
+      <Group guid="guidGroups" id="GroupForDeletionToolbar" priority="0x0000">
+        <Parent guid="guidMenus" id="DeletionToolbar"/>
+      </Group>
     </Groups>
 
     <Menus>
@@ -64,14 +82,42 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
       </Menu>
-    
-      <Menu guid="guidMenus" id="Toolbar" type="Toolbar" >  
+
+      <Menu guid="guidMenus" id="DeletionSubmenu_TopLevel" type="MenuController" >
+        <Parent guid="guidGroups" id="GroupForDeletionSubmenuInTopbarMenu" />
+        <CommandFlag>IconAndText</CommandFlag>
+        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>TextIsAnchorCommand</CommandFlag>
+        <Strings>
+          <CommandName>Deletion Submenu</CommandName>
+        </Strings>
+      </Menu>
+
+      <Menu guid="guidMenus" id="DeletionSubmenu_InEdit" type="MenuController" >
+        <Parent guid="guidGroups" id="GroupForDeletionSubmenuInEditMenu" />
+        <CommandFlag>IconAndText</CommandFlag>
+        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>TextIsAnchorCommand</CommandFlag>
+        <Strings>
+          <CommandName>Deletion Submenu</CommandName>
+        </Strings>
+      </Menu>
+
+      <Menu guid="guidMenus" id="NavigationToolbar" type="Toolbar" >  
         <Strings>  
-            <ButtonText>SuperBookmarks</ButtonText>  
-            <CommandName>SuperBookmarks</CommandName>  
+            <ButtonText>SuperBookmarks - Navigation</ButtonText>  
+            <CommandName>SuperBookmarks - Navigation</CommandName>  
         </Strings>
         <CommandFlag>DefaultDocked</CommandFlag>  
-      </Menu>  
+      </Menu>
+
+      <Menu guid="guidMenus" id="DeletionToolbar" type="Toolbar" >
+        <Strings>
+          <ButtonText>SuperBookmarks - Deletion</ButtonText>
+          <CommandName>SuperBookmarks - Deletion</CommandName>
+        </Strings>
+        <CommandFlag>DefaultDocked</CommandFlag>
+      </Menu>
     </Menus>
 
     <Buttons>
@@ -175,6 +221,46 @@
         </Strings>
       </Button>
 
+      <Button guid="guidCmds" id="DeleteAllInCurrentDocCommandId" priority="0x0100" type="Button">
+        <Icon guid="guidImages" id="bmpDelAllInDoc" />
+        <Strings>
+          <ButtonText>Delete All Bookmarks in Document</ButtonText>
+          <LocCanonicalName>SuperBookmarks.DeleteAllInDocument</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidCmds" id="DeleteAllInOpenDocsCommandId" priority="0x0100" type="Button">
+        <Icon guid="guidImages" id="bmpDelAllInOpenDocs" />
+        <Strings>
+          <ButtonText>Delete All Bookmarks in Open Documents</ButtonText>
+          <LocCanonicalName>SuperBookmarks.DeleteAllInOpenDocuments</LocCanonicalName>
+        </Strings>
+      </Button>
+      
+      <Button guid="guidCmds" id="DeleteAllInFolderCommandId" priority="0x0100" type="Button">
+        <Icon guid="guidImages" id="bmpDelAllInFolder" />
+        <Strings>
+          <ButtonText>Delete All Bookmarks in Current Folder</ButtonText>
+          <LocCanonicalName>SuperBookmarks.DeleteAllInFolder</LocCanonicalName>
+        </Strings>
+      </Button>
+      
+      <Button guid="guidCmds" id="DeleteAllInProjectCommandId" priority="0x0100" type="Button">
+        <Icon guid="guidImages" id="bmpDelAllInProject" />
+        <Strings>
+          <ButtonText>Delete All Bookmarks in Current Project</ButtonText>
+          <LocCanonicalName>SuperBookmarks.DeleteAllInProject</LocCanonicalName>
+        </Strings>
+      </Button>
+      
+      <Button guid="guidCmds" id="DeleteAllInSolutionCommandId" priority="0x0100" type="Button">
+        <Icon guid="guidImages" id="bmpDelAllInSolution" />
+        <Strings>
+          <ButtonText>Delete All Bookmarks in Solution</ButtonText>
+          <LocCanonicalName>SuperBookmarks.DeleteAllInSolution</LocCanonicalName>
+        </Strings>
+      </Button>
+
       <Button guid="guidCmds" id="ShowOptionsPageCommandId" priority="0x0100" type="Button">
         <Strings>
           <ButtonText>Options...</ButtonText>
@@ -183,7 +269,7 @@
     </Buttons>
 
     <Bitmaps>
-      <Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpToggle, bmpPrevInDoc, bmpNextInDoc, bmpPrevInOpen, bmpNextInOpen, bmpPrevInFolder, bmpNextInFolder, bmpPrevInProject, bmpNextInProject, bmpPrevInSolution, bmpNextInSolution, bmpSolutionExplorerFilter"/>
+      <Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpToggle, bmpPrevInDoc, bmpNextInDoc, bmpPrevInOpen, bmpNextInOpen, bmpPrevInFolder, bmpNextInFolder, bmpPrevInProject, bmpNextInProject, bmpPrevInSolution, bmpNextInSolution, bmpSolutionExplorerFilter, bmpDelAllInDoc, bmpDelAllInOpenDocs, bmpDelAllInFolder, bmpDelAllInProject, bmpDelAllInSolution"/>
     </Bitmaps>
     
   </Commands>
@@ -199,6 +285,7 @@
     
     <GuidSymbol name="guidCmds" value="{ce119b9b-9a23-444f-80cb-945bd56d9b6e}">
       <IDSymbol name="ToggleBookmarkCommandId" value="1" />
+      
       <IDSymbol name="NavigateToPrevInCurrentDocCommandId" value="2" />
       <IDSymbol name="NavigateToNextInCurrentDocCommandId" value="3" />
       <IDSymbol name="NavigateToPrevInOpenDocsCommandId" value="4" />
@@ -209,7 +296,15 @@
       <IDSymbol name="NavigateToNextInProjectCommandId" value="9" />
       <IDSymbol name="NavigateToPrevInSolutionCommandId" value="10" />
       <IDSymbol name="NavigateToNextInSolutionCommandId" value="11" />
+      
       <IDSymbol name="SolutionExplorerFilterCommandId" value="12" />
+      
+      <IDSymbol name="DeleteAllInCurrentDocCommandId" value="13" />
+      <IDSymbol name="DeleteAllInOpenDocsCommandId" value="14" />
+      <IDSymbol name="DeleteAllInFolderCommandId" value="15" />
+      <IDSymbol name="DeleteAllInProjectCommandId" value="16" />
+      <IDSymbol name="DeleteAllInSolutionCommandId" value="17" />
+      
       <IDSymbol name="ShowOptionsPageCommandId" value="100" />
     </GuidSymbol>
 
@@ -222,19 +317,30 @@
 
       <IDSymbol name="NavigationGroup_TopLevel" value="3" />
       <IDSymbol name="NavigationGroup_InEdit" value="4" />
+
+      <IDSymbol name="DeletionGroup_TopLevel" value="5" />
+      <IDSymbol name="DeletionGroup_InEdit" value="6" />
       
       <IDSymbol name="OptionsGroup_TopLevel" value="98" />
       <IDSymbol name="OptionsGroup_InEdit" value="99" />
       
       <!-- This is a special group needed for the submenu under "Edit" itself -->
       <IDSymbol name="GroupForSubmenuInEditMenu" value="100" />
-      <IDSymbol name="GroupForToolbar" value="200" />
+
+      <IDSymbol name="GroupForDeletionSubmenuInEditMenu" value="101" />
+      <IDSymbol name="GroupForDeletionSubmenuInTopbarMenu" value="102" />
+      
+      <IDSymbol name="GroupForNavigationToolbar" value="200" />
+      <IDSymbol name="GroupForDeletionToolbar" value="201" />
     </GuidSymbol>
     
     <GuidSymbol name="guidMenus" value="{391D1519-100C-4656-AC82-F3DA9998E55B}">
       <IDSymbol name="TopLevelMenu" value="1"/>
       <IDSymbol name="SubmenuInEditMenu" value="2"/>
-      <IDSymbol name="Toolbar" value="3"/>
+      <IDSymbol name="DeletionSubmenu_TopLevel" value="3"/>
+      <IDSymbol name="DeletionSubmenu_InEdit" value="4"/>
+      <IDSymbol name="NavigationToolbar" value="100"/>
+      <IDSymbol name="DeletionToolbar" value="101"/>
     </GuidSymbol>
       
     <GuidSymbol name="guidImages" value="{1c3ed7c8-e761-4067-a59c-bfe3de369896}" >
@@ -250,6 +356,11 @@
       <IDSymbol name="bmpPrevInSolution" value="10" />
       <IDSymbol name="bmpNextInSolution" value="11" />
       <IDSymbol name="bmpSolutionExplorerFilter" value="12" />
+      <IDSymbol name="bmpDelAllInDoc" value="13" />
+      <IDSymbol name="bmpDelAllInOpenDocs" value="14" />
+      <IDSymbol name="bmpDelAllInFolder" value="15" />
+      <IDSymbol name="bmpDelAllInProject" value="16" />
+      <IDSymbol name="bmpDelAllInSolution" value="17" />
     </GuidSymbol>
   </Symbols>
 
@@ -265,7 +376,7 @@
       <Parent guid="guidGroups" id="ToggleGroup_TopLevel" />
     </CommandPlacement>
     <CommandPlacement guid="guidCmds" id="ToggleBookmarkCommandId" priority="1">
-      <Parent guid="guidGroups" id="GroupForToolbar" />
+      <Parent guid="guidGroups" id="GroupForNavigationToolbar" />
     </CommandPlacement>
 
     <CommandPlacement guid="guidCmds" id="NavigateToPrevInCurrentDocCommandId" priority="2">
@@ -275,7 +386,7 @@
       <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
     </CommandPlacement>
     <CommandPlacement guid="guidCmds" id="NavigateToPrevInCurrentDocCommandId" priority="2">
-      <Parent guid="guidGroups" id="GroupForToolbar" />
+      <Parent guid="guidGroups" id="GroupForNavigationToolbar" />
     </CommandPlacement>
 
     <CommandPlacement guid="guidCmds" id="NavigateToNextInCurrentDocCommandId" priority="3">
@@ -285,7 +396,7 @@
       <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
     </CommandPlacement>
     <CommandPlacement guid="guidCmds" id="NavigateToNextInCurrentDocCommandId" priority="3">
-      <Parent guid="guidGroups" id="GroupForToolbar" />
+      <Parent guid="guidGroups" id="GroupForNavigationToolbar" />
     </CommandPlacement>
 
     <CommandPlacement guid="guidCmds" id="NavigateToPrevInOpenDocsCommandId" priority="4">
@@ -295,7 +406,7 @@
       <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
     </CommandPlacement>
     <CommandPlacement guid="guidCmds" id="NavigateToPrevInOpenDocsCommandId" priority="4">
-      <Parent guid="guidGroups" id="GroupForToolbar" />
+      <Parent guid="guidGroups" id="GroupForNavigationToolbar" />
     </CommandPlacement>
 
     <CommandPlacement guid="guidCmds" id="NavigateToNextInOpenDocsCommandId" priority="5">
@@ -305,7 +416,7 @@
       <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
     </CommandPlacement>
     <CommandPlacement guid="guidCmds" id="NavigateToNextInOpenDocsCommandId" priority="5">
-      <Parent guid="guidGroups" id="GroupForToolbar" />
+      <Parent guid="guidGroups" id="GroupForNavigationToolbar" />
     </CommandPlacement>
     
     <CommandPlacement guid="guidCmds" id="NavigateToPrevInFolderCommandId" priority="6">
@@ -315,7 +426,7 @@
       <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
     </CommandPlacement>
     <CommandPlacement guid="guidCmds" id="NavigateToPrevInFolderCommandId" priority="6">
-      <Parent guid="guidGroups" id="GroupForToolbar" />
+      <Parent guid="guidGroups" id="GroupForNavigationToolbar" />
     </CommandPlacement>
       
     <CommandPlacement guid="guidCmds" id="NavigateToNextInFolderCommandId" priority="7">
@@ -325,7 +436,7 @@
       <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
     </CommandPlacement>
     <CommandPlacement guid="guidCmds" id="NavigateToNextInFolderCommandId" priority="7">
-      <Parent guid="guidGroups" id="GroupForToolbar" />
+      <Parent guid="guidGroups" id="GroupForNavigationToolbar" />
     </CommandPlacement>
 
     <CommandPlacement guid="guidCmds" id="NavigateToPrevInProjectCommandId" priority="8">
@@ -335,7 +446,7 @@
       <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
     </CommandPlacement>
     <CommandPlacement guid="guidCmds" id="NavigateToPrevInProjectCommandId" priority="8">
-      <Parent guid="guidGroups" id="GroupForToolbar" />
+      <Parent guid="guidGroups" id="GroupForNavigationToolbar" />
     </CommandPlacement>
 
     <CommandPlacement guid="guidCmds" id="NavigateToNextInProjectCommandId" priority="9">
@@ -345,7 +456,7 @@
       <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
     </CommandPlacement>
     <CommandPlacement guid="guidCmds" id="NavigateToNextInProjectCommandId" priority="9">
-      <Parent guid="guidGroups" id="GroupForToolbar" />
+      <Parent guid="guidGroups" id="GroupForNavigationToolbar" />
     </CommandPlacement>
 
     <CommandPlacement guid="guidCmds" id="NavigateToPrevInSolutionCommandId" priority="10">
@@ -355,7 +466,7 @@
       <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
     </CommandPlacement>
     <CommandPlacement guid="guidCmds" id="NavigateToPrevInSolutionCommandId" priority="10">
-      <Parent guid="guidGroups" id="GroupForToolbar" />
+      <Parent guid="guidGroups" id="GroupForNavigationToolbar" />
     </CommandPlacement>
 
     <CommandPlacement guid="guidCmds" id="NavigateToNextInSolutionCommandId" priority="11">
@@ -365,9 +476,59 @@
       <Parent guid="guidGroups" id="NavigationGroup_TopLevel" />
     </CommandPlacement>
     <CommandPlacement guid="guidCmds" id="NavigateToNextInSolutionCommandId" priority="11">
-      <Parent guid="guidGroups" id="GroupForToolbar" />
+      <Parent guid="guidGroups" id="GroupForNavigationToolbar" />
     </CommandPlacement>
 
+    <CommandPlacement guid="guidCmds" id="DeleteAllInCurrentDocCommandId" priority="12">
+      <Parent guid="guidGroups" id="DeletionGroup_TopLevel"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="DeleteAllInCurrentDocCommandId" priority="12">
+      <Parent guid="guidGroups" id="DeletionGroup_InEdit" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="DeleteAllInCurrentDocCommandId" priority="12">
+      <Parent guid="guidGroups" id="GroupForDeletionToolbar" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidCmds" id="DeleteAllInOpenDocsCommandId" priority="13">
+      <Parent guid="guidGroups" id="DeletionGroup_TopLevel"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="DeleteAllInOpenDocsCommandId" priority="13">
+      <Parent guid="guidGroups" id="DeletionGroup_InEdit" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="DeleteAllInOpenDocsCommandId" priority="13">
+      <Parent guid="guidGroups" id="GroupForDeletionToolbar" />
+    </CommandPlacement>
+    
+    <CommandPlacement guid="guidCmds" id="DeleteAllInFolderCommandId" priority="14">
+      <Parent guid="guidGroups" id="DeletionGroup_TopLevel"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="DeleteAllInFolderCommandId" priority="14">
+      <Parent guid="guidGroups" id="DeletionGroup_InEdit" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="DeleteAllInFolderCommandId" priority="14">
+      <Parent guid="guidGroups" id="GroupForDeletionToolbar" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidCmds" id="DeleteAllInProjectCommandId" priority="15">
+      <Parent guid="guidGroups" id="DeletionGroup_TopLevel"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="DeleteAllInProjectCommandId" priority="15">
+      <Parent guid="guidGroups" id="DeletionGroup_InEdit" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="DeleteAllInProjectCommandId" priority="15">
+      <Parent guid="guidGroups" id="GroupForDeletionToolbar" />
+    </CommandPlacement>
+      
+    <CommandPlacement guid="guidCmds" id="DeleteAllInSolutionCommandId" priority="16">
+      <Parent guid="guidGroups" id="DeletionGroup_TopLevel"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="DeleteAllInSolutionCommandId" priority="16">
+      <Parent guid="guidGroups" id="DeletionGroup_InEdit" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="DeleteAllInSolutionCommandId" priority="16">
+      <Parent guid="guidGroups" id="GroupForDeletionToolbar" />
+    </CommandPlacement>
+      
     <CommandPlacement guid="guidCmds" id="ShowOptionsPageCommandId" priority="100">
       <Parent guid="guidGroups" id="OptionsGroup_InEdit"/>
     </CommandPlacement>

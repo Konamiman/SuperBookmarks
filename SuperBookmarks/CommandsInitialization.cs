@@ -51,6 +51,12 @@ namespace Konamiman.SuperBookmarks
 
                 new SolutionExplorerFilterCommand(),
 
+                new DeleteAllInDocCommand(), 
+                new DeleteAllInOpenDocsCommand(), 
+                new DeleteAllInFolderCommand(), 
+                new DeleteAllInProjectCommand(), 
+                new DeleteAllInSolutionCommand(), 
+
                 new OpenOptionsCommand()
             };
         }

@@ -288,22 +288,6 @@ namespace Konamiman.SuperBookmarks
             }
         }
 
-        public void ClearAllBookmarks()
-        {
-            foreach (var fileName in viewsByFilename.Keys)
-            {
-                var view = viewsByFilename[fileName];
-                foreach (var bookmark in bookmarksByView[view])
-                {
-                    var tagger = Helpers.GetTaggerFor(Helpers.GetRootTextBuffer(view.TextBuffer));
-                    tagger.RemoveTagSpan(bookmark.TrackingSpan);
-                }
-            }
-            bookmarksByView.Clear();
-            viewsByFilename.Clear();
-            bookmarksPendingCreation.Clear();
-        }
-
         public void OnFileDeleted(string filePath)
         {
             bookmarksPendingCreation.Remove(filePath);

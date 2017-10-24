@@ -75,6 +75,11 @@
       <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
     </Compile>
     <Compile Include="Commands\CommandBase.cs" />
+    <Compile Include="Commands\DeleteAllInSolutionCommand.cs" />
+    <Compile Include="Commands\DeleteAllInProjectCommand.cs" />
+    <Compile Include="Commands\DeleteAllInFolderCommand.cs" />
+    <Compile Include="Commands\DeleteAllInOpenDocsCommand.cs" />
+    <Compile Include="Commands\DeleteAllInDocCommand.cs" />
     <Compile Include="Commands\GoToNextInDocCommand.cs" />
     <Compile Include="Commands\GoToNextInFolderCommand.cs" />
     <Compile Include="Commands\GoToNextInProjectCommand.cs" />
@@ -88,6 +93,9 @@
     <Compile Include="Commands\OpenOptionsCommand.cs" />
     <Compile Include="Commands\SolutionExplorerFilterCommand.cs" />
     <Compile Include="Commands\ToggleBookmarkCommand.cs" />
+    <Compile Include="Deletion.cs">
+      <DependentUpon>BookmarksManager.cs</DependentUpon>
+    </Compile>
     <Compile Include="Helpers.cs" />
     <Compile Include="IVsPersistSolutionOpts.cs">
       <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
