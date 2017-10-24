@@ -86,6 +86,7 @@
     <Compile Include="Commands\GoToPrevInOpenDocsCommand.cs" />
     <Compile Include="Commands\GoToPrevInDocCommand.cs" />
     <Compile Include="Commands\OpenOptionsCommand.cs" />
+    <Compile Include="Commands\SolutionExplorerFilterCommand.cs" />
     <Compile Include="Commands\ToggleBookmarkCommand.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="IVsPersistSolutionOpts.cs">
@@ -137,6 +138,7 @@
     <Compile Include="RuntimeBookmark.cs">
       <DependentUpon>BookmarksManager.cs</DependentUpon>
     </Compile>
+    <Compile Include="SolutionExplorerFilter.cs" />
     <Compile Include="SuperBookmarksPackage.cs" />
     <Compile Include="BookmarkGlyphFactory.cs" />
     <Compile Include="BookmarkGlyphFactoryProvider.cs" />

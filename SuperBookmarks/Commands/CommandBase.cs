@@ -6,7 +6,16 @@ namespace Konamiman.SuperBookmarks.Commands
 {
     internal abstract class CommandBase
     {
-        protected Guid CommandsGuid = new Guid("ce119b9b-9a23-444f-80cb-945bd56d9b6e");
+        static CommandBase()
+        {
+            CommandsGuidString = CommandsGuid.ToString();
+        }
+
+        public static string CommandsGuidString { get; }
+
+        public const string TheCommandsGuid = "{ce119b9b-9a23-444f-80cb-945bd56d9b6e}";
+
+        public static Guid CommandsGuid { get; } = Guid.Parse(TheCommandsGuid);
 
         protected abstract int CommandId { get; }
 
@@ -45,38 +54,21 @@ namespace Konamiman.SuperBookmarks.Commands
         {
             var command = (OleMenuCommand) sender;
 
-            if (RequiresOpenSolution && !Package.SolutionIsCurrentlyOpen)
-            {
-                command.Enabled = false;
-                return;
-            }
-
-            if (RequiresActiveTextDocument && !Package.ActiveDocumentIsText)
-            {
-                command.Enabled = false;
-                return;
-            }
-
-            if (RequiresOpenDocumentsOfAnyKind && !Package.ThereAreOpenDocuments)
-            {
-                command.Enabled = false;
-                return;
-            }
-
-            if (RequiresOpenTextDocuments && !Package.ThereAreOpenTextDocuments)
-            {
-                command.Enabled = false;
-                return;
-            }
-
-            if (RequiresActiveDocumentToBeInProject && !Package.ActiveDocumentIsInProject)
-            {
-                command.Enabled = false;
-                return;
-            }
-
+            command.Visible = true;
             command.Enabled = true;
             QueryStatusCallback(command);
+            if (!command.Enabled || !command.Visible)
+                return;
+
+            if (
+                (RequiresOpenSolution && !Package.SolutionIsCurrentlyOpen) ||
+                (RequiresActiveTextDocument && !Package.ActiveDocumentIsText) ||
+                (RequiresOpenDocumentsOfAnyKind && !Package.ThereAreOpenDocuments) ||
+                (RequiresOpenTextDocuments && !Package.ThereAreOpenTextDocuments) ||
+                (RequiresActiveDocumentToBeInProject && !Package.ActiveDocumentIsInProject))
+            {
+                command.Enabled = false;
+            }
         }
 
         protected virtual void QueryStatusCallback(OleMenuCommand command)

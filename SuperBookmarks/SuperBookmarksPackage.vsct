@@ -166,6 +166,15 @@
         </Strings>
       </Button>
 
+      <Button guid="guidCmds" id="SolutionExplorerFilterCommandId" priority="0x0400" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLBAR_PROJWIN_FILTERS" />
+        <Icon guid="guidImages" id="bmpSolutionExplorerFilter" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Files with Bookmarks Filter</ButtonText>
+        </Strings>
+      </Button>
+
       <Button guid="guidCmds" id="ShowOptionsPageCommandId" priority="0x0100" type="Button">
         <Strings>
           <ButtonText>Options...</ButtonText>
@@ -174,9 +183,15 @@
     </Buttons>
 
     <Bitmaps>
-      <Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpToggle, bmpPrevInDoc, bmpNextInDoc, bmpPrevInOpen, bmpNextInOpen, bmpPrevInFolder, bmpNextInFolder, bmpPrevInProject, bmpNextInProject, bmpPrevInSolution, bmpNextInSolution"/>
+      <Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpToggle, bmpPrevInDoc, bmpNextInDoc, bmpPrevInOpen, bmpNextInOpen, bmpPrevInFolder, bmpNextInFolder, bmpPrevInProject, bmpNextInProject, bmpPrevInSolution, bmpNextInSolution, bmpSolutionExplorerFilter"/>
     </Bitmaps>
+    
   </Commands>
+
+  <KeyBindings>
+    <KeyBinding guid="guidCmds" id="SolutionExplorerFilterCommandId"
+        editor="guidVSStd97" key1="VK_OEM_4" key2="B" mod1="CONTROL"/>  
+  </KeyBindings>
 
   <Symbols>
     <!-- This is the package guid. -->
@@ -194,6 +209,7 @@
       <IDSymbol name="NavigateToNextInProjectCommandId" value="9" />
       <IDSymbol name="NavigateToPrevInSolutionCommandId" value="10" />
       <IDSymbol name="NavigateToNextInSolutionCommandId" value="11" />
+      <IDSymbol name="SolutionExplorerFilterCommandId" value="12" />
       <IDSymbol name="ShowOptionsPageCommandId" value="100" />
     </GuidSymbol>
 
@@ -233,6 +249,7 @@
       <IDSymbol name="bmpNextInProject" value="9" />
       <IDSymbol name="bmpPrevInSolution" value="10" />
       <IDSymbol name="bmpNextInSolution" value="11" />
+      <IDSymbol name="bmpSolutionExplorerFilter" value="12" />
     </GuidSymbol>
   </Symbols>
 

@@ -258,8 +258,15 @@ namespace Konamiman.SuperBookmarks
                 //Create new bookmark
 
                 var trackingSpan = Helpers.CreateTagSpan(docData.TextBuffer, lineNumber);
-                if(trackingSpan != null)
+                if (trackingSpan != null)
+                {
                     docData.Bookmarks.Add(new Bookmark(trackingSpan));
+                    if (docData.Bookmarks.Count == 1)
+                    {
+                        var path = viewsByFilename.Keys.Single(k => viewsByFilename[k] == docData.TextView);
+                        SolutionExplorerFilter.OnFileGotItsFirstBookmark(path);
+                    }
+                }
             }
             else
             {
@@ -271,6 +278,12 @@ namespace Konamiman.SuperBookmarks
                     var tagger = Helpers.GetTaggerFor(docData.TextBuffer);
                     tagger.RemoveTagSpan(existingBookmark.TrackingSpan);
                     docData.Bookmarks.Remove(existingBookmark);
+
+                    if(docData.Bookmarks.Count == 0)
+                    {
+                        var path = viewsByFilename.Keys.Single(k => viewsByFilename[k] == docData.TextView);
+                        SolutionExplorerFilter.OnFileLostItsLastBookmark(path);
+                    }
                 }
             }
         }
@@ -314,6 +327,12 @@ namespace Konamiman.SuperBookmarks
                 bookmarksPendingCreation[newPath] = bookmarksPendingCreation[oldPath];
                 bookmarksPendingCreation.Remove(newPath);
             }
+        }
+
+        public bool HasBookmarks(string path)
+        {
+            return (viewsByFilename.ContainsKey(path) && bookmarksByView[viewsByFilename[path]].Any())
+                   || bookmarksPendingCreation.ContainsKey(path);
         }
     }
 }
