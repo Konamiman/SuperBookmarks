@@ -30,12 +30,13 @@ namespace Konamiman.SuperBookmarks
                 rbInEdit.Checked = true;
 
             chkNavInFolderIncludesSubfolders.Checked = Options.NavigateInFolderIncludesSubfolders;
+            chkDelAllInFolderIncludesSubfolder.Checked = Options.DeleteAllInFolderIncludesSubfolders;
 
             chkDeletingLineDeletesBookmark.CheckedChanged += chkDeletingLineDeletesBookmark_CheckedChanged;
             chkNavInFolderIncludesSubfolders.CheckedChanged += ChkNavInFolderIncludesSubfoldersOnCheckedChanged;
+            chkDelAllInFolderIncludesSubfolder.CheckedChanged += ChkDelAllInFolderIncludesSubfolderOnCheckedChanged;
             rbInTopLevel.CheckedChanged += rbInTopLevelMenu_CheckedChanged;
         }
-
 
         private void chkDeletingLineDeletesBookmark_CheckedChanged(object sender, EventArgs e)
         {
@@ -45,6 +46,11 @@ namespace Konamiman.SuperBookmarks
         private void ChkNavInFolderIncludesSubfoldersOnCheckedChanged(object sender, EventArgs eventArgs)
         {
             Options.NavigateInFolderIncludesSubfolders = chkNavInFolderIncludesSubfolders.Checked;
+        }
+
+        private void ChkDelAllInFolderIncludesSubfolderOnCheckedChanged(object sender, EventArgs eventArgs)
+        {
+            Options.DeleteAllInFolderIncludesSubfolders = chkDelAllInFolderIncludesSubfolder.Checked;
         }
 
         private void rbInTopLevelMenu_CheckedChanged(object sender, EventArgs e)

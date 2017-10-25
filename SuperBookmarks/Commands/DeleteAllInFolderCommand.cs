@@ -10,7 +10,10 @@ namespace Konamiman.SuperBookmarks.Commands
 
         protected override void CommandCallback(OleMenuCommand command)
         {
-            BookmarksManager.DeleteAllBookmarksIn(BookmarkActionTarget.Folder);
+            BookmarksManager.DeleteAllBookmarksIn(
+                Package.Options.DeleteAllInFolderIncludesSubfolders ?
+                BookmarkActionTarget.FolderAndSubfolders :
+                BookmarkActionTarget.Folder);
         }
     }
 }

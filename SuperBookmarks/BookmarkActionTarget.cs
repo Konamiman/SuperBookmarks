@@ -5,6 +5,7 @@
         Document,
         OpenDocuments,
         Folder,
+        FolderAndSubfolders,
         Project,
         Solution
     }

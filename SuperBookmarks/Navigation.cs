@@ -14,7 +14,6 @@ namespace Konamiman.SuperBookmarks
         private string currentDocumentFolder = null;
         private string currentTextDocumentPath = null;
         private string currentProjectFolder = null;
-        private bool folderNavigationIsRecursive = false;
         private List<string> currentTextDocumentPathCollection;
         private Dictionary<BookmarkActionTarget, Func<List<string>>> filesSelectors;
 
@@ -27,7 +26,8 @@ namespace Konamiman.SuperBookmarks
             {
                 {BookmarkActionTarget.Document, () => currentTextDocumentPathCollection},
                 {BookmarkActionTarget.OpenDocuments, GetOpenDocumentsWithBookmarks },
-                {BookmarkActionTarget.Folder, () => GetDocumentsInFolder(currentDocumentFolder, folderNavigationIsRecursive) },
+                {BookmarkActionTarget.Folder, () => GetDocumentsInFolder(currentDocumentFolder, false) },
+                {BookmarkActionTarget.FolderAndSubfolders, () => GetDocumentsInFolder(currentDocumentFolder, true) },
                 {BookmarkActionTarget.Project, () => GetDocumentsInFolder(currentProjectFolder, true) },
                 {BookmarkActionTarget.Solution, GetDocumentsWithBookmarks }
             };

@@ -42,6 +42,7 @@
             this.lblGlyphColor = new System.Windows.Forms.Label();
             this.pnlChooseColor = new System.Windows.Forms.Panel();
             this.chkNavInFolderIncludesSubfolders = new System.Windows.Forms.CheckBox();
+            this.chkDelAllInFolderIncludesSubfolder = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.pnlRequiresRestaring.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -61,8 +62,8 @@
             // 
             this.panel1.Controls.Add(this.rbInEdit);
             this.panel1.Controls.Add(this.rbInTopLevel);
-            this.panel1.Location = new System.Drawing.Point(14, 122);
-            this.panel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.panel1.Location = new System.Drawing.Point(14, 145);
+            this.panel1.Margin = new System.Windows.Forms.Padding(2);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(388, 106);
             this.panel1.TabIndex = 2;
@@ -71,7 +72,7 @@
             // 
             this.rbInEdit.AutoSize = true;
             this.rbInEdit.Location = new System.Drawing.Point(2, 3);
-            this.rbInEdit.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rbInEdit.Margin = new System.Windows.Forms.Padding(2);
             this.rbInEdit.Name = "rbInEdit";
             this.rbInEdit.Size = new System.Drawing.Size(385, 24);
             this.rbInEdit.TabIndex = 0;
@@ -83,7 +84,7 @@
             // 
             this.rbInTopLevel.AutoSize = true;
             this.rbInTopLevel.Location = new System.Drawing.Point(2, 29);
-            this.rbInTopLevel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rbInTopLevel.Margin = new System.Windows.Forms.Padding(2);
             this.rbInTopLevel.Name = "rbInTopLevel";
             this.rbInTopLevel.Size = new System.Drawing.Size(290, 24);
             this.rbInTopLevel.TabIndex = 1;
@@ -94,21 +95,21 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(11, 96);
+            this.label1.Location = new System.Drawing.Point(11, 119);
             this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(147, 20);
-            this.label1.TabIndex = 2;
+            this.label1.TabIndex = 3;
             this.label1.Text = "Show commands in";
             // 
             // pnlRequiresRestaring
             // 
             this.pnlRequiresRestaring.Controls.Add(this.lblInfoMessage);
             this.pnlRequiresRestaring.Controls.Add(this.pictureBox1);
-            this.pnlRequiresRestaring.Location = new System.Drawing.Point(16, 177);
+            this.pnlRequiresRestaring.Location = new System.Drawing.Point(16, 200);
             this.pnlRequiresRestaring.Name = "pnlRequiresRestaring";
             this.pnlRequiresRestaring.Size = new System.Drawing.Size(384, 38);
-            this.pnlRequiresRestaring.TabIndex = 3;
+            this.pnlRequiresRestaring.TabIndex = 4;
             this.pnlRequiresRestaring.Visible = false;
             // 
             // lblInfoMessage
@@ -137,11 +138,11 @@
             // 
             // btnResetColor
             // 
-            this.btnResetColor.Location = new System.Drawing.Point(259, 212);
-            this.btnResetColor.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnResetColor.Location = new System.Drawing.Point(259, 235);
+            this.btnResetColor.Margin = new System.Windows.Forms.Padding(2);
             this.btnResetColor.Name = "btnResetColor";
             this.btnResetColor.Size = new System.Drawing.Size(94, 32);
-            this.btnResetColor.TabIndex = 6;
+            this.btnResetColor.TabIndex = 7;
             this.btnResetColor.Text = "Reset";
             this.btnResetColor.UseVisualStyleBackColor = true;
             this.btnResetColor.Click += new System.EventHandler(this.btnResetColor_Click);
@@ -150,11 +151,11 @@
             // 
             this.lblGlyphColor.AutoSize = true;
             this.lblGlyphColor.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.lblGlyphColor.Location = new System.Drawing.Point(13, 217);
+            this.lblGlyphColor.Location = new System.Drawing.Point(13, 240);
             this.lblGlyphColor.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblGlyphColor.Name = "lblGlyphColor";
             this.lblGlyphColor.Size = new System.Drawing.Size(164, 20);
-            this.lblGlyphColor.TabIndex = 4;
+            this.lblGlyphColor.TabIndex = 5;
             this.lblGlyphColor.Text = "Bookmark glyph color:";
             this.lblGlyphColor.Click += new System.EventHandler(this.lblGlyphColor_Click);
             // 
@@ -162,11 +163,11 @@
             // 
             this.pnlChooseColor.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.pnlChooseColor.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pnlChooseColor.Location = new System.Drawing.Point(186, 212);
-            this.pnlChooseColor.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pnlChooseColor.Location = new System.Drawing.Point(186, 235);
+            this.pnlChooseColor.Margin = new System.Windows.Forms.Padding(2);
             this.pnlChooseColor.Name = "pnlChooseColor";
             this.pnlChooseColor.Size = new System.Drawing.Size(52, 32);
-            this.pnlChooseColor.TabIndex = 5;
+            this.pnlChooseColor.TabIndex = 6;
             this.pnlChooseColor.Click += new System.EventHandler(this.pnlChooseColor_Click);
             // 
             // chkNavInFolderIncludesSubfolders
@@ -179,10 +180,21 @@
             this.chkNavInFolderIncludesSubfolders.Text = "\"Go to prev/next in Folder\" includes subfolders";
             this.chkNavInFolderIncludesSubfolders.UseVisualStyleBackColor = true;
             // 
+            // chkDelAllInFolderIncludesSubfolder
+            // 
+            this.chkDelAllInFolderIncludesSubfolder.AutoSize = true;
+            this.chkDelAllInFolderIncludesSubfolder.Location = new System.Drawing.Point(14, 79);
+            this.chkDelAllInFolderIncludesSubfolder.Name = "chkDelAllInFolderIncludesSubfolder";
+            this.chkDelAllInFolderIncludesSubfolder.Size = new System.Drawing.Size(318, 24);
+            this.chkDelAllInFolderIncludesSubfolder.TabIndex = 2;
+            this.chkDelAllInFolderIncludesSubfolder.Text = "\"Delete all in Folder\" includes subfolders";
+            this.chkDelAllInFolderIncludesSubfolder.UseVisualStyleBackColor = true;
+            // 
             // OptionsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkDelAllInFolderIncludesSubfolder);
             this.Controls.Add(this.chkNavInFolderIncludesSubfolders);
             this.Controls.Add(this.btnResetColor);
             this.Controls.Add(this.pnlChooseColor);
@@ -218,5 +230,6 @@
         private System.Windows.Forms.Label lblGlyphColor;
         private System.Windows.Forms.Panel pnlChooseColor;
         private System.Windows.Forms.CheckBox chkNavInFolderIncludesSubfolders;
+        private System.Windows.Forms.CheckBox chkDelAllInFolderIncludesSubfolder;
     }
 }

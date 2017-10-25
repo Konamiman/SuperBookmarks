@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
 
@@ -12,9 +11,6 @@ namespace Konamiman.SuperBookmarks
     [TagType(typeof(BookmarkTag))]
     class BookmarkTaggerProvider : ITaggerProvider
     {
-        [Import]
-        internal IClassifierAggregatorService AggregatorService;
-
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
         {
             if (buffer == null)

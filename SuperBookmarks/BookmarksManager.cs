@@ -46,16 +46,10 @@ namespace Konamiman.SuperBookmarks
 
             var options = SuperBookmarksPackage.Instance.Options;
             deletingALineDeletesTheBookmark = options.DeletingALineDeletesTheBookmark;
-            folderNavigationIsRecursive = options.NavigateInFolderIncludesSubfolders;
 
             options.DeletingALineDeletesTheBookmarkChanged += (sender, args) =>
             {
                 deletingALineDeletesTheBookmark = ((OptionsPage)sender).DeletingALineDeletesTheBookmark;
-            };
-
-            options.NavigateInFolderIncludesSubfoldersChanged += (sender, args) =>
-            {
-                folderNavigationIsRecursive = ((OptionsPage) sender).NavigateInFolderIncludesSubfolders;
             };
 
             options.GlyphColorChanged += (sender, args) =>

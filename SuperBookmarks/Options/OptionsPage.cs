@@ -14,7 +14,7 @@ namespace Konamiman.SuperBookmarks
 
         private bool deletingALineDeletesTheBookmark = true;
         private bool navigateInFolderIncludesSubfolders = false;
-        private bool navigateInFolderIncludesSubfoldersChanged = false;
+        private bool delAllInFolderIncludesSubfolders = false;
         private bool optionsChanged = false;
         private bool deletingALineDeletesTheBookmarkChanged = false;
         private bool glyphColorChanged = false;
@@ -51,7 +51,19 @@ namespace Konamiman.SuperBookmarks
             set
             {
                 navigateInFolderIncludesSubfolders = value;
-                navigateInFolderIncludesSubfoldersChanged = true;
+                optionsChanged = true;
+            }
+        }
+
+        public bool DeleteAllInFolderIncludesSubfolders
+        {
+            get
+            {
+                return delAllInFolderIncludesSubfolders;
+            }
+            set
+            {
+                delAllInFolderIncludesSubfolders = value;
                 optionsChanged = true;
             }
         }
@@ -98,7 +110,6 @@ namespace Konamiman.SuperBookmarks
 
         public event EventHandler DeletingALineDeletesTheBookmarkChanged;
         public event EventHandler GlyphColorChanged;
-        public event EventHandler NavigateInFolderIncludesSubfoldersChanged;
         public event EventHandler OptionsChanged;
 
         private bool applyClicked = false;
@@ -114,10 +125,7 @@ namespace Konamiman.SuperBookmarks
             if(glyphColorChanged)
                 GlyphColorChanged?.Invoke(this, EventArgs.Empty);
 
-            if(navigateInFolderIncludesSubfoldersChanged)
-                NavigateInFolderIncludesSubfoldersChanged?.Invoke(this, EventArgs.Empty);
-
-            if(optionsChanged)
+            if (optionsChanged)
                 OptionsChanged?.Invoke(this, EventArgs.Empty);
 
             //SetAsUnchanged(); --> OnClosed will take care of that
@@ -145,7 +153,6 @@ namespace Konamiman.SuperBookmarks
         {
             optionsChanged = false;
             deletingALineDeletesTheBookmarkChanged = false;
-            navigateInFolderIncludesSubfoldersChanged = false;
             glyphColorChanged = false;
             applyClicked = false;
         }

@@ -10,7 +10,10 @@ namespace Konamiman.SuperBookmarks.Commands
 
         protected override void CommandCallback(OleMenuCommand command)
         {
-            BookmarksManager.GoToNextIn(BookmarkActionTarget.Folder);
+            BookmarksManager.GoToNextIn(
+                Package.Options.NavigateInFolderIncludesSubfolders ?
+                BookmarkActionTarget.FolderAndSubfolders :
+                BookmarkActionTarget.Folder);
         }
     }
 }

@@ -43,6 +43,9 @@ namespace Konamiman.SuperBookmarks
             Options.NavigateInFolderIncludesSubfolders =
                 settingsStore.GetInt32(SettingsStoreName, "NavigateInFolderIncludesSubfolders", intFalse) == intTrue;
 
+            Options.DeleteAllInFolderIncludesSubfolders =
+                settingsStore.GetInt32(SettingsStoreName, "DeleteAllInFolderIncludesSubfolders", intFalse) == intTrue;
+
             var glypColorRgb =
                 settingsStore.GetInt32(SettingsStoreName, "GlyphColor", BookmarkGlyphFactory.DefaultColor.ToArgb());
             Options.GlyphColor = Color.FromArgb(glypColorRgb);
@@ -63,6 +66,10 @@ namespace Konamiman.SuperBookmarks
             settingsStore.SetInt32(SettingsStoreName,
                 "NavigateInFolderIncludesSubfolders",
                 Options.NavigateInFolderIncludesSubfolders ? intTrue : intFalse);
+
+            settingsStore.SetInt32(SettingsStoreName,
+                "DeleteAllInFolderIncludesSubfolders",
+                Options.DeleteAllInFolderIncludesSubfolders ? intTrue : intFalse);
 
             settingsStore.SetInt32(SettingsStoreName,
                 "ShowCommandsInTopLevelMenu",
