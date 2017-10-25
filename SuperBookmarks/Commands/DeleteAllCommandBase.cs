@@ -10,6 +10,13 @@ namespace Konamiman.SuperBookmarks.Commands
 
         protected override void CommandCallback(OleMenuCommand command)
         {
+            var shouldAskConfirmation = Package.ConfirmationOptions.ShouldConfirmForDeleteAllIn(Target);
+            if (!shouldAskConfirmation)
+            {
+                BookmarksManager.DeleteAllBookmarksIn(Target);
+                return;
+            }
+
             string message;
             var count = BookmarksManager.GetBookmarksCount(Target);
             if (count == 0)

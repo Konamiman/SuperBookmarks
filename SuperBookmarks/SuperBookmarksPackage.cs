@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using Konamiman.SuperBookmarks.Options;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -35,6 +36,7 @@ namespace Konamiman.SuperBookmarks
     [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)]
     [ProvideOptionPage(typeof(OptionsPage), "SuperBookmarks", "General", 0, 0, true)]
     [ProvideOptionPage(typeof(StorageOptionsPage), "SuperBookmarks", "Storage", 0, 0, true)]
+    [ProvideOptionPage(typeof(ConfirmationsPage), "SuperBookmarks", "Confirmations", 0, 0, true)]
     public sealed partial class SuperBookmarksPackage : Package,
         IVsPersistSolutionOpts,
         IVsSolutionEvents,
@@ -65,6 +67,8 @@ namespace Konamiman.SuperBookmarks
         #region Package Members
         public static SuperBookmarksPackage Instance { get; private set; }
 
+        public IVsUIShell UiShell { get; private set; }
+
         private IVsSolution solutionService;
 
         private IVsRunningDocumentTable runningDocumentTable;
@@ -86,6 +90,8 @@ namespace Konamiman.SuperBookmarks
 
             var tpdService = (IVsTrackProjectDocuments2)GetService(typeof(SVsTrackProjectDocuments));
             tpdService.AdviseTrackProjectDocumentsEvents(this, out var tpdCookie);
+
+            UiShell = (IVsUIShell) GetService(typeof(SVsUIShell));
 
             InitializeOptionsStorage();
 

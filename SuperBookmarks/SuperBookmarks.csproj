@@ -116,6 +116,15 @@
     <Compile Include="OptionsStorage.cs">
       <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Options\ConfirmationOptionsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\ConfirmationOptionsControl.Designer.cs">
+      <DependentUpon>ConfirmationOptionsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\ConfirmationsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Options\OptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -311,6 +320,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Options\ConfirmationOptionsControl.resx">
+      <DependentUpon>ConfirmationOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Options\OptionsControl.resx">
       <DependentUpon>OptionsControl.cs</DependentUpon>
     </EmbeddedResource>

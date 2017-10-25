@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
+using Konamiman.SuperBookmarks.Options;
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell.Settings;
 
@@ -10,6 +11,7 @@ namespace Konamiman.SuperBookmarks
     {
         public OptionsPage Options { get; private set; }
         public StorageOptionsPage StorageOptions { get; private set; }
+        public ConfirmationsPage ConfirmationOptions { get; private set; }
 
         private WritableSettingsStore settingsStore;
 
@@ -29,7 +31,11 @@ namespace Konamiman.SuperBookmarks
 
             StorageOptions = (StorageOptionsPage) GetDialogPage(typeof(StorageOptionsPage));
             SetPersistenceOptionsFromStorage();
-            StorageOptions.OptionsChanged += SavePersistenceOptionsToStorage;
+            StorageOptions.OptionsChanged += (sender, args) => SavePersistenceOptionsToStorage();
+
+            ConfirmationOptions = (ConfirmationsPage) GetDialogPage(typeof(ConfirmationsPage));
+            SetConfirmationOptionsFromStorage();
+            ConfirmationOptions.OptionsChanged += (sender, args) => SaveConfirmationOptionsToStorage();
         }
 
         private void SetOptionsFromStorage()
@@ -96,7 +102,7 @@ namespace Konamiman.SuperBookmarks
                 settingsStore.GetInt32(SettingsStoreName, "AutoIncludeInGitignore", intFalse) == intTrue;
         }
 
-        private void SavePersistenceOptionsToStorage(object sender, EventArgs eventArgs)
+        private void SavePersistenceOptionsToStorage()
         {
             settingsStore.SetInt32(SettingsStoreName,
                 "SaveBookmarksToOwnFile",
@@ -105,6 +111,17 @@ namespace Konamiman.SuperBookmarks
             settingsStore.SetInt32(SettingsStoreName,
                 "AutoIncludeInGitignore",
                 StorageOptions.AutoIncludeInGitignore ? intTrue : intFalse);
+        }
+
+        private void SetConfirmationOptionsFromStorage()
+        {
+            ConfirmationOptions.Deserialize(
+                settingsStore.GetString(SettingsStoreName, "ConfirmationOptions", "11111"));
+        }
+
+        private void SaveConfirmationOptionsToStorage()
+        {
+            settingsStore.SetString(SettingsStoreName, "ConfirmationOptions", ConfirmationOptions.Serialize());
         }
     }
 }

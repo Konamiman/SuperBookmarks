@@ -1,6 +1,6 @@
 ﻿namespace Konamiman.SuperBookmarks
 {
-    enum BookmarkActionTarget
+    public enum BookmarkActionTarget
     {
         Document,
         OpenDocuments,
