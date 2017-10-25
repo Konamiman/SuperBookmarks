@@ -75,6 +75,7 @@
       <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
     </Compile>
     <Compile Include="Commands\CommandBase.cs" />
+    <Compile Include="Commands\DeleteAllCommandBase.cs" />
     <Compile Include="Commands\DeleteAllInSolutionCommand.cs" />
     <Compile Include="Commands\DeleteAllInProjectCommand.cs" />
     <Compile Include="Commands\DeleteAllInFolderCommand.cs" />

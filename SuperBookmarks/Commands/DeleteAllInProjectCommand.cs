@@ -1,16 +1,13 @@
-﻿using Microsoft.VisualStudio.Shell;
-
-namespace Konamiman.SuperBookmarks.Commands
+﻿namespace Konamiman.SuperBookmarks.Commands
 {
-    class DeleteAllInProjectCommand : CommandBase
+    class DeleteAllInProjectCommand : DeleteAllCommandBase
     {
         protected override int CommandId => 16;
 
         protected override bool RequiresActiveDocumentToBeInProject => true;
 
-        protected override void CommandCallback(OleMenuCommand command)
-        {
-            BookmarksManager.DeleteAllBookmarksIn(BookmarkActionTarget.Project);
-        }
+        protected override BookmarkActionTarget Target => BookmarkActionTarget.Project;
+
+        protected override string TargetDisplayName => "the current project";
     }
 }

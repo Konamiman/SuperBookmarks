@@ -1,19 +1,19 @@
-﻿using Microsoft.VisualStudio.Shell;
-
-namespace Konamiman.SuperBookmarks.Commands
+﻿namespace Konamiman.SuperBookmarks.Commands
 {
-    class DeleteAllInFolderCommand : CommandBase
+    class DeleteAllInFolderCommand : DeleteAllCommandBase
     {
         protected override int CommandId => 15;
 
         protected override bool RequiresOpenDocumentsOfAnyKind => true;
 
-        protected override void CommandCallback(OleMenuCommand command)
-        {
-            BookmarksManager.DeleteAllBookmarksIn(
-                Package.Options.DeleteAllInFolderIncludesSubfolders ?
+        protected override BookmarkActionTarget Target =>
+            Package.Options.DeleteAllInFolderIncludesSubfolders ?
                 BookmarkActionTarget.FolderAndSubfolders :
-                BookmarkActionTarget.Folder);
-        }
+                BookmarkActionTarget.Folder;
+
+        protected override string TargetDisplayName =>
+            Package.Options.DeleteAllInFolderIncludesSubfolders ? 
+            "the current folder (including subfolders)" :
+            "the current folder";
     }
 }
