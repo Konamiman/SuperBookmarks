@@ -22,14 +22,14 @@ namespace Konamiman.SuperBookmarks.Commands
             if (count == 0)
             {
                 message = $"There are no bookmarks in {TargetDisplayName}";
-                Helpers.ShowInfoMessage(message, showTitle: false);
+                Helpers.ShowInfoMessage(message);
                 return;
             }
 
             message = 
 $@"There {(count == 1 ? "is 1 bookmark" : $"are {count} bookmarks")} in {TargetDisplayName}.
 Do you want to delete {(count == 1 ? "it" : "all of them")}?";
-            if (Helpers.ShowYesNoQuestionMessage(message, showTitle: false))
+            if (Helpers.ShowYesNoQuestionMessage(message))
                 BookmarksManager.DeleteAllBookmarksIn(Target);
         }
     }

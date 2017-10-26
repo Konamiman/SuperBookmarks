@@ -16,8 +16,16 @@ namespace Konamiman.SuperBookmarks.Commands
                 return;
 
             SerializableBookmarksInfo info;
-            using (var stream = File.OpenRead(fileName))
-                info = SerializableBookmarksInfo.DeserializeFrom(stream);
+            try
+            {
+                using (var stream = File.OpenRead(fileName))
+                    info = SerializableBookmarksInfo.DeserializeFrom(stream);
+            }
+            catch
+            {
+                Helpers.ShowErrorMessage("Sorry, I couldn't parse the file. Perhaps it is malformed?", showHeader: false);
+                return;
+            }
 
             if (!Package.Options.MergeWhenImporting)
             {
@@ -30,7 +38,7 @@ namespace Konamiman.SuperBookmarks.Commands
                         var message =
 $@"{existingCount} existing bookmark{(existingCount == 1 ? "" : "s")} will be replaced with {newCount} bookmark{(newCount == 1 ? "" : "s")} from the file.
 Are you sure?";
-                        if (!Helpers.ShowYesNoQuestionMessage(message, showTitle: false))
+                        if (!Helpers.ShowYesNoQuestionMessage(message))
                             return;
                     }
                 }

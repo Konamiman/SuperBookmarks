@@ -18,7 +18,7 @@ namespace Konamiman.SuperBookmarks.Commands
             var count = BookmarksManager.GetBookmarksCount(BookmarkActionTarget.Solution);
             if (count == 0)
             {
-                Helpers.ShowInfoMessage("There are no bookmarks to export", showTitle: false);
+                Helpers.ShowInfoMessage("There are no bookmarks to export");
                 return;
             }
 

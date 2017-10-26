@@ -303,11 +303,13 @@
 
   <KeyBindings>
     <KeyBinding guid="guidCmds" id="SolutionExplorerFilterCommandId"
-        editor="guidVSStd97" key1="VK_OEM_4" key2="B" mod1="CONTROL"/>
+        editor="guidVSStd97" key1="VK_OEM_4" key2="B" mod1="CONTROL" mod2="CONTROL"/>
     <KeyBinding guid="guidCmds" id="ExportBookmarksCommandId"
-        editor="guidVSStd97" key1="B" key2="X" mod1="CONTROL"/>
+        editor="guidVSStd97" key1="B" key2="X" mod1="CONTROL" mod2="CONTROL"/>
     <KeyBinding guid="guidCmds" id="ImportBookmarksCommandId"
-        editor="guidVSStd97" key1="B" key2="M" mod1="CONTROL"/>
+        editor="guidVSStd97" key1="B" key2="M" mod1="CONTROL" mod2="CONTROL"/>
+    <KeyBinding guid="guidCmds" id="ToggleBookmarkCommandId"
+        editor="guidVSStd97" key1="B" key2="B" mod1="CONTROL" mod2="CONTROL"/>
   </KeyBindings>
 
   <Symbols>

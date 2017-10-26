@@ -34,9 +34,9 @@ namespace Konamiman.SuperBookmarks
             if(pszKey != persistenceKey)
                 throw new InvalidOperationException("SuperBookmarks: WriteUserOptions was called for unknown key " + pszKey);
 
-            var info = this.BookmarksManager.GetPersistableInfo();
+            var info = this.BookmarksManager.GetSerializableInfo();
             var stream = new DataStreamFromComStream(pOptionsStream);
-            info.SerializeTo(stream);
+            info.SerializeTo(stream, prettyPrint: false);
 
             return VSConstants.S_OK;
         }
@@ -47,8 +47,17 @@ namespace Konamiman.SuperBookmarks
                 throw new InvalidOperationException("SuperBookmarks: ReadUserOptions was called for unknown key " + pszKey);
 
             var stream = new DataStreamFromComStream(pOptionsStream);
-            var info = PersistableBookmarksInfo.DeserializeFrom(stream);
-            this.BookmarksManager.RecreateBookmarksFromPersistableInfo(info);
+            SerializableBookmarksInfo info;
+            try
+            {
+                info = SerializableBookmarksInfo.DeserializeFrom(stream);
+            }
+            catch
+            {
+                Helpers.ShowErrorMessage("Sorry, I couldn't parse the bookmarks information from the .suo file", showHeader: false);
+                return VSConstants.S_OK;
+            }
+            this.BookmarksManager.RecreateBookmarksFromSerializedInfo(info);
 
             return VSConstants.S_OK;
         }

@@ -30,12 +30,12 @@ namespace Konamiman.SuperBookmarks
 
         private void SaveBookmarksToDatFile()
         {
-            if (StorageOptions.SaveBookmarksToOwnFile)
-            {
-                var info = this.BookmarksManager.GetPersistableInfo();
-                using (var stream = File.Create(DataFilePath))
-                    info.SerializeTo(stream);
-            }
+            if (!StorageOptions.SaveBookmarksToOwnFile)
+                return;
+
+            var info = BookmarksManager.GetSerializableInfo();
+            using (var stream = File.Create(DataFilePath))
+                info.SerializeTo(stream, prettyPrint: false);
         }
 
         public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
@@ -70,21 +70,27 @@ namespace Konamiman.SuperBookmarks
 
         private void LoadBookmarksFromDatFile()
         {
-            if (StorageOptions.SaveBookmarksToOwnFile)
+            if (!StorageOptions.SaveBookmarksToOwnFile)
+                return;
+
+            this.BookmarksManager.ClearAllBookmarks();
+
+            if (!File.Exists(DataFilePath))
+                return;
+
+            SerializableBookmarksInfo info;
+            try
             {
-                if (File.Exists(DataFilePath))
-                {
-                    using (var stream = File.OpenRead(DataFilePath))
-                    {
-                        var info = PersistableBookmarksInfo.DeserializeFrom(stream);
-                        this.BookmarksManager.RecreateBookmarksFromPersistableInfo(info);
-                    }
-                }
-                else
-                {
-                    this.BookmarksManager.ClearAllBookmarks();
-                }
+                using (var stream = File.OpenRead(DataFilePath))
+                    info = SerializableBookmarksInfo.DeserializeFrom(stream);
             }
+            catch
+            {
+                Helpers.ShowErrorMessage("Sorry, I couldn't parse the .SuperBookmarks.dat file, perhaps it is corrupted?", showHeader: false);
+                return;
+            }
+
+            this.BookmarksManager.RecreateBookmarksFromSerializedInfo(info);
         }
         
         #region Unused members

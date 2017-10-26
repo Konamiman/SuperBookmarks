@@ -142,7 +142,7 @@ namespace Konamiman.SuperBookmarks
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }
 
-        public static bool ShowYesNoQuestionMessage(string message, bool showTitle = true)
+        public static bool ShowYesNoQuestionMessage(string message, bool showTitle = false)
         {
             const int YesButton = 6;
 
@@ -155,12 +155,14 @@ namespace Konamiman.SuperBookmarks
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST) == YesButton;
         }
 
-        public static void ShowErrorMessage(string message)
+        public static void ShowErrorMessage(string message, bool showTitle = false, bool showHeader = true)
         {
             VsShellUtilities.ShowMessageBox(
                 SuperBookmarksPackage.Instance,
-                "Something went wrong. The ugly details:\r\n\r\n" + message,
-                "SuperBookmarks",
+                showHeader ?
+                    "Something went wrong. The ugly details:\r\n\r\n" + message :
+                    message,
+                showTitle ? "SuperBookmarks" : null,
                 OLEMSGICON.OLEMSGICON_CRITICAL,
                 OLEMSGBUTTON.OLEMSGBUTTON_OK,
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
