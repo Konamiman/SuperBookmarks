@@ -4,3 +4,12 @@
 - Split text windows?
 - Changed file differences windows?
 - Properly report errors
+
+-------
+
+- Use proper json when saving/loading bookmarks
+- Refactor
+- Status messages
+- Fast save/load commands
+- The TODOs
+- Proper README and manifest metadata

@@ -43,9 +43,14 @@
             this.pnlChooseColor = new System.Windows.Forms.Panel();
             this.chkNavInFolderIncludesSubfolders = new System.Windows.Forms.CheckBox();
             this.chkDelAllInFolderIncludesSubfolder = new System.Windows.Forms.CheckBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.rbImportReplaces = new System.Windows.Forms.RadioButton();
+            this.rbImportMerges = new System.Windows.Forms.RadioButton();
             this.panel1.SuspendLayout();
             this.pnlRequiresRestaring.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // chkDeletingLineDeletesBookmark
@@ -110,7 +115,6 @@
             this.pnlRequiresRestaring.Name = "pnlRequiresRestaring";
             this.pnlRequiresRestaring.Size = new System.Drawing.Size(384, 38);
             this.pnlRequiresRestaring.TabIndex = 4;
-            this.pnlRequiresRestaring.Visible = false;
             // 
             // lblInfoMessage
             // 
@@ -138,7 +142,7 @@
             // 
             // btnResetColor
             // 
-            this.btnResetColor.Location = new System.Drawing.Point(259, 235);
+            this.btnResetColor.Location = new System.Drawing.Point(259, 358);
             this.btnResetColor.Margin = new System.Windows.Forms.Padding(2);
             this.btnResetColor.Name = "btnResetColor";
             this.btnResetColor.Size = new System.Drawing.Size(94, 32);
@@ -151,7 +155,7 @@
             // 
             this.lblGlyphColor.AutoSize = true;
             this.lblGlyphColor.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.lblGlyphColor.Location = new System.Drawing.Point(13, 240);
+            this.lblGlyphColor.Location = new System.Drawing.Point(13, 363);
             this.lblGlyphColor.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblGlyphColor.Name = "lblGlyphColor";
             this.lblGlyphColor.Size = new System.Drawing.Size(164, 20);
@@ -163,7 +167,7 @@
             // 
             this.pnlChooseColor.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.pnlChooseColor.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pnlChooseColor.Location = new System.Drawing.Point(186, 235);
+            this.pnlChooseColor.Location = new System.Drawing.Point(186, 358);
             this.pnlChooseColor.Margin = new System.Windows.Forms.Padding(2);
             this.pnlChooseColor.Name = "pnlChooseColor";
             this.pnlChooseColor.Size = new System.Drawing.Size(52, 32);
@@ -190,10 +194,56 @@
             this.chkDelAllInFolderIncludesSubfolder.Text = "\"Delete all in Folder\" includes subfolders";
             this.chkDelAllInFolderIncludesSubfolder.UseVisualStyleBackColor = true;
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(9, 253);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(215, 20);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "\"Import Bookmarks\" behavior";
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.rbImportReplaces);
+            this.panel2.Controls.Add(this.rbImportMerges);
+            this.panel2.Location = new System.Drawing.Point(12, 279);
+            this.panel2.Margin = new System.Windows.Forms.Padding(2);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(388, 65);
+            this.panel2.TabIndex = 8;
+            // 
+            // rbImportReplaces
+            // 
+            this.rbImportReplaces.AutoSize = true;
+            this.rbImportReplaces.Location = new System.Drawing.Point(2, 3);
+            this.rbImportReplaces.Margin = new System.Windows.Forms.Padding(2);
+            this.rbImportReplaces.Name = "rbImportReplaces";
+            this.rbImportReplaces.Size = new System.Drawing.Size(232, 24);
+            this.rbImportReplaces.TabIndex = 0;
+            this.rbImportReplaces.TabStop = true;
+            this.rbImportReplaces.Text = "Replace existing bookmarks";
+            this.rbImportReplaces.UseVisualStyleBackColor = true;
+            // 
+            // rbImportMerges
+            // 
+            this.rbImportMerges.AutoSize = true;
+            this.rbImportMerges.Location = new System.Drawing.Point(2, 29);
+            this.rbImportMerges.Margin = new System.Windows.Forms.Padding(2);
+            this.rbImportMerges.Name = "rbImportMerges";
+            this.rbImportMerges.Size = new System.Drawing.Size(250, 24);
+            this.rbImportMerges.TabIndex = 1;
+            this.rbImportMerges.TabStop = true;
+            this.rbImportMerges.Text = "Merge with existing bookmarks";
+            this.rbImportMerges.UseVisualStyleBackColor = true;
+            // 
             // OptionsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.panel2);
             this.Controls.Add(this.chkDelAllInFolderIncludesSubfolder);
             this.Controls.Add(this.chkNavInFolderIncludesSubfolders);
             this.Controls.Add(this.btnResetColor);
@@ -204,12 +254,14 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.chkDeletingLineDeletesBookmark);
             this.Name = "OptionsControl";
-            this.Size = new System.Drawing.Size(408, 352);
+            this.Size = new System.Drawing.Size(408, 448);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.pnlRequiresRestaring.ResumeLayout(false);
             this.pnlRequiresRestaring.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -231,5 +283,9 @@
         private System.Windows.Forms.Panel pnlChooseColor;
         private System.Windows.Forms.CheckBox chkNavInFolderIncludesSubfolders;
         private System.Windows.Forms.CheckBox chkDelAllInFolderIncludesSubfolder;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.RadioButton rbImportReplaces;
+        private System.Windows.Forms.RadioButton rbImportMerges;
     }
 }

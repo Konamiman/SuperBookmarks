@@ -81,6 +81,8 @@
     <Compile Include="Commands\DeleteAllInFolderCommand.cs" />
     <Compile Include="Commands\DeleteAllInOpenDocsCommand.cs" />
     <Compile Include="Commands\DeleteAllInDocCommand.cs" />
+    <Compile Include="Commands\ImportBookmarksCommand.cs" />
+    <Compile Include="Commands\ExportBookmarksCommand.cs" />
     <Compile Include="Commands\GoToNextInDocCommand.cs" />
     <Compile Include="Commands\GoToNextInFolderCommand.cs" />
     <Compile Include="Commands\GoToNextInProjectCommand.cs" />
@@ -97,6 +99,8 @@
     <Compile Include="Deletion.cs">
       <DependentUpon>BookmarksManager.cs</DependentUpon>
     </Compile>
+    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="FileDialogs.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="IVsPersistSolutionOpts.cs">
       <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
@@ -170,6 +174,7 @@
     <Compile Include="WpfTextViewCreationListener.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Key.snk" />
     <None Include="packages.config" />
     <None Include="Resources\CommandIcons.pfi" />
@@ -295,6 +300,9 @@
     <Reference Include="Microsoft.VisualStudio.Validation, Version=15.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.VisualStudio.Validation.15.3.15\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />

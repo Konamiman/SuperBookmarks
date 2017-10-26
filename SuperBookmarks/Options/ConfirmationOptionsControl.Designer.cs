@@ -34,6 +34,7 @@
             this.chkFolder = new System.Windows.Forms.CheckBox();
             this.chkProject = new System.Windows.Forms.CheckBox();
             this.chkSolution = new System.Windows.Forms.CheckBox();
+            this.chkConfirmOnImportReplace = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -48,7 +49,7 @@
             // chkDocument
             // 
             this.chkDocument.AutoSize = true;
-            this.chkDocument.Location = new System.Drawing.Point(13, 44);
+            this.chkDocument.Location = new System.Drawing.Point(32, 39);
             this.chkDocument.Name = "chkDocument";
             this.chkDocument.Size = new System.Drawing.Size(109, 24);
             this.chkDocument.TabIndex = 1;
@@ -58,7 +59,7 @@
             // chkOpenFiles
             // 
             this.chkOpenFiles.AutoSize = true;
-            this.chkOpenFiles.Location = new System.Drawing.Point(13, 75);
+            this.chkOpenFiles.Location = new System.Drawing.Point(32, 70);
             this.chkOpenFiles.Name = "chkOpenFiles";
             this.chkOpenFiles.Size = new System.Drawing.Size(106, 24);
             this.chkOpenFiles.TabIndex = 2;
@@ -68,7 +69,7 @@
             // chkFolder
             // 
             this.chkFolder.AutoSize = true;
-            this.chkFolder.Location = new System.Drawing.Point(13, 106);
+            this.chkFolder.Location = new System.Drawing.Point(32, 101);
             this.chkFolder.Name = "chkFolder";
             this.chkFolder.Size = new System.Drawing.Size(80, 24);
             this.chkFolder.TabIndex = 3;
@@ -78,7 +79,7 @@
             // chkProject
             // 
             this.chkProject.AutoSize = true;
-            this.chkProject.Location = new System.Drawing.Point(13, 137);
+            this.chkProject.Location = new System.Drawing.Point(32, 132);
             this.chkProject.Name = "chkProject";
             this.chkProject.Size = new System.Drawing.Size(84, 24);
             this.chkProject.TabIndex = 4;
@@ -88,17 +89,28 @@
             // chkSolution
             // 
             this.chkSolution.AutoSize = true;
-            this.chkSolution.Location = new System.Drawing.Point(13, 168);
+            this.chkSolution.Location = new System.Drawing.Point(32, 163);
             this.chkSolution.Name = "chkSolution";
             this.chkSolution.Size = new System.Drawing.Size(93, 24);
             this.chkSolution.TabIndex = 5;
             this.chkSolution.Text = "Solution";
             this.chkSolution.UseVisualStyleBackColor = true;
             // 
+            // chkConfirmOnImportReplace
+            // 
+            this.chkConfirmOnImportReplace.AutoSize = true;
+            this.chkConfirmOnImportReplace.Location = new System.Drawing.Point(13, 214);
+            this.chkConfirmOnImportReplace.Name = "chkConfirmOnImportReplace";
+            this.chkConfirmOnImportReplace.Size = new System.Drawing.Size(458, 24);
+            this.chkConfirmOnImportReplace.TabIndex = 6;
+            this.chkConfirmOnImportReplace.Text = "Deleting all bookmarks when importing requires confirmation";
+            this.chkConfirmOnImportReplace.UseVisualStyleBackColor = true;
+            // 
             // ConfirmationOptionsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkConfirmOnImportReplace);
             this.Controls.Add(this.chkSolution);
             this.Controls.Add(this.chkProject);
             this.Controls.Add(this.chkFolder);
@@ -106,7 +118,7 @@
             this.Controls.Add(this.chkDocument);
             this.Controls.Add(this.label1);
             this.Name = "ConfirmationOptionsControl";
-            this.Size = new System.Drawing.Size(393, 249);
+            this.Size = new System.Drawing.Size(500, 311);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -120,5 +132,6 @@
         private System.Windows.Forms.CheckBox chkFolder;
         private System.Windows.Forms.CheckBox chkProject;
         private System.Windows.Forms.CheckBox chkSolution;
+        private System.Windows.Forms.CheckBox chkConfirmOnImportReplace;
     }
 }

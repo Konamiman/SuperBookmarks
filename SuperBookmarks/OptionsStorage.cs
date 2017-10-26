@@ -4,6 +4,7 @@ using System.Linq;
 using Konamiman.SuperBookmarks.Options;
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell.Settings;
+using System.IO;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -29,11 +30,11 @@ namespace Konamiman.SuperBookmarks
             SetOptionsFromStorage();
             Options.OptionsChanged += (sender, args) => SaveOptionsToStorage();
 
-            StorageOptions = (StorageOptionsPage) GetDialogPage(typeof(StorageOptionsPage));
+            StorageOptions = (StorageOptionsPage)GetDialogPage(typeof(StorageOptionsPage));
             SetPersistenceOptionsFromStorage();
             StorageOptions.OptionsChanged += (sender, args) => SavePersistenceOptionsToStorage();
 
-            ConfirmationOptions = (ConfirmationsPage) GetDialogPage(typeof(ConfirmationsPage));
+            ConfirmationOptions = (ConfirmationsPage)GetDialogPage(typeof(ConfirmationsPage));
             SetConfirmationOptionsFromStorage();
             ConfirmationOptions.OptionsChanged += (sender, args) => SaveConfirmationOptionsToStorage();
         }
@@ -61,6 +62,9 @@ namespace Konamiman.SuperBookmarks
                 settingsStore.GetString(SettingsStoreName, "CustomColors", null);
             Options.CustomColors =
                 customColorsRgbs?.Split(',').Select(rgb => int.Parse(rgb)).ToArray();
+
+            Options.MergeWhenImporting =
+                settingsStore.GetInt32(SettingsStoreName, "MergeWhenImporting", intFalse) == intTrue;
         }
 
         private void SaveOptionsToStorage()
@@ -91,6 +95,10 @@ namespace Konamiman.SuperBookmarks
                     "CustomColors",
                     string.Join(",", Options.CustomColors.Select(rgb => rgb.ToString())));
             }
+
+            settingsStore.SetInt32(SettingsStoreName,
+                "MergeWhenImporting",
+                Options.MergeWhenImporting ? intTrue : intFalse);
         }
 
         private void SetPersistenceOptionsFromStorage()
@@ -122,6 +130,24 @@ namespace Konamiman.SuperBookmarks
         private void SaveConfirmationOptionsToStorage()
         {
             settingsStore.SetString(SettingsStoreName, "ConfirmationOptions", ConfirmationOptions.Serialize());
+        }
+
+        string cachedLastUsedImportExportFolder = null;
+        public string GetLastUsedExportImportFolder()
+        {
+            if(cachedLastUsedImportExportFolder == null)
+            {
+                cachedLastUsedImportExportFolder = 
+                    settingsStore.GetString(SettingsStoreName, "LastUsedExportImportFolder", "")
+                    .WithTrailingDirectorySeparator();
+            }
+            return cachedLastUsedImportExportFolder;
+        }
+
+        public void SetLastUsedExportImportFolder(string value)
+        {
+            value = value.WithTrailingDirectorySeparator();
+            settingsStore.SetString(SettingsStoreName, "LastUsedExportImportFolder", value);
         }
     }
 }

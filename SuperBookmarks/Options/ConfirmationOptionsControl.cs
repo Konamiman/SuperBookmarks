@@ -18,6 +18,7 @@ namespace Konamiman.SuperBookmarks.Options
             chkFolder.Checked = Options.DelAllInFolderRequiresConfirmation;
             chkProject.Checked = Options.DelAllInProjectRequiresConfirmation;
             chkSolution.Checked = Options.DelAllInSolutionRequiresConfirmation;
+            chkConfirmOnImportReplace.Checked = Options.ReplacingImportRequiresConfirmation;
 
             chkDocument.CheckedChanged += (sender, args) =>
                 Options.DelAllInDocumentRequiresConfirmation = chkDocument.Checked;
@@ -33,6 +34,9 @@ namespace Konamiman.SuperBookmarks.Options
 
             chkSolution.CheckedChanged += (sender, args) =>
                 Options.DelAllInSolutionRequiresConfirmation = chkSolution.Checked;
+
+            chkConfirmOnImportReplace.CheckedChanged += (sender, args) =>
+                Options.ReplacingImportRequiresConfirmation = chkConfirmOnImportReplace.Checked;
         }
     }
 }

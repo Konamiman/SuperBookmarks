@@ -1,4 +1,8 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using System;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudioTools;
 
 namespace Konamiman.SuperBookmarks.Commands
 {

@@ -15,6 +15,7 @@ namespace Konamiman.SuperBookmarks
         private bool deletingALineDeletesTheBookmark = true;
         private bool navigateInFolderIncludesSubfolders = false;
         private bool delAllInFolderIncludesSubfolders = false;
+        private bool mergeWhenImporting = false;
         private bool optionsChanged = false;
         private bool deletingALineDeletesTheBookmarkChanged = false;
         private bool glyphColorChanged = false;
@@ -64,6 +65,19 @@ namespace Konamiman.SuperBookmarks
             set
             {
                 delAllInFolderIncludesSubfolders = value;
+                optionsChanged = true;
+            }
+        }
+
+        public bool MergeWhenImporting
+        {
+            get
+            {
+                return mergeWhenImporting;
+            }
+            set
+            {
+                mergeWhenImporting = value;
                 optionsChanged = true;
             }
         }

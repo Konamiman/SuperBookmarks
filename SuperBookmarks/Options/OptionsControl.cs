@@ -21,13 +21,16 @@ namespace Konamiman.SuperBookmarks
             if (Options.CustomColors != null)
                 colorDialog.CustomColors = Options.CustomColors;
 
-            pnlRequiresRestaring.Visible = false;
-
             chkDeletingLineDeletesBookmark.Checked = Options.DeletingALineDeletesTheBookmark;
             if (Options.ShowCommandsInTopLevelMenu)
                 rbInTopLevel.Checked = true;
             else
                 rbInEdit.Checked = true;
+
+            if (Options.MergeWhenImporting)
+                rbImportMerges.Checked = true;
+            else
+                rbImportReplaces.Checked = true;
 
             chkNavInFolderIncludesSubfolders.Checked = Options.NavigateInFolderIncludesSubfolders;
             chkDelAllInFolderIncludesSubfolder.Checked = Options.DeleteAllInFolderIncludesSubfolders;
@@ -36,6 +39,7 @@ namespace Konamiman.SuperBookmarks
             chkNavInFolderIncludesSubfolders.CheckedChanged += ChkNavInFolderIncludesSubfoldersOnCheckedChanged;
             chkDelAllInFolderIncludesSubfolder.CheckedChanged += ChkDelAllInFolderIncludesSubfolderOnCheckedChanged;
             rbInTopLevel.CheckedChanged += rbInTopLevelMenu_CheckedChanged;
+            rbImportMerges.CheckedChanged += rbImportMerges_CheckedChanged;
         }
 
         private void chkDeletingLineDeletesBookmark_CheckedChanged(object sender, EventArgs e)
@@ -53,10 +57,14 @@ namespace Konamiman.SuperBookmarks
             Options.DeleteAllInFolderIncludesSubfolders = chkDelAllInFolderIncludesSubfolder.Checked;
         }
 
+        private void rbImportMerges_CheckedChanged(object sender, EventArgs e)
+        {
+            Options.MergeWhenImporting = rbImportMerges.Checked;
+        }
+
         private void rbInTopLevelMenu_CheckedChanged(object sender, EventArgs e)
         {
             Options.ShowCommandsInTopLevelMenu = rbInTopLevel.Checked;
-            pnlRequiresRestaring.Visible = true;
         }
 
         private void pnlChooseColor_Click(object sender, EventArgs e)

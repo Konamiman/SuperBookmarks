@@ -57,6 +57,9 @@ namespace Konamiman.SuperBookmarks
                 new DeleteAllInProjectCommand(), 
                 new DeleteAllInSolutionCommand(), 
 
+                new ExportBookmarksCommand(),
+                new ImportBookmarksCommand(),
+
                 new OpenOptionsCommand()
             };
         }
