@@ -36,7 +36,7 @@ namespace Konamiman.SuperBookmarks.Commands
                     {
                         var newCount = info.TotalBookmarksCount;
                         var message =
-$@"{existingCount} existing bookmark{(existingCount == 1 ? "" : "s")} will be replaced with {newCount} bookmark{(newCount == 1 ? "" : "s")} from the file.
+$@"{Helpers.Quantifier(existingCount, @"existing bookmark")} will be replaced with {Helpers.Quantifier(newCount, "bookmark")} from the file.
 Are you sure?";
                         if (!Helpers.ShowYesNoQuestionMessage(message))
                             return;
@@ -47,6 +47,8 @@ Are you sure?";
             }
 
             this.BookmarksManager.RecreateBookmarksFromSerializedInfo(info);
+
+            Helpers.WriteToStatusBar($"Import done, solution has now {Helpers.Quantifier(BookmarksManager.GetBookmarksCount(BookmarkActionTarget.Solution), "bookmark")} in {Helpers.Quantifier(BookmarksManager.GetFilesWithBookmarksCount(), "file")}");
 
             Package.SetLastUsedExportImportFolder(Path.GetDirectoryName(fileName));
         }

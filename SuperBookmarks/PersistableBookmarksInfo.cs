@@ -43,5 +43,10 @@ namespace Konamiman.SuperBookmarks
             .SelectMany(c => c.FilesWithBookmarks)
             .SelectMany(f => f.LinesWithBookmarks)
             .Count();
+
+        public int TotalFilesCount =>
+            BookmarksContexts
+            .SelectMany(c => c.FilesWithBookmarks)
+            .Count();
     }
 }

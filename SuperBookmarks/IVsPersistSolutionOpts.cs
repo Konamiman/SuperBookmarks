@@ -58,6 +58,7 @@ namespace Konamiman.SuperBookmarks
                 return VSConstants.S_OK;
             }
             this.BookmarksManager.RecreateBookmarksFromSerializedInfo(info);
+            Helpers.WriteToStatusBar($"Restored {Helpers.Quantifier(info.TotalBookmarksCount, "bookmark")} for {Helpers.Quantifier(info.TotalFilesCount, "file")} from .suo file");
 
             return VSConstants.S_OK;
         }

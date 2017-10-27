@@ -30,7 +30,11 @@ namespace Konamiman.SuperBookmarks.Commands
 $@"There {(count == 1 ? "is 1 bookmark" : $"are {count} bookmarks")} in {TargetDisplayName}.
 Do you want to delete {(count == 1 ? "it" : "all of them")}?";
             if (Helpers.ShowYesNoQuestionMessage(message))
+            {
+                var filesCount = BookmarksManager.GetFilesWithBookmarksCount(Target);
                 BookmarksManager.DeleteAllBookmarksIn(Target);
+                Helpers.WriteToStatusBar($"{Helpers.Quantifier(count, "bookmark")} from {Helpers.Quantifier(filesCount, "file")} have been deleted");
+            }
         }
     }
 }

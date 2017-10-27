@@ -29,6 +29,8 @@ namespace Konamiman.SuperBookmarks.Commands
                 using (var stream = File.Create(fileName))
                     info.SerializeTo(stream, prettyPrint: true);
 
+                Helpers.WriteToStatusBar($"{Helpers.Quantifier(info.TotalBookmarksCount, "bookmark")} from {Helpers.Quantifier(info.TotalFilesCount, "file")} have been exported to {Path.GetFileName(fileName)}");
+
                 Package.SetLastUsedExportImportFolder(Path.GetDirectoryName(fileName));
             }
         }

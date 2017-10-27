@@ -40,5 +40,20 @@ namespace Konamiman.SuperBookmarks
 
             return count;
         }
+
+        public int GetFilesWithBookmarksCount()
+            => bookmarksPendingCreation.Count + 
+               bookmarksByView.Values.Count(b => b.Any());
+
+        public int GetFilesWithBookmarksCount(BookmarkActionTarget target)
+        {
+            var targetFiles = filesSelectors[target]();
+
+            var pendingCreationCount = bookmarksPendingCreation.Keys.Intersect(targetFiles).Count();
+            var registeredCount = viewsByFilename.Keys.Intersect(targetFiles)
+                .Where(f => bookmarksByView[viewsByFilename[f]].Any()).Count();
+
+            return pendingCreationCount + registeredCount;
+        }
     }
 }

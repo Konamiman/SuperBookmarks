@@ -7,7 +7,6 @@
 
 -------
 
-- Status messages
 - Fast save/load commands
 - Debugging/activity log
 - The TODOs

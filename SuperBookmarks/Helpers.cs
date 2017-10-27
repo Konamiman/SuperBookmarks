@@ -19,9 +19,14 @@ namespace Konamiman.SuperBookmarks
     static class Helpers
     {
         private static IServiceProvider serviceProvider = null;
+        private static IVsStatusbar statusBar = null;
 
         private static IServiceProvider ServiceProvider =>
             serviceProvider ?? (serviceProvider = SuperBookmarksPackage.Instance);
+
+        private static IVsStatusbar StatusBar =>
+            statusBar ?? (statusBar = (IVsStatusbar)ServiceProvider.GetService(typeof(SVsStatusbar)));
+
 
         //https://msdn.microsoft.com/en-us/library/dd884850.aspx (AddAdornmentHandler)
         public static ITextView GetTextViewForActiveDocument()
@@ -239,6 +244,20 @@ namespace Konamiman.SuperBookmarks
             parts.Add(root);
             parts.Reverse();
             return Path.Combine(parts.ToArray());
+        }
+
+        public static string Quantifier(int count, string singularTerm)
+            => $"{count} {singularTerm}{(count == 1 ? "" : "s")}";
+
+        public static void WriteToStatusBar(string message)
+        {
+            StatusBar.IsFrozen(out int frozen);
+            if (frozen != 0)
+                StatusBar.FreezeOutput(0);
+
+            StatusBar.SetText(message);
+
+            StatusBar.FreezeOutput(1);
         }
     }
 }

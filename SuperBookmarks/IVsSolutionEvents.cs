@@ -91,6 +91,7 @@ namespace Konamiman.SuperBookmarks
             }
 
             this.BookmarksManager.RecreateBookmarksFromSerializedInfo(info);
+            Helpers.WriteToStatusBar($"Restored {Helpers.Quantifier(info.TotalBookmarksCount, "bookmark")} for {Helpers.Quantifier(info.TotalFilesCount, "file")} from .SuperBookmarks.dat file");
         }
         
         #region Unused members
