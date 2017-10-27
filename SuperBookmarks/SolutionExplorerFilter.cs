@@ -160,7 +160,7 @@ namespace Konamiman.SuperBookmarks
                 if (hierarchyItem == null || !HierarchyUtilities.IsPhysicalFile(hierarchyItem.HierarchyIdentity))
                     return false;
 
-                return BookmarksManager.HasBookmarks(Helpers.GetProperlyCasedPath(hierarchyItem.CanonicalName));
+                return BookmarksManager.HasBookmarks(hierarchyItem.CanonicalName);
             }
         }
     }

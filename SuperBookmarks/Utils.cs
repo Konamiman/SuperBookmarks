@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.Text.Editor;
+using System;
 using System.Linq;
 
 namespace Konamiman.SuperBookmarks
@@ -8,10 +9,22 @@ namespace Konamiman.SuperBookmarks
         private int GetCurrentLineNumber(ITextView view)
            => view.Selection.ActivePoint.Position.GetContainingLine().LineNumber + 1;
 
+        private string GetProperlyCasedRegisteredFilename(string fileNameWithMismatchingCase)
+        {
+            bool EqualsIgnoreCase(string value1) =>
+                value1.Equals(fileNameWithMismatchingCase, StringComparison.OrdinalIgnoreCase);
+
+            return viewsByFilename.Keys.SingleOrDefault(EqualsIgnoreCase) ??
+                bookmarksPendingCreation.Keys.SingleOrDefault(EqualsIgnoreCase);
+        }
+
         public bool HasBookmarks(string path)
         {
-            return (viewsByFilename.ContainsKey(path) && bookmarksByView[viewsByFilename[path]].Any())
-                   || bookmarksPendingCreation.ContainsKey(path);
+            path = GetProperlyCasedRegisteredFilename(path);
+            if (path == null) return false;
+
+            return bookmarksPendingCreation.ContainsKey(path) ||
+                    bookmarksByView[viewsByFilename[path]].Any();
         }
 
         public int GetBookmarksCount(BookmarkActionTarget target)
