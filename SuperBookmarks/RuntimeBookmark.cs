@@ -14,11 +14,6 @@ namespace Konamiman.SuperBookmarks
                 this.TrackingSpan = trackingSpan;
             }
 
-            public void UpdateSpan(TrackingTagSpan<BookmarkTag> span)
-            {
-                this.TrackingSpan = span;
-            }
-
             //This is set when the buffer is changing, needed to properly handling line deletes
             public int LineNumberBeforeChanging { get; set; }
 

@@ -78,15 +78,8 @@ namespace Konamiman.SuperBookmarks
                     foreach (var lineNumber in lineNumbers)
                     {
                         var bookmarkExists = bookmarks.Any(b => b.GetRow(buffer) == lineNumber);
-                        if (bookmarkExists) continue;
-
-                        var trackingSpan = Helpers.CreateTagSpan(buffer, lineNumber);
-                        if (trackingSpan != null)
-                        {
-                            bookmarks.Add(new Bookmark(trackingSpan));
-                            if (bookmarks.Count == 1)
-                                SolutionExplorerFilter.OnFileGotItsFirstBookmark(fileName);
-                        }
+                        if (!bookmarkExists)
+                            RegisterAndCreateBookmark(bookmarks, buffer, fileName, lineNumber);
                     }
                 }
                 else if(bookmarksPendingCreation.ContainsKey(fileName))

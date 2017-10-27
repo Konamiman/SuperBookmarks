@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Konamiman.SuperBookmarks
+﻿namespace Konamiman.SuperBookmarks
 {
     partial class BookmarksManager
     {
@@ -24,13 +18,9 @@ namespace Konamiman.SuperBookmarks
             if (viewsByFilename.ContainsKey(path))
             {
                 var view = viewsByFilename[path];
-                foreach (var bookmark in bookmarksByView[view])
-                {
-                    var tagger = Helpers.GetTaggerFor(Helpers.GetRootTextBuffer(view.TextBuffer));
-                    tagger.RemoveTagSpan(bookmark.TrackingSpan);
-                }
-                bookmarksByView[view].Clear();
-                SolutionExplorerFilter.OnFileLostItsLastBookmark(path);
+                var bookmarks = bookmarksByView[view];
+                foreach (var bookmark in bookmarks.ToArray())
+                    UnregisterAndDeleteBookmark(bookmarks, bookmark, view.TextBuffer);
             }
             else if (bookmarksPendingCreation.ContainsKey(path))
             {

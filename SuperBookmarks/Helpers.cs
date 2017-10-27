@@ -40,22 +40,6 @@ namespace Konamiman.SuperBookmarks
             return viewHost.TextView;
         }
 
-        public static TrackingTagSpan<BookmarkTag> CreateTagSpan(ITextBuffer buffer, int lineNumber)
-        {
-            var snapshot = buffer.CurrentSnapshot;
-
-            //This can happen if the file is edited outside Visual Studio
-            //while the solution is closed
-            if (lineNumber > snapshot.LineCount)
-                return null;
-
-            var line = snapshot.GetLineFromLineNumber(lineNumber - 1);
-            var span = snapshot.CreateTrackingSpan(new SnapshotSpan(line.Start, 0), SpanTrackingMode.EdgeExclusive);
-            var tagger = GetTaggerFor(buffer);
-            var trackingSpan = tagger.CreateTagSpan(span, new BookmarkTag());
-            return trackingSpan;
-        }
-        
         public static SimpleTagger<BookmarkTag> GetTaggerFor(ITextBuffer buffer)
         {
             return buffer.Properties.GetOrCreateSingletonProperty("tagger", () => new SimpleTagger<BookmarkTag>(buffer));

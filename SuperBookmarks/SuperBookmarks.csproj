@@ -71,6 +71,9 @@
   <ItemGroup>
     <Compile Include="BookmarkActionTarget.cs" />
     <Compile Include="BookmarksManager.cs" />
+    <Compile Include="BufferChangeHandling.cs">
+      <DependentUpon>BookmarksManager.cs</DependentUpon>
+    </Compile>
     <Compile Include="CommandsInitialization.cs">
       <DependentUpon>SuperBookmarksPackage.cs</DependentUpon>
     </Compile>
@@ -161,10 +164,16 @@
       <DependentUpon>BookmarksManager.cs</DependentUpon>
     </Compile>
     <Compile Include="SolutionExplorerFilter.cs" />
+    <Compile Include="StateChangeCallbacks.cs">
+      <DependentUpon>BookmarksManager.cs</DependentUpon>
+    </Compile>
     <Compile Include="SuperBookmarksPackage.cs" />
     <Compile Include="BookmarkGlyphFactory.cs" />
     <Compile Include="BookmarkGlyphFactoryProvider.cs" />
     <Compile Include="BookmarkTaggerProvider.cs" />
+    <Compile Include="Utils.cs">
+      <DependentUpon>BookmarksManager.cs</DependentUpon>
+    </Compile>
     <Compile Include="VSPackage.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

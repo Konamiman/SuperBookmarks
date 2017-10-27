@@ -7,8 +7,6 @@
 
 -------
 
-- Use proper json when saving/loading bookmarks
-- Refactor
 - Status messages
 - Fast save/load commands
 - Debugging/activity log
