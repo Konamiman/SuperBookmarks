@@ -1,8 +1,6 @@
 ﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.IO;
-using System.Linq;
-using Microsoft.VisualStudio.Shell;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -28,7 +26,7 @@ namespace Konamiman.SuperBookmarks
             return VSConstants.S_OK;
         }
 
-        private void SaveBookmarksToDatFile()
+        public void SaveBookmarksToDatFile()
         {
             if (!StorageOptions.SaveBookmarksToOwnFile)
                 return;
@@ -36,6 +34,8 @@ namespace Konamiman.SuperBookmarks
             var info = BookmarksManager.GetSerializableInfo();
             using (var stream = File.Create(DataFilePath))
                 info.SerializeTo(stream, prettyPrint: false);
+
+            Helpers.WriteToStatusBar($"Saved {Helpers.Quantifier(info.TotalBookmarksCount, "bookmark")} from {Helpers.Quantifier(info.TotalFilesCount, "file")} to .SuperBookmarks.dat file");
         }
 
         public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
@@ -68,12 +68,10 @@ namespace Konamiman.SuperBookmarks
             }
         }
 
-        private void LoadBookmarksFromDatFile()
+        public void LoadBookmarksFromDatFile()
         {
             if (!StorageOptions.SaveBookmarksToOwnFile)
                 return;
-
-            this.BookmarksManager.ClearAllBookmarks();
 
             if (!File.Exists(DataFilePath))
                 return;
@@ -89,6 +87,8 @@ namespace Konamiman.SuperBookmarks
                 Helpers.ShowErrorMessage("Sorry, I couldn't parse the .SuperBookmarks.dat file, perhaps it is corrupted?", showHeader: false);
                 return;
             }
+
+            this.BookmarksManager.DeleteAllBookmarksIn(BookmarkActionTarget.Solution);
 
             this.BookmarksManager.RecreateBookmarksFromSerializedInfo(info);
             Helpers.WriteToStatusBar($"Restored {Helpers.Quantifier(info.TotalBookmarksCount, "bookmark")} for {Helpers.Quantifier(info.TotalFilesCount, "file")} from .SuperBookmarks.dat file");

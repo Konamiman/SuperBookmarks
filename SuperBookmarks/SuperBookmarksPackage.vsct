@@ -71,6 +71,10 @@
       <Group guid="guidGroups" id="GroupForDeletionToolbar" priority="0x0000">
         <Parent guid="guidMenus" id="DeletionToolbar"/>
       </Group>
+
+      <Group guid="guidGroups" id="GroupForSaveLoadToolbar" priority="0x0000">
+        <Parent guid="guidMenus" id="SaveLoadToolbar"/>
+      </Group>
     </Groups>
 
     <Menus>
@@ -126,6 +130,14 @@
         <Strings>
           <ButtonText>SuperBookmarks - Deletion</ButtonText>
           <CommandName>SuperBookmarks - Deletion</CommandName>
+        </Strings>
+        <CommandFlag>DefaultDocked</CommandFlag>
+      </Menu>
+
+      <Menu guid="guidMenus" id="SaveLoadToolbar" type="Toolbar" >
+        <Strings>
+          <ButtonText>SuperBookmarks - Save/Load</ButtonText>
+          <CommandName>SuperBookmarks - Save/Load</CommandName>
         </Strings>
         <CommandFlag>DefaultDocked</CommandFlag>
       </Menu>
@@ -288,6 +300,22 @@
         </Strings>
       </Button>
 
+      <Button guid="guidCmds" id="SaveToDatCommandId" priority="0x0102" type="Button">
+        <Icon guid="guidImages" id="bmpSave" />
+        <Strings>
+          <ButtonText>Save Bookmarks to .dat file</ButtonText>
+          <LocCanonicalName>SuperBookmarks.SaveBookmarks</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidCmds" id="LoadFromDatCommandId" priority="0x0102" type="Button">
+        <Icon guid="guidImages" id="bmpLoad" />
+        <Strings>
+          <ButtonText>Load Bookmarks from .dat file</ButtonText>
+          <LocCanonicalName>SuperBookmarks.LoadBookmarks</LocCanonicalName>
+        </Strings>
+      </Button>
+
       <Button guid="guidCmds" id="ShowOptionsPageCommandId" priority="0x0100" type="Button">
         <Strings>
           <ButtonText>Options...</ButtonText>
@@ -296,20 +324,24 @@
     </Buttons>
 
     <Bitmaps>
-      <Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpToggle, bmpPrevInDoc, bmpNextInDoc, bmpPrevInOpen, bmpNextInOpen, bmpPrevInFolder, bmpNextInFolder, bmpPrevInProject, bmpNextInProject, bmpPrevInSolution, bmpNextInSolution, bmpSolutionExplorerFilter, bmpDelAllInDoc, bmpDelAllInOpenDocs, bmpDelAllInFolder, bmpDelAllInProject, bmpDelAllInSolution, bmpExport, bmpImport"/>
+      <Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpToggle, bmpPrevInDoc, bmpNextInDoc, bmpPrevInOpen, bmpNextInOpen, bmpPrevInFolder, bmpNextInFolder, bmpPrevInProject, bmpNextInProject, bmpPrevInSolution, bmpNextInSolution, bmpSolutionExplorerFilter, bmpDelAllInDoc, bmpDelAllInOpenDocs, bmpDelAllInFolder, bmpDelAllInProject, bmpDelAllInSolution, bmpExport, bmpImport, bmpSave, bmpLoad"/>
     </Bitmaps>
     
   </Commands>
 
   <KeyBindings>
+    <KeyBinding guid="guidCmds" id="ToggleBookmarkCommandId"
+        editor="guidVSStd97" key1="B" key2="B" mod1="CONTROL" mod2="CONTROL"/>
     <KeyBinding guid="guidCmds" id="SolutionExplorerFilterCommandId"
         editor="guidVSStd97" key1="VK_OEM_4" key2="B" mod1="CONTROL" mod2="CONTROL"/>
     <KeyBinding guid="guidCmds" id="ExportBookmarksCommandId"
         editor="guidVSStd97" key1="B" key2="X" mod1="CONTROL" mod2="CONTROL"/>
     <KeyBinding guid="guidCmds" id="ImportBookmarksCommandId"
         editor="guidVSStd97" key1="B" key2="M" mod1="CONTROL" mod2="CONTROL"/>
-    <KeyBinding guid="guidCmds" id="ToggleBookmarkCommandId"
-        editor="guidVSStd97" key1="B" key2="B" mod1="CONTROL" mod2="CONTROL"/>
+    <KeyBinding guid="guidCmds" id="SaveToDatCommandId"
+        editor="guidVSStd97" key1="B" key2="S" mod1="CONTROL" mod2="CONTROL"/>
+    <KeyBinding guid="guidCmds" id="LoadFromDatCommandId"
+        editor="guidVSStd97" key1="B" key2="L" mod1="CONTROL" mod2="CONTROL"/>
   </KeyBindings>
 
   <Symbols>
@@ -340,6 +372,8 @@
 
       <IDSymbol name="ExportBookmarksCommandId" value="18" />
       <IDSymbol name="ImportBookmarksCommandId" value="19" />
+      <IDSymbol name="SaveToDatCommandId" value="20" />
+      <IDSymbol name="LoadFromDatCommandId" value="21" />
       
       <IDSymbol name="ShowOptionsPageCommandId" value="100" />
     </GuidSymbol>
@@ -371,6 +405,7 @@
       
       <IDSymbol name="GroupForNavigationToolbar" value="200" />
       <IDSymbol name="GroupForDeletionToolbar" value="201" />
+      <IDSymbol name="GroupForSaveLoadToolbar" value="202" />
     </GuidSymbol>
     
     <GuidSymbol name="guidMenus" value="{391D1519-100C-4656-AC82-F3DA9998E55B}">
@@ -380,6 +415,7 @@
       <IDSymbol name="DeletionSubmenu_InEdit" value="4"/>
       <IDSymbol name="NavigationToolbar" value="100"/>
       <IDSymbol name="DeletionToolbar" value="101"/>
+      <IDSymbol name="SaveLoadToolbar" value="102"/>
     </GuidSymbol>
       
     <GuidSymbol name="guidImages" value="{1c3ed7c8-e761-4067-a59c-bfe3de369896}" >
@@ -402,6 +438,8 @@
       <IDSymbol name="bmpDelAllInSolution" value="17" />
       <IDSymbol name="bmpExport" value="18" />
       <IDSymbol name="bmpImport" value="19" />
+      <IDSymbol name="bmpSave" value="20" />
+      <IDSymbol name="bmpLoad" value="21" />
     </GuidSymbol>
   </Symbols>
 
@@ -576,12 +614,38 @@
     <CommandPlacement guid="guidCmds" id="ExportBookmarksCommandId" priority="17">
       <Parent guid="guidGroups" id="ImportExportGroup_InEdit" />
     </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="ExportBookmarksCommandId" priority="17">
+      <Parent guid="guidGroups" id="GroupForSaveLoadToolbar" />
+    </CommandPlacement>
 
     <CommandPlacement guid="guidCmds" id="ImportBookmarksCommandId" priority="18">
       <Parent guid="guidGroups" id="ImportExportGroup_TopLevel"/>
     </CommandPlacement>
     <CommandPlacement guid="guidCmds" id="ImportBookmarksCommandId" priority="18">
       <Parent guid="guidGroups" id="ImportExportGroup_InEdit" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="ImportBookmarksCommandId" priority="18">
+      <Parent guid="guidGroups" id="GroupForSaveLoadToolbar" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidCmds" id="SaveToDatCommandId" priority="19">
+      <Parent guid="guidGroups" id="ImportExportGroup_TopLevel"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="SaveToDatCommandId" priority="19">
+      <Parent guid="guidGroups" id="ImportExportGroup_InEdit" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="SaveToDatCommandId" priority="19">
+      <Parent guid="guidGroups" id="GroupForSaveLoadToolbar" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidCmds" id="LoadFromDatCommandId" priority="20">
+      <Parent guid="guidGroups" id="ImportExportGroup_TopLevel"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="LoadFromDatCommandId" priority="20">
+      <Parent guid="guidGroups" id="ImportExportGroup_InEdit" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidCmds" id="LoadFromDatCommandId" priority="20">
+      <Parent guid="guidGroups" id="GroupForSaveLoadToolbar" />
     </CommandPlacement>
 
     <CommandPlacement guid="guidCmds" id="ShowOptionsPageCommandId" priority="100">

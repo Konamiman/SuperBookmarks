@@ -59,6 +59,8 @@ namespace Konamiman.SuperBookmarks
 
                 new ExportBookmarksCommand(),
                 new ImportBookmarksCommand(),
+                new SaveToDatCommand(),
+                new LoadFromDatCommand(),
 
                 new OpenOptionsCommand()
             };

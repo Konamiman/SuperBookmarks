@@ -103,6 +103,20 @@ namespace Konamiman.SuperBookmarks.Options
             }
         }
 
+        private bool replacingLoadRequiresConfirmation;
+        public bool ReplacingLoadRequiresConfirmation
+        {
+            get
+            {
+                return replacingLoadRequiresConfirmation;
+            }
+            set
+            {
+                replacingLoadRequiresConfirmation = value;
+                optionsChanged = true;
+            }
+        }
+
         public event EventHandler OptionsChanged;
 
         protected override void OnApply(PageApplyEventArgs e)
@@ -137,14 +151,15 @@ namespace Konamiman.SuperBookmarks.Options
                    Convert(DelAllInFolderRequiresConfirmation) +
                    Convert(DelAllInProjectRequiresConfirmation) +
                    Convert(DelAllInSolutionRequiresConfirmation) +
-                   Convert(ReplacingImportRequiresConfirmation);
+                   Convert(ReplacingImportRequiresConfirmation) +
+                   Convert(ReplacingLoadRequiresConfirmation);
         }
 
         public void Deserialize(string serialized)
         {
             bool Convert(char value) => value == '1';
 
-            serialized = serialized.PadRight(6, '1');
+            serialized = serialized.PadRight(7, '1');
 
             DelAllInDocumentRequiresConfirmation = Convert(serialized[0]);
             DelAllInOpenDocumentsRequiresConfirmation = Convert(serialized[1]);
@@ -152,6 +167,7 @@ namespace Konamiman.SuperBookmarks.Options
             DelAllInProjectRequiresConfirmation = Convert(serialized[3]);
             DelAllInSolutionRequiresConfirmation = Convert(serialized[4]);
             ReplacingImportRequiresConfirmation = Convert(serialized[5]);
+            ReplacingLoadRequiresConfirmation = Convert(serialized[6]);
         }
 
         public bool ShouldConfirmForDeleteAllIn(BookmarkActionTarget target)

@@ -45,7 +45,7 @@ namespace Konamiman.SuperBookmarks
             => bookmarksPendingCreation.Count + 
                bookmarksByView.Values.Count(b => b.Any());
 
-        public int GetFilesWithBookmarksCount(BookmarkActionTarget target)
+        public int GetFilesWithBookmarksCount(BookmarkActionTarget target = BookmarkActionTarget.Solution)
         {
             var targetFiles = filesSelectors[target]();
 

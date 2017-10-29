@@ -97,6 +97,7 @@
     <Compile Include="Commands\GoToPrevInOpenDocsCommand.cs" />
     <Compile Include="Commands\GoToPrevInDocCommand.cs" />
     <Compile Include="Commands\OpenOptionsCommand.cs" />
+    <Compile Include="Commands\LoadFromDat.cs" />
     <Compile Include="Commands\SolutionExplorerFilterCommand.cs" />
     <Compile Include="Commands\ToggleBookmarkCommand.cs" />
     <Compile Include="Deletion.cs">
@@ -163,6 +164,7 @@
     <Compile Include="RuntimeBookmark.cs">
       <DependentUpon>BookmarksManager.cs</DependentUpon>
     </Compile>
+    <Compile Include="Commands\SaveToDatCommand.cs" />
     <Compile Include="SolutionExplorerFilter.cs" />
     <Compile Include="StateChangeCallbacks.cs">
       <DependentUpon>BookmarksManager.cs</DependentUpon>
