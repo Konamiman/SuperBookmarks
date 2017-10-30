@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Design;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Konamiman.SuperBookmarks.Commands;
 using Microsoft.VisualStudio.Shell;
 
@@ -13,24 +9,26 @@ namespace Konamiman.SuperBookmarks
     {
         private CommandBase[] Commands;
 
+        const int menuId = 1;
+        private readonly static Guid menuGuid = new Guid("391D1519-100C-4656-AC82-F3DA9998E55B");
+        private CommandID menuCommandId = new CommandID(menuGuid, menuId);
+
         void InitializeMenu()
         {
-            //Both menus are declared as "default invisible" in the .vsct file,
-            //therefore only the one we register now will show.
-
-            const int topLevelMenuId = 1;
-            const int submenuId = 2;
-
-            var menuToShow = Options.ShowCommandsInTopLevelMenu
-                ? topLevelMenuId
-                : submenuId;
-
             var commandService = this.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            var menusGuid = new Guid("391D1519-100C-4656-AC82-F3DA9998E55B");
-            var menuCommandID = new CommandID(menusGuid, menuToShow);
-            var menuItem = new OleMenuCommand(null, menuCommandID);
-            menuItem.BeforeQueryStatus += (sender, args) => menuItem.Visible = true;
+            var menuItem = new OleMenuCommand(null, menuCommandId);
+            menuItem.Visible = false;
             commandService.AddCommand(menuItem);
+            UpdateMenuVisibilityAndText();
+        }
+
+        private void UpdateMenuVisibilityAndText()
+        {
+            var commandService = this.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            var menu = (OleMenuCommand)commandService.FindCommand(menuCommandId);
+            menu.Visible = Options.ShowMenuOption != ShowMenuOption.DontShow;
+            menu.Text = Options.ShowMenuOption == ShowMenuOption.WithTitleBookmarks ?
+                "Bookmarks" : "SuperBookmarks";
         }
 
         void InitializeCommands()

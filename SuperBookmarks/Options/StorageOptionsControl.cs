@@ -5,8 +5,6 @@ namespace Konamiman.SuperBookmarks
 {
     public partial class StorageOptionsControl : UserControl
     {
-        private bool programmaticChangeInProgress = false;
-
         public StorageOptionsControl()
         {
             InitializeComponent();
@@ -16,91 +14,61 @@ namespace Konamiman.SuperBookmarks
 
         public void Initialize()
         {
-            
-        }
+            rbInOwnFile.Checked = Options.SaveBookmarksToOwnFile;
+            chkAutoIncludeInGitignore.Checked = Options.AutoIncludeInGitignore;
 
-        public void ChangeAutoGitignoreWriteEnabled(bool enabled)
-        {
-            chkAutoIncludeInGitignore.Enabled = enabled;
-            lblIfGitignoreExists.Enabled = enabled;
-        }
+            rbInOwnFile.CheckedChanged += RbInOwnFile_CheckedChanged;
+            chkAutoIncludeInGitignore.CheckedChanged += ChkAutoIncludeInGitignore_CheckedChanged;
 
-        public void ChangeIncludeInGitignoreNowEnabled(bool enabled)
-        {
-            btnIncludeInGitignoreNow.Enabled = enabled;
+            var solutionIsOpen = SuperBookmarksPackage.Instance.SolutionIsCurrentlyOpen;
+            var solutionIsInGitRepo = solutionIsOpen && SuperBookmarksPackage.Instance.CurrentSolutionIsInGitRepo;
+            SetControlsState(solutionIsOpen, solutionIsInGitRepo);
         }
-
-        public void ChangeOpenSuoFolderEnabled(bool enabled)
+        
+        private void SetControlsState(bool solutionIsOpen, bool solutionIsInGitRepo)
         {
-            btnOpenSuoFolder.Enabled = enabled;
-        }
+            btnIncludeInGitignoreNow.Enabled = solutionIsInGitRepo;
+            btnOpenSuoFolder.Enabled = solutionIsOpen;
 
-        public bool SaveInSuoFile
-        {
-            get { return rbInSuo.Checked; }
-            set
-            {
-                programmaticChangeInProgress = true;
-                rbInSuo.Checked = value;
-                programmaticChangeInProgress = false;
-            }
-        }
-
-        public bool SaveInOwnFile
-        {
-            get { return rbInOwnFile.Checked; }
-            set
-            {
-                programmaticChangeInProgress = true;
-                rbInOwnFile.Checked = value;
-                programmaticChangeInProgress = false;
-            }
-        }
-
-        public bool AutoIncludeInGitignore
-        {
-            get { return chkAutoIncludeInGitignore.Checked; }
-            set
-            {
-                programmaticChangeInProgress = true;
-                chkAutoIncludeInGitignore.Checked = value;
-                programmaticChangeInProgress = false;
-            }
-        }
-
-        public void SetInfoMessage(string message)
-        {
-            if (message == null)
-            {
-                pnlInfoMessage.Visible = false;
-            }
+            if (!solutionIsOpen)
+                lblInfoMessage.Text = "No solution is open currently";
+            else if (!solutionIsInGitRepo)
+                lblInfoMessage.Text = "Current solution is not in a Git repository";
             else
-            {
-                lblInfoMessage.Text = message;
-                pnlInfoMessage.Visible = true;
-            }
+                lblInfoMessage.Text = "";
+
+            pnlInfoMessage.Visible = lblInfoMessage.Text != "";
+        }
+
+        private void RbInOwnFile_CheckedChanged(object sender, EventArgs e)
+        {
+            var saveToOwnFile = rbInOwnFile.Checked;
+
+            Options.SaveBookmarksToOwnFile = saveToOwnFile;
+
+            chkAutoIncludeInGitignore.Enabled = saveToOwnFile;
+            lblIfGitignoreExists.Enabled = saveToOwnFile;
+
+            if (!saveToOwnFile)
+                chkAutoIncludeInGitignore.Checked = false;
+        }
+        
+        private void ChkAutoIncludeInGitignore_CheckedChanged(object sender, EventArgs e)
+        {
+            Options.AutoIncludeInGitignore = chkAutoIncludeInGitignore.Checked;
         }
 
         public event EventHandler OpenSuoFolderRequested;
         public event EventHandler IncludeFileInCurrentGitignoreRequested;
-        public event EventHandler SaveOptionChanged;
 
         private void btnOpenSuoFolder_Click(object sender, System.EventArgs e)
         {
-            if(!programmaticChangeInProgress)
-                OpenSuoFolderRequested?.Invoke(this, EventArgs.Empty);
+            OpenSuoFolderRequested?.Invoke(this, EventArgs.Empty);
         }
 
         private void btnIncludeInGitignoreNow_Click(object sender, EventArgs e)
         {
-            if (!programmaticChangeInProgress)
-                IncludeFileInCurrentGitignoreRequested?.Invoke(this, EventArgs.Empty);
-        }
-
-        private void rbInSuo_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!programmaticChangeInProgress)
-                SaveOptionChanged?.Invoke(this, EventArgs.Empty);
+            IncludeFileInCurrentGitignoreRequested?.Invoke(this, EventArgs.Empty);
         }
     }
 }

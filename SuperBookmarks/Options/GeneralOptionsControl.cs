@@ -4,14 +4,14 @@ using System.Windows.Forms;
 
 namespace Konamiman.SuperBookmarks
 {
-    public partial class OptionsControl : UserControl
+    public partial class GeneralOptionsControl : UserControl
     {
-        public OptionsControl()
+        public GeneralOptionsControl()
         {
             InitializeComponent();
         }
 
-        internal OptionsPage Options { get; set; }
+        internal GeneralOptionsPage Options { get; set; }
 
         public void Initialize()
         {
@@ -22,10 +22,19 @@ namespace Konamiman.SuperBookmarks
                 colorDialog.CustomColors = Options.CustomColors;
 
             chkDeletingLineDeletesBookmark.Checked = Options.DeletingALineDeletesTheBookmark;
-            if (Options.ShowCommandsInTopLevelMenu)
-                rbInTopLevel.Checked = true;
-            else
-                rbInEdit.Checked = true;
+
+            switch(Options.ShowMenuOption)
+            {
+                case ShowMenuOption.WithTitleSuperBookmarks:
+                    rbMenuShowSuperBookmarks.Checked = true;
+                    break;
+                case ShowMenuOption.WithTitleBookmarks:
+                    rbMenuShowBookmarks.Checked = true;
+                    break;
+                case ShowMenuOption.DontShow:
+                    rbMenuDontShow.Checked = true;
+                    break;
+            }
 
             if (Options.MergeWhenImporting)
                 rbImportMerges.Checked = true;
@@ -38,8 +47,22 @@ namespace Konamiman.SuperBookmarks
             chkDeletingLineDeletesBookmark.CheckedChanged += chkDeletingLineDeletesBookmark_CheckedChanged;
             chkNavInFolderIncludesSubfolders.CheckedChanged += ChkNavInFolderIncludesSubfoldersOnCheckedChanged;
             chkDelAllInFolderIncludesSubfolder.CheckedChanged += ChkDelAllInFolderIncludesSubfolderOnCheckedChanged;
-            rbInTopLevel.CheckedChanged += rbInTopLevelMenu_CheckedChanged;
             rbImportMerges.CheckedChanged += rbImportMerges_CheckedChanged;
+
+            rbMenuShowSuperBookmarks.CheckedChanged += MenuShowSuperBookmarks_CheckedChanged;
+            rbMenuShowBookmarks.CheckedChanged += MenuShowSuperBookmarks_CheckedChanged;
+            rbMenuDontShow.CheckedChanged += MenuShowSuperBookmarks_CheckedChanged;
+        }
+
+        private void MenuShowSuperBookmarks_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!((RadioButton)sender).Checked) return;
+            if (rbMenuShowSuperBookmarks.Checked)
+                Options.ShowMenuOption = ShowMenuOption.WithTitleSuperBookmarks;
+            else if (rbMenuShowBookmarks.Checked)
+                Options.ShowMenuOption = ShowMenuOption.WithTitleBookmarks;
+            else if (rbMenuDontShow.Checked)
+                Options.ShowMenuOption = ShowMenuOption.DontShow;
         }
 
         private void chkDeletingLineDeletesBookmark_CheckedChanged(object sender, EventArgs e)
@@ -60,11 +83,6 @@ namespace Konamiman.SuperBookmarks
         private void rbImportMerges_CheckedChanged(object sender, EventArgs e)
         {
             Options.MergeWhenImporting = rbImportMerges.Checked;
-        }
-
-        private void rbInTopLevelMenu_CheckedChanged(object sender, EventArgs e)
-        {
-            Options.ShowCommandsInTopLevelMenu = rbInTopLevel.Checked;
         }
 
         private void pnlChooseColor_Click(object sender, EventArgs e)

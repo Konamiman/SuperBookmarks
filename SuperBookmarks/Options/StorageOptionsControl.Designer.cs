@@ -84,7 +84,6 @@
             this.rbInSuo.TabStop = true;
             this.rbInSuo.Text = "User solution options file (.suo)";
             this.rbInSuo.UseVisualStyleBackColor = true;
-            this.rbInSuo.CheckedChanged += new System.EventHandler(this.rbInSuo_CheckedChanged);
             // 
             // chkAutoIncludeInGitignore
             // 

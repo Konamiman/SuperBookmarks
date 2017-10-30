@@ -27,7 +27,7 @@ Do you want me to open the options page so that you can change where bookmarks a
 
             if(!File.Exists(Package.DataFilePath))
             {
-                Helpers.ShowInfoMessage(noFileExistsMessage, showTitle: false);
+                Helpers.ShowInfoMessage(noFileExistsMessage);
                 return;
             }
 

@@ -49,21 +49,7 @@ namespace Konamiman.SuperBookmarks
 
             options.DeletingALineDeletesTheBookmarkChanged += (sender, args) =>
             {
-                deletingALineDeletesTheBookmark = ((OptionsPage)sender).DeletingALineDeletesTheBookmark;
-            };
-
-            options.GlyphColorChanged += (sender, args) =>
-            {
-                BookmarkGlyphFactory.SetGlyphColor(options.GlyphColor);
-
-                //Force redraw of currently visible bookmarks
-                //(there must be a better way to do this...)
-                var frame = SuperBookmarksPackage.Instance.CurrentWindowFrame;
-                if (frame?.IsVisible() == VSConstants.S_OK)
-                {
-                    frame.Hide();
-                    frame.Show();
-                }
+                deletingALineDeletesTheBookmark = ((GeneralOptionsPage)sender).DeletingALineDeletesTheBookmark;
             };
         }
 

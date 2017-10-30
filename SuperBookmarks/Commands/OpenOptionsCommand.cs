@@ -10,7 +10,7 @@ namespace Konamiman.SuperBookmarks.Commands
 
         protected override void CommandCallback(OleMenuCommand command)
         {
-            this.Package.ShowOptionPage(typeof(OptionsPage));
+            this.Package.ShowOptionPage(typeof(GeneralOptionsPage));
         }
     }
 }

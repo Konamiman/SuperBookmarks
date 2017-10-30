@@ -34,7 +34,7 @@ namespace Konamiman.SuperBookmarks
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)]
-    [ProvideOptionPage(typeof(OptionsPage), "SuperBookmarks", "General", 0, 0, true)]
+    [ProvideOptionPage(typeof(GeneralOptionsPage), "SuperBookmarks", "General", 0, 0, true)]
     [ProvideOptionPage(typeof(StorageOptionsPage), "SuperBookmarks", "Storage", 0, 0, true)]
     [ProvideOptionPage(typeof(ConfirmationsPage), "SuperBookmarks", "Confirmations", 0, 0, true)]
     public sealed partial class SuperBookmarksPackage : Package,
@@ -46,7 +46,7 @@ namespace Konamiman.SuperBookmarks
         /// <summary>
         /// SuperBookmarksPackage GUID string.
         /// </summary>
-        public const string PackageGuidString = "b634341b-bb5b-463e-9886-f11c4391941e";
+        private const string PackageGuidString = "b634341b-bb5b-463e-9886-f11c4391941e";
 
         private const string SettingsStoreName = "Konamiman.SuperBookmarks";
 

@@ -6,7 +6,6 @@
 
 -------
 
-- Fast save/load commands
 - Debugging/activity log
 - The TODOs
 - Proper README and manifest metadata

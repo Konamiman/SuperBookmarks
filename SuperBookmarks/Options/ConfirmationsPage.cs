@@ -1,17 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
-using Microsoft.VisualStudio.Shell;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace Konamiman.SuperBookmarks.Options
 {
     [Guid("2A147C3B-3B79-4746-BF40-F97AA8569BC4")]
-    public class ConfirmationsPage : DialogPage
+    public class ConfirmationsPage : OptionsPageBase
     {
         ConfirmationOptionsControl control;
-
-        private bool optionsChanged = false;
 
         public ConfirmationsPage()
         {
@@ -19,155 +16,66 @@ namespace Konamiman.SuperBookmarks.Options
             control.Options = this;
         }
 
-        private bool delAllInDocumentRequiresConfirmation;
-        public bool DelAllInDocumentRequiresConfirmation
-        {
-            get
-            {
-                return delAllInDocumentRequiresConfirmation;
-            }
-            set
-            {
-                delAllInDocumentRequiresConfirmation = value;
-                optionsChanged = true;
-            }
-        }
+        public bool DelAllInDocumentRequiresConfirmation { get; set; }
 
-        private bool delAllInOpenDocumentsRequiresConfirmation;
-        public bool DelAllInOpenDocumentsRequiresConfirmation
-        {
-            get
-            {
-                return delAllInOpenDocumentsRequiresConfirmation;
-            }
-            set
-            {
-                delAllInOpenDocumentsRequiresConfirmation = value;
-                optionsChanged = true;
-            }
-        }
+        public bool DelAllInOpenDocumentsRequiresConfirmation { get; set; }
 
-        private bool delAllInFolderRequiresConfirmation;
-        public bool DelAllInFolderRequiresConfirmation
-        {
-            get
-            {
-                return delAllInFolderRequiresConfirmation;
-            }
-            set
-            {
-                delAllInFolderRequiresConfirmation = value;
-                optionsChanged = true;
-            }
-        }
+        public bool DelAllInFolderRequiresConfirmation { get; set; }
 
-        private bool delAllInProjectRequiresConfirmation;
-        public bool DelAllInProjectRequiresConfirmation
-        {
-            get
-            {
-                return delAllInProjectRequiresConfirmation;
-            }
-            set
-            {
-                delAllInProjectRequiresConfirmation = value;
-                optionsChanged = true;
-            }
-        }
+        public bool DelAllInProjectRequiresConfirmation { get; set; }
 
-        private bool delAllInSolutionRequiresConfirmation;
-        public bool DelAllInSolutionRequiresConfirmation
-        {
-            get
-            {
-                return delAllInSolutionRequiresConfirmation;
-            }
-            set
-            {
-                delAllInSolutionRequiresConfirmation = value;
-                optionsChanged = true;
-            }
-        }
+        public bool DelAllInSolutionRequiresConfirmation { get; set; }
 
-        private bool replacingImportRequiresConfirmation;
-        public bool ReplacingImportRequiresConfirmation
-        {
-            get
-            {
-                return replacingImportRequiresConfirmation;
-            }
-            set
-            {
-                replacingImportRequiresConfirmation = value;
-                optionsChanged = true;
-            }
-        }
+        public bool ReplacingImportRequiresConfirmation { get; set; }
 
-        private bool replacingLoadRequiresConfirmation;
-        public bool ReplacingLoadRequiresConfirmation
-        {
-            get
-            {
-                return replacingLoadRequiresConfirmation;
-            }
-            set
-            {
-                replacingLoadRequiresConfirmation = value;
-                optionsChanged = true;
-            }
-        }
-
-        public event EventHandler OptionsChanged;
-
-        protected override void OnApply(PageApplyEventArgs e)
-        {
-            if(optionsChanged)
-                OptionsChanged?.Invoke(this, EventArgs.Empty);
-
-            base.OnApply(e);
-        }
-
-        protected override void OnClosed(EventArgs e)
-        {
-            optionsChanged = false;
-            base.OnClosed(e);
-        }
+        public bool ReplacingLoadRequiresConfirmation { get; set; }
 
         protected override void OnActivate(CancelEventArgs e)
         {
             control.Initialize();
-            optionsChanged = false;
             base.OnActivate(e);
         }
 
         protected override IWin32Window Window => control;
 
-        public string Serialize()
+        public override void ResetSettings()
+        {
+            DelAllInDocumentRequiresConfirmation = true;
+            DelAllInOpenDocumentsRequiresConfirmation = true;
+            DelAllInFolderRequiresConfirmation = true;
+            DelAllInProjectRequiresConfirmation = true;
+            ReplacingImportRequiresConfirmation = true;
+            ReplacingLoadRequiresConfirmation = true;
+        }
+
+        public override void LoadSettingsFromStorage()
+        {
+            bool Convert(char value) => value == '1';
+
+            var settingValue = LoadStringProperty("ConfirmationOptions", "1111111").PadRight(7, '1');
+
+            DelAllInDocumentRequiresConfirmation = Convert(settingValue[0]);
+            DelAllInOpenDocumentsRequiresConfirmation = Convert(settingValue[1]);
+            DelAllInFolderRequiresConfirmation = Convert(settingValue[2]);
+            DelAllInProjectRequiresConfirmation = Convert(settingValue[3]);
+            DelAllInSolutionRequiresConfirmation = Convert(settingValue[4]);
+            ReplacingImportRequiresConfirmation = Convert(settingValue[5]);
+            ReplacingLoadRequiresConfirmation = Convert(settingValue[6]);
+        }
+
+        public override void SaveSettingsToStorage()
         {
             string Convert(bool value) => value ? "1" : "0";
 
-            return Convert(DelAllInDocumentRequiresConfirmation) +
+            var settingValue = Convert(DelAllInDocumentRequiresConfirmation) +
                    Convert(DelAllInOpenDocumentsRequiresConfirmation) +
                    Convert(DelAllInFolderRequiresConfirmation) +
                    Convert(DelAllInProjectRequiresConfirmation) +
                    Convert(DelAllInSolutionRequiresConfirmation) +
                    Convert(ReplacingImportRequiresConfirmation) +
                    Convert(ReplacingLoadRequiresConfirmation);
-        }
 
-        public void Deserialize(string serialized)
-        {
-            bool Convert(char value) => value == '1';
-
-            serialized = serialized.PadRight(7, '1');
-
-            DelAllInDocumentRequiresConfirmation = Convert(serialized[0]);
-            DelAllInOpenDocumentsRequiresConfirmation = Convert(serialized[1]);
-            DelAllInFolderRequiresConfirmation = Convert(serialized[2]);
-            DelAllInProjectRequiresConfirmation = Convert(serialized[3]);
-            DelAllInSolutionRequiresConfirmation = Convert(serialized[4]);
-            ReplacingImportRequiresConfirmation = Convert(serialized[5]);
-            ReplacingLoadRequiresConfirmation = Convert(serialized[6]);
+            SaveProperty("ConfirmationOptions", settingValue);
         }
 
         public bool ShouldConfirmForDeleteAllIn(BookmarkActionTarget target)

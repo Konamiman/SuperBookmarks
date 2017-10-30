@@ -109,12 +109,12 @@ namespace Konamiman.SuperBookmarks
             return output == "" ? null : output.Trim('\r', '\n', ' ');
         }
 
-        public static void ShowInfoMessage(string message, bool showTitle = true)
+        public static void ShowInfoMessage(string message)
         {
             VsShellUtilities.ShowMessageBox(
                 SuperBookmarksPackage.Instance,
                 message,
-                showTitle ? "SuperBookmarks" : null,
+                null,
                 OLEMSGICON.OLEMSGICON_INFO,
                 OLEMSGBUTTON.OLEMSGBUTTON_OK,
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
@@ -125,20 +125,20 @@ namespace Konamiman.SuperBookmarks
             VsShellUtilities.ShowMessageBox(
                 SuperBookmarksPackage.Instance,
                 message,
-                "SuperBookmarks",
+                null,
                 OLEMSGICON.OLEMSGICON_WARNING,
                 OLEMSGBUTTON.OLEMSGBUTTON_OK,
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }
 
-        public static bool ShowYesNoQuestionMessage(string message, bool showTitle = false)
+        public static bool ShowYesNoQuestionMessage(string message)
         {
             const int YesButton = 6;
 
             return VsShellUtilities.ShowMessageBox(
                 SuperBookmarksPackage.Instance,
                 message,
-                showTitle ? "SuperBookmarks" : null,
+                null,
                 OLEMSGICON.OLEMSGICON_QUERY,
                 OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST) == YesButton;

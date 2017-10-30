@@ -1,6 +1,6 @@
 ﻿namespace Konamiman.SuperBookmarks
 {
-    partial class OptionsControl
+    partial class GeneralOptionsControl
     {
         /// <summary> 
         /// Required designer variable.
@@ -28,11 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OptionsControl));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GeneralOptionsControl));
             this.chkDeletingLineDeletesBookmark = new System.Windows.Forms.CheckBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.rbInEdit = new System.Windows.Forms.RadioButton();
-            this.rbInTopLevel = new System.Windows.Forms.RadioButton();
+            this.rbMenuDontShow = new System.Windows.Forms.RadioButton();
+            this.rbMenuShowSuperBookmarks = new System.Windows.Forms.RadioButton();
+            this.rbMenuShowBookmarks = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
             this.pnlRequiresRestaring = new System.Windows.Forms.Panel();
             this.lblInfoMessage = new System.Windows.Forms.Label();
@@ -65,37 +66,50 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.rbInEdit);
-            this.panel1.Controls.Add(this.rbInTopLevel);
-            this.panel1.Location = new System.Drawing.Point(14, 145);
+            this.panel1.Controls.Add(this.rbMenuDontShow);
+            this.panel1.Controls.Add(this.rbMenuShowSuperBookmarks);
+            this.panel1.Controls.Add(this.rbMenuShowBookmarks);
+            this.panel1.Location = new System.Drawing.Point(14, 140);
             this.panel1.Margin = new System.Windows.Forms.Padding(2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(388, 106);
+            this.panel1.Size = new System.Drawing.Size(556, 156);
             this.panel1.TabIndex = 2;
             // 
-            // rbInEdit
+            // rbMenuDontShow
             // 
-            this.rbInEdit.AutoSize = true;
-            this.rbInEdit.Location = new System.Drawing.Point(2, 3);
-            this.rbInEdit.Margin = new System.Windows.Forms.Padding(2);
-            this.rbInEdit.Name = "rbInEdit";
-            this.rbInEdit.Size = new System.Drawing.Size(385, 24);
-            this.rbInEdit.TabIndex = 0;
-            this.rbInEdit.TabStop = true;
-            this.rbInEdit.Text = "A \"SuperBookmarks\" submenu in the \"Edit\" menu";
-            this.rbInEdit.UseVisualStyleBackColor = true;
+            this.rbMenuDontShow.AutoSize = true;
+            this.rbMenuDontShow.Location = new System.Drawing.Point(2, 56);
+            this.rbMenuDontShow.Margin = new System.Windows.Forms.Padding(2);
+            this.rbMenuDontShow.Name = "rbMenuDontShow";
+            this.rbMenuDontShow.Size = new System.Drawing.Size(113, 24);
+            this.rbMenuDontShow.TabIndex = 2;
+            this.rbMenuDontShow.TabStop = true;
+            this.rbMenuDontShow.Text = "Don\'t show";
+            this.rbMenuDontShow.UseVisualStyleBackColor = true;
             // 
-            // rbInTopLevel
+            // rbMenuShowSuperBookmarks
             // 
-            this.rbInTopLevel.AutoSize = true;
-            this.rbInTopLevel.Location = new System.Drawing.Point(2, 29);
-            this.rbInTopLevel.Margin = new System.Windows.Forms.Padding(2);
-            this.rbInTopLevel.Name = "rbInTopLevel";
-            this.rbInTopLevel.Size = new System.Drawing.Size(290, 24);
-            this.rbInTopLevel.TabIndex = 1;
-            this.rbInTopLevel.TabStop = true;
-            this.rbInTopLevel.Text = "A \"SuperBookmarks\" top level menu";
-            this.rbInTopLevel.UseVisualStyleBackColor = true;
+            this.rbMenuShowSuperBookmarks.AutoSize = true;
+            this.rbMenuShowSuperBookmarks.Location = new System.Drawing.Point(2, 3);
+            this.rbMenuShowSuperBookmarks.Margin = new System.Windows.Forms.Padding(2);
+            this.rbMenuShowSuperBookmarks.Name = "rbMenuShowSuperBookmarks";
+            this.rbMenuShowSuperBookmarks.Size = new System.Drawing.Size(278, 24);
+            this.rbMenuShowSuperBookmarks.TabIndex = 0;
+            this.rbMenuShowSuperBookmarks.TabStop = true;
+            this.rbMenuShowSuperBookmarks.Text = "Show, with title \"SuperBookmarks\"";
+            this.rbMenuShowSuperBookmarks.UseVisualStyleBackColor = true;
+            // 
+            // rbMenuShowBookmarks
+            // 
+            this.rbMenuShowBookmarks.AutoSize = true;
+            this.rbMenuShowBookmarks.Location = new System.Drawing.Point(2, 29);
+            this.rbMenuShowBookmarks.Margin = new System.Windows.Forms.Padding(2);
+            this.rbMenuShowBookmarks.Name = "rbMenuShowBookmarks";
+            this.rbMenuShowBookmarks.Size = new System.Drawing.Size(235, 24);
+            this.rbMenuShowBookmarks.TabIndex = 1;
+            this.rbMenuShowBookmarks.TabStop = true;
+            this.rbMenuShowBookmarks.Text = "Show, with title \"Bookmarks\"";
+            this.rbMenuShowBookmarks.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -103,32 +117,34 @@
             this.label1.Location = new System.Drawing.Point(11, 119);
             this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(147, 20);
+            this.label1.Size = new System.Drawing.Size(265, 20);
             this.label1.TabIndex = 3;
-            this.label1.Text = "Show commands in";
+            this.label1.Text = "SuperBookmarks menu in Menu Bar";
             // 
             // pnlRequiresRestaring
             // 
             this.pnlRequiresRestaring.Controls.Add(this.lblInfoMessage);
             this.pnlRequiresRestaring.Controls.Add(this.pictureBox1);
-            this.pnlRequiresRestaring.Location = new System.Drawing.Point(16, 200);
+            this.pnlRequiresRestaring.Location = new System.Drawing.Point(16, 229);
             this.pnlRequiresRestaring.Name = "pnlRequiresRestaring";
-            this.pnlRequiresRestaring.Size = new System.Drawing.Size(384, 38);
+            this.pnlRequiresRestaring.Size = new System.Drawing.Size(551, 61);
             this.pnlRequiresRestaring.TabIndex = 4;
             // 
             // lblInfoMessage
             // 
             this.lblInfoMessage.AutoSize = true;
-            this.lblInfoMessage.Location = new System.Drawing.Point(22, 3);
+            this.lblInfoMessage.Location = new System.Drawing.Point(22, -4);
             this.lblInfoMessage.Name = "lblInfoMessage";
-            this.lblInfoMessage.Size = new System.Drawing.Size(339, 20);
+            this.lblInfoMessage.Size = new System.Drawing.Size(464, 60);
             this.lblInfoMessage.TabIndex = 0;
-            this.lblInfoMessage.Text = "Requires restarting Visual Studio to take effect";
+            this.lblInfoMessage.Text = "You can still use the toolbars (to show: Tools - Customize)\r\nand open the Options" +
+    " dialog (Tools - Options - SuperBookmarks)\r\nwhen the menu is not visible in the " +
+    "Menu Bar";
             // 
             // pictureBox1
             // 
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(4, 7);
+            this.pictureBox1.Location = new System.Drawing.Point(4, 0);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(29, 31);
             this.pictureBox1.TabIndex = 0;
@@ -142,7 +158,7 @@
             // 
             // btnResetColor
             // 
-            this.btnResetColor.Location = new System.Drawing.Point(259, 358);
+            this.btnResetColor.Location = new System.Drawing.Point(260, 400);
             this.btnResetColor.Margin = new System.Windows.Forms.Padding(2);
             this.btnResetColor.Name = "btnResetColor";
             this.btnResetColor.Size = new System.Drawing.Size(94, 32);
@@ -155,7 +171,7 @@
             // 
             this.lblGlyphColor.AutoSize = true;
             this.lblGlyphColor.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.lblGlyphColor.Location = new System.Drawing.Point(13, 363);
+            this.lblGlyphColor.Location = new System.Drawing.Point(13, 405);
             this.lblGlyphColor.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblGlyphColor.Name = "lblGlyphColor";
             this.lblGlyphColor.Size = new System.Drawing.Size(164, 20);
@@ -167,7 +183,7 @@
             // 
             this.pnlChooseColor.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.pnlChooseColor.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pnlChooseColor.Location = new System.Drawing.Point(186, 358);
+            this.pnlChooseColor.Location = new System.Drawing.Point(186, 400);
             this.pnlChooseColor.Margin = new System.Windows.Forms.Padding(2);
             this.pnlChooseColor.Name = "pnlChooseColor";
             this.pnlChooseColor.Size = new System.Drawing.Size(52, 32);
@@ -179,9 +195,9 @@
             this.chkNavInFolderIncludesSubfolders.AutoSize = true;
             this.chkNavInFolderIncludesSubfolders.Location = new System.Drawing.Point(14, 49);
             this.chkNavInFolderIncludesSubfolders.Name = "chkNavInFolderIncludesSubfolders";
-            this.chkNavInFolderIncludesSubfolders.Size = new System.Drawing.Size(360, 24);
+            this.chkNavInFolderIncludesSubfolders.Size = new System.Drawing.Size(363, 24);
             this.chkNavInFolderIncludesSubfolders.TabIndex = 1;
-            this.chkNavInFolderIncludesSubfolders.Text = "\"Go to prev/next in Folder\" includes subfolders";
+            this.chkNavInFolderIncludesSubfolders.Text = "\"Go to Prev/Next in Folder\" includes subfolders";
             this.chkNavInFolderIncludesSubfolders.UseVisualStyleBackColor = true;
             // 
             // chkDelAllInFolderIncludesSubfolder
@@ -189,15 +205,15 @@
             this.chkDelAllInFolderIncludesSubfolder.AutoSize = true;
             this.chkDelAllInFolderIncludesSubfolder.Location = new System.Drawing.Point(14, 79);
             this.chkDelAllInFolderIncludesSubfolder.Name = "chkDelAllInFolderIncludesSubfolder";
-            this.chkDelAllInFolderIncludesSubfolder.Size = new System.Drawing.Size(318, 24);
+            this.chkDelAllInFolderIncludesSubfolder.Size = new System.Drawing.Size(320, 24);
             this.chkDelAllInFolderIncludesSubfolder.TabIndex = 2;
-            this.chkDelAllInFolderIncludesSubfolder.Text = "\"Delete all in Folder\" includes subfolders";
+            this.chkDelAllInFolderIncludesSubfolder.Text = "\"Delete All in Folder\" includes subfolders";
             this.chkDelAllInFolderIncludesSubfolder.UseVisualStyleBackColor = true;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(9, 253);
+            this.label2.Location = new System.Drawing.Point(9, 303);
             this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(215, 20);
@@ -208,7 +224,7 @@
             // 
             this.panel2.Controls.Add(this.rbImportReplaces);
             this.panel2.Controls.Add(this.rbImportMerges);
-            this.panel2.Location = new System.Drawing.Point(12, 279);
+            this.panel2.Location = new System.Drawing.Point(12, 324);
             this.panel2.Margin = new System.Windows.Forms.Padding(2);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(388, 65);
@@ -238,7 +254,7 @@
             this.rbImportMerges.Text = "Merge with existing bookmarks";
             this.rbImportMerges.UseVisualStyleBackColor = true;
             // 
-            // OptionsControl
+            // GeneralOptionsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -253,8 +269,8 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.chkDeletingLineDeletesBookmark);
-            this.Name = "OptionsControl";
-            this.Size = new System.Drawing.Size(408, 448);
+            this.Name = "GeneralOptionsControl";
+            this.Size = new System.Drawing.Size(602, 520);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.pnlRequiresRestaring.ResumeLayout(false);
@@ -272,8 +288,8 @@
         private System.Windows.Forms.CheckBox chkDeletingLineDeletesBookmark;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.RadioButton rbInEdit;
-        private System.Windows.Forms.RadioButton rbInTopLevel;
+        private System.Windows.Forms.RadioButton rbMenuShowSuperBookmarks;
+        private System.Windows.Forms.RadioButton rbMenuShowBookmarks;
         private System.Windows.Forms.Panel pnlRequiresRestaring;
         private System.Windows.Forms.Label lblInfoMessage;
         private System.Windows.Forms.PictureBox pictureBox1;
@@ -287,5 +303,6 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.RadioButton rbImportReplaces;
         private System.Windows.Forms.RadioButton rbImportMerges;
+        private System.Windows.Forms.RadioButton rbMenuDontShow;
     }
 }
