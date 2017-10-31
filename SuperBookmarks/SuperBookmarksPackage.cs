@@ -37,6 +37,7 @@ namespace Konamiman.SuperBookmarks
     [ProvideOptionPage(typeof(GeneralOptionsPage), "SuperBookmarks", "General", 0, 0, true)]
     [ProvideOptionPage(typeof(StorageOptionsPage), "SuperBookmarks", "Storage", 0, 0, true)]
     [ProvideOptionPage(typeof(ConfirmationsPage), "SuperBookmarks", "Confirmations", 0, 0, true)]
+    [ProvideOptionPage(typeof(DebugPage), "SuperBookmarks", "Debug", 0, 0, true)]
     public sealed partial class SuperBookmarksPackage : Package,
         IVsPersistSolutionOpts,
         IVsSolutionEvents,
@@ -84,6 +85,8 @@ namespace Konamiman.SuperBookmarks
         protected override void Initialize()
         {
             base.Initialize();
+
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) => Helpers.LogException(e.ExceptionObject as Exception);
 
             solutionService = (IVsSolution) GetService(typeof(SVsSolution));
             solutionService.AdviseSolutionEvents(this, out var cookie);

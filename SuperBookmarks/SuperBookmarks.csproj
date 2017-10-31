@@ -133,6 +133,15 @@
     <Compile Include="Options\ConfirmationsPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Options\DebugOptionsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\DebugOptionsControl.Designer.cs">
+      <DependentUpon>DebugOptionsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\DebugPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Options\GeneralOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -345,6 +354,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Options\ConfirmationOptionsControl.resx">
       <DependentUpon>ConfirmationOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\DebugOptionsControl.resx">
+      <DependentUpon>DebugOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\GeneralOptionsControl.resx">
       <DependentUpon>GeneralOptionsControl.cs</DependentUpon>

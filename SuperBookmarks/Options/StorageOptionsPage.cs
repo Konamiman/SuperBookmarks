@@ -12,8 +12,6 @@ namespace Konamiman.SuperBookmarks
     {
         StorageOptionsControl control;
 
-        private bool optionsChanged = false;
-
         public StorageOptionsPage()
         {
             control = new StorageOptionsControl();

@@ -13,6 +13,9 @@ using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Editor;
 using System.Collections.Generic;
 using System.Globalization;
+using EnvDTE;
+using Process = System.Diagnostics.Process;
+using Microsoft.VisualStudio;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -144,14 +147,14 @@ namespace Konamiman.SuperBookmarks
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST) == YesButton;
         }
 
-        public static void ShowErrorMessage(string message, bool showTitle = false, bool showHeader = true)
+        public static void ShowErrorMessage(string message, bool showHeader = true)
         {
             VsShellUtilities.ShowMessageBox(
                 SuperBookmarksPackage.Instance,
                 showHeader ?
                     "Something went wrong. The ugly details:\r\n\r\n" + message :
                     message,
-                showTitle ? "SuperBookmarks" : null,
+                showHeader ? "SuperBookmarks" : null,
                 OLEMSGICON.OLEMSGICON_CRITICAL,
                 OLEMSGBUTTON.OLEMSGBUTTON_OK,
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
@@ -194,13 +197,13 @@ namespace Konamiman.SuperBookmarks
                 properlyCasedPath = GetProperlyCasedPathCore(path);
                 if (properlyCasedPath == null)
                 {
-                    Helpers.ShowErrorMessage($"I couldn't get the properly cased version of '{path}' - bookmark navigation might not work properly");
+                    Helpers.LogError($"I couldn't get the properly cased version of '{path}' - bookmark navigation might not work properly");
                     properlyCasedPath = path;
                 }
             }
             catch (Exception ex)
             {
-                Helpers.ShowErrorMessage($"Error when trying to get the properly cased version of path '{path}':\r\n\r\n{ex.Message}");
+                Helpers.LogError($"Error when trying to get the properly cased version of path '{path}':\r\n\r\n({ex.GetType().Name}){ex.Message}");
                 properlyCasedPath = path;
             }
             
@@ -258,6 +261,80 @@ namespace Konamiman.SuperBookmarks
             StatusBar.SetText(message);
 
             StatusBar.FreezeOutput(1);
+        }
+
+        private static string activityLogFilePath = null;
+
+        public static string ActivityLogFilePath =>
+            activityLogFilePath ??
+            (activityLogFilePath = GetActivityLogFilePath());
+
+        private static string GetActivityLogFilePath()
+        {
+            var shell = (IVsShell)((IServiceProvider)SuperBookmarksPackage.Instance).GetService(typeof(SVsShell));
+
+            if (shell.GetProperty((int)__VSSPROPID.VSSPROPID_VirtualRegistryRoot, out object root) != VSConstants.S_OK)
+                return null;
+
+            var version = Path.GetFileName(root.ToString());
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            return Path.Combine(appDataPath, "Microsoft\\VisualStudio", version, "ActivityLog.xml");
+        }
+
+        public static void LogError(string message)
+        {
+            if (SuperBookmarksPackage.Instance.DebugOptions.ShowErrorsInMessageBox)
+                WriteErrorToActivityLog(message);
+
+            if (SuperBookmarksPackage.Instance.DebugOptions.ShowErrorsInMessageBox)
+                ShowErrorMessage("SuperBookmarks - Error:\r\n\r\n" + message, showHeader: false);
+
+            if (SuperBookmarksPackage.Instance.DebugOptions.ShowErrorsInOutputWindow)
+                WriteToOutputWindow("*** SuperBookmarks: " + message);
+        }
+
+        public static void LogException(Exception exception)
+        {
+            if (exception == null)
+                return;
+
+            string message;
+            if (SuperBookmarksPackage.Instance.DebugOptions.WriteErrorsToActivityLog)
+            {
+                message = $"Unhandled exception: ({exception.GetType().Name}) {exception.Message}\r\n{exception.StackTrace}";
+                WriteErrorToActivityLog(message);
+            }
+
+            if(SuperBookmarksPackage.Instance.DebugOptions.ShowErrorsInMessageBox)
+            {
+                message = $"SuperBookmarks - Unhandled exception:\r\n\r\n({exception.GetType().Name}) {exception.Message}";
+                ShowErrorMessage(message, showHeader: false);
+            }
+
+            if (SuperBookmarksPackage.Instance.DebugOptions.ShowErrorsInOutputWindow)
+            {
+                message = $"*** SuperBookmarks - Unhandled exception:\r\n   ({exception.GetType().Name}) {exception.Message}\r\n{exception.StackTrace}\r\n";
+                WriteToOutputWindow(message);
+            }
+        }
+
+        private static void WriteErrorToActivityLog(string message)
+        {
+            var log = ((IServiceProvider)SuperBookmarksPackage.Instance).GetService(typeof(SVsActivityLog)) as IVsActivityLog;
+            if (log == null) return;
+            
+            log.LogEntry((uint)__ACTIVITYLOG_ENTRYTYPE.ALE_ERROR, "SuperBookmarks", message);
+        }
+
+        private static void WriteToOutputWindow(string message)
+        {
+            var outWindow = SuperBookmarksPackage.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+
+            var generalPaneGuid = VSConstants.GUID_OutWindowDebugPane;
+            outWindow.GetPane(ref generalPaneGuid, out IVsOutputWindowPane pane);
+
+            pane.OutputString(message);
+            pane.Activate();
         }
     }
 }

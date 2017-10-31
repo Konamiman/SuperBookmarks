@@ -3,9 +3,6 @@
 - Files not included in project, but in project folder (or a subfolder)?
 - Split text windows?
 - Changed file differences windows?
-
--------
-
-- Debugging/activity log
-- The TODOs
 - Proper README and manifest metadata
+
+

@@ -10,12 +10,14 @@ namespace Konamiman.SuperBookmarks
         public GeneralOptionsPage Options { get; private set; }
         public StorageOptionsPage StorageOptions { get; private set; }
         public ConfirmationsPage ConfirmationOptions { get; private set; }
+        public DebugPage DebugOptions { get; private set; }
 
         private void InitializeOptionsStorage()
         {
             Options = (GeneralOptionsPage)GetDialogPage(typeof(GeneralOptionsPage));
             StorageOptions = (StorageOptionsPage)GetDialogPage(typeof(StorageOptionsPage));
             ConfirmationOptions = (ConfirmationsPage)GetDialogPage(typeof(ConfirmationsPage));
+            DebugOptions = (DebugPage)GetDialogPage(typeof(DebugPage));
 
             Options.GlyphColorChanged += (sender, args) =>
             {

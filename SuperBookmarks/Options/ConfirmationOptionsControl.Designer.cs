@@ -52,7 +52,7 @@
             // 
             this.chkDocument.AutoSize = true;
             this.chkDocument.Location = new System.Drawing.Point(57, 60);
-            this.chkDocument.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.chkDocument.Margin = new System.Windows.Forms.Padding(5);
             this.chkDocument.Name = "chkDocument";
             this.chkDocument.Size = new System.Drawing.Size(182, 36);
             this.chkDocument.TabIndex = 1;
@@ -63,7 +63,7 @@
             // 
             this.chkOpenFiles.AutoSize = true;
             this.chkOpenFiles.Location = new System.Drawing.Point(57, 108);
-            this.chkOpenFiles.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.chkOpenFiles.Margin = new System.Windows.Forms.Padding(5);
             this.chkOpenFiles.Name = "chkOpenFiles";
             this.chkOpenFiles.Size = new System.Drawing.Size(182, 36);
             this.chkOpenFiles.TabIndex = 2;
@@ -73,8 +73,8 @@
             // chkFolder
             // 
             this.chkFolder.AutoSize = true;
-            this.chkFolder.Location = new System.Drawing.Point(57, 157);
-            this.chkFolder.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.chkFolder.Location = new System.Drawing.Point(57, 156);
+            this.chkFolder.Margin = new System.Windows.Forms.Padding(5);
             this.chkFolder.Name = "chkFolder";
             this.chkFolder.Size = new System.Drawing.Size(134, 36);
             this.chkFolder.TabIndex = 3;
@@ -84,8 +84,8 @@
             // chkProject
             // 
             this.chkProject.AutoSize = true;
-            this.chkProject.Location = new System.Drawing.Point(57, 205);
-            this.chkProject.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.chkProject.Location = new System.Drawing.Point(57, 204);
+            this.chkProject.Margin = new System.Windows.Forms.Padding(5);
             this.chkProject.Name = "chkProject";
             this.chkProject.Size = new System.Drawing.Size(142, 36);
             this.chkProject.TabIndex = 4;
@@ -95,8 +95,8 @@
             // chkSolution
             // 
             this.chkSolution.AutoSize = true;
-            this.chkSolution.Location = new System.Drawing.Point(57, 253);
-            this.chkSolution.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.chkSolution.Location = new System.Drawing.Point(57, 252);
+            this.chkSolution.Margin = new System.Windows.Forms.Padding(5);
             this.chkSolution.Name = "chkSolution";
             this.chkSolution.Size = new System.Drawing.Size(158, 36);
             this.chkSolution.TabIndex = 5;
@@ -107,7 +107,7 @@
             // 
             this.chkConfirmOnImportReplace.AutoSize = true;
             this.chkConfirmOnImportReplace.Location = new System.Drawing.Point(23, 332);
-            this.chkConfirmOnImportReplace.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.chkConfirmOnImportReplace.Margin = new System.Windows.Forms.Padding(5);
             this.chkConfirmOnImportReplace.Name = "chkConfirmOnImportReplace";
             this.chkConfirmOnImportReplace.Size = new System.Drawing.Size(814, 36);
             this.chkConfirmOnImportReplace.TabIndex = 6;
@@ -138,7 +138,7 @@
             this.Controls.Add(this.chkOpenFiles);
             this.Controls.Add(this.chkDocument);
             this.Controls.Add(this.label1);
-            this.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "ConfirmationOptionsControl";
             this.Size = new System.Drawing.Size(889, 482);
             this.ResumeLayout(false);
