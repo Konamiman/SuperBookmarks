@@ -1,4 +1,3 @@
-- Rename files -> nav in current folder/open docs?
 - Files outside solution?
 - Files not included in project, but in project folder (or a subfolder)?
 - Split text windows?

@@ -11,6 +11,19 @@ namespace Konamiman.SuperBookmarks
         private string currentProjectFolder = null;
         private List<string> currentTextDocumentPathCollection;
 
+        private string CurrentTextDocumentPath
+        {
+            get
+            {
+                return currentTextDocumentPath;
+            }
+            set
+            {
+                currentTextDocumentPath = value;
+                currentTextDocumentPathCollection[0] = value;
+            }
+        }
+
         public void OnTextDocumentOpen(string path)
         {
             if (!openDocumentPaths.Contains(path))
@@ -25,15 +38,14 @@ namespace Konamiman.SuperBookmarks
             if (viewsByFilename.ContainsKey(path))
                 UnregisterTextView(path);
 
-            currentTextDocumentPath = null;
-            currentTextDocumentPathCollection[0] = null;
+            CurrentTextDocumentPath = null;
         }
 
         public void OnSolutionClosed()
         {
             openDocumentPaths.Clear();
             currentDocumentFolder = null;
-            currentTextDocumentPath = null;
+            CurrentTextDocumentPath = null;
             currentProjectFolder = null;
         }
 
@@ -43,21 +55,24 @@ namespace Konamiman.SuperBookmarks
             currentProjectFolder = projectFolder + Path.DirectorySeparatorChar;
 
             if (openDocumentPaths.Contains(path))
-                currentTextDocumentPath = path;
+                CurrentTextDocumentPath = path;
             else
-                currentTextDocumentPath = null;
-
-            currentTextDocumentPathCollection[0] = currentTextDocumentPath;
+                CurrentTextDocumentPath = null;
         }
 
         public void OnFileDeleted(string filePath)
         {
-            bookmarksPendingCreation.Remove(filePath);
+            if(bookmarksPendingCreation.ContainsKey(filePath))
+                bookmarksPendingCreation.Remove(filePath);
+
             if (viewsByFilename.ContainsKey(filePath))
-            {
-                bookmarksByView.Remove(viewsByFilename[filePath]);
-                viewsByFilename.Remove(filePath);
-            }
+                UnregisterTextView(filePath);
+
+            if(openDocumentPaths.Contains(filePath))
+                openDocumentPaths.Remove(filePath);
+
+            if(filePath == CurrentTextDocumentPath)
+                CurrentTextDocumentPath = null;
         }
 
         public void OnFileRenamed(string oldPath, string newPath)
@@ -72,6 +87,17 @@ namespace Konamiman.SuperBookmarks
             {
                 bookmarksPendingCreation[newPath] = bookmarksPendingCreation[oldPath];
                 bookmarksPendingCreation.Remove(newPath);
+            }
+
+            if(openDocumentPaths.Contains(oldPath))
+            {
+                openDocumentPaths.Remove(oldPath);
+                openDocumentPaths.Add(newPath);
+            }
+
+            if (oldPath == CurrentTextDocumentPath)
+            {
+                CurrentTextDocumentPath = newPath;
             }
         }
     }
