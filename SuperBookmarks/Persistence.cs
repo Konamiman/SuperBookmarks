@@ -39,7 +39,7 @@ namespace Konamiman.SuperBookmarks
                 filesWithBookmarks.Add(new SerializableBookmarksInfo.FileWithBookmarks
                 {
                     FileName = ConvertPath(fileName),
-                    LinesWithBookmarks = lineNumbers.ToArray()
+                    Lines = lineNumbers.ToArray()
                 });
             }
 
@@ -48,29 +48,24 @@ namespace Konamiman.SuperBookmarks
                 filesWithBookmarks.Add(new SerializableBookmarksInfo.FileWithBookmarks
                 {
                     FileName = ConvertPath(fileName),
-                    LinesWithBookmarks = bookmarksPendingCreation[fileName].ToArray()
+                    Lines = bookmarksPendingCreation[fileName].ToArray()
                 });
             }
 
             var info = new SerializableBookmarksInfo();
-            var context = new SerializableBookmarksInfo.BookmarksContext
-            {
-                Name = "(default)",
-                FilesWithBookmarks = filesWithBookmarks.ToArray()
-            };
-            info.BookmarksContexts = new[] { context };
+            info.FilesWithBookmarks = filesWithBookmarks.ToArray();
 
             return info;
         }
 
         public void RecreateBookmarksFromSerializedInfo(SerializableBookmarksInfo info)
         {
-            foreach (var item in info.BookmarksContexts[0].FilesWithBookmarks)
+            foreach (var item in info.FilesWithBookmarks)
             {
                 var fileName = Path.Combine(SolutionPath, item.FileName); //Filename could be absolute, then this is a NOP, that's ok
                 if (!File.Exists(fileName)) continue;
 
-                var lineNumbers = item.LinesWithBookmarks;
+                var lineNumbers = item.Lines;
 
                 if (activeViewsByFilename.ContainsKey(fileName))
                 {

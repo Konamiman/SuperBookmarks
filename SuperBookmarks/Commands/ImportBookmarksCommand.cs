@@ -46,9 +46,16 @@ Are you sure?";
                 this.BookmarksManager.DeleteAllBookmarksIn(BookmarkActionTarget.Solution);
             }
 
-            this.BookmarksManager.RecreateBookmarksFromSerializedInfo(info);
-
-            Helpers.WriteToStatusBar($"Import done, solution has now {Helpers.Quantifier(BookmarksManager.GetBookmarksCount(BookmarkActionTarget.Solution), "bookmark")} in {Helpers.Quantifier(BookmarksManager.GetFilesWithBookmarksCount(), "file")}");
+            try
+            {
+                this.BookmarksManager.RecreateBookmarksFromSerializedInfo(info);
+                Helpers.WriteToStatusBar($"Import done, solution has now {Helpers.Quantifier(BookmarksManager.GetBookmarksCount(BookmarkActionTarget.Solution), "bookmark")} in {Helpers.Quantifier(BookmarksManager.GetFilesWithBookmarksCount(), "file")}");
+            }
+            catch
+            {
+                Helpers.ShowErrorMessage("Sorry, I couldn't get bookmarks information from the file. Perhaps it is malformed?", showHeader: false);
+                return;
+            }
 
             Package.SetLastUsedExportImportFolder(Path.GetDirectoryName(fileName));
         }

@@ -90,7 +90,16 @@ namespace Konamiman.SuperBookmarks
 
             this.BookmarksManager.DeleteAllBookmarksIn(BookmarkActionTarget.Solution);
 
-            this.BookmarksManager.RecreateBookmarksFromSerializedInfo(info);
+            try
+            {
+                this.BookmarksManager.RecreateBookmarksFromSerializedInfo(info);
+            }
+            catch
+            {
+                Helpers.ShowErrorMessage("Sorry, I couldn't get bookmarks data the .SuperBookmarks.dat file, perhaps it is corrupted?", showHeader: false);
+                return;
+            }
+                        
             Helpers.WriteToStatusBar($"Restored {Helpers.Quantifier(info.TotalBookmarksCount, "bookmark")} for {Helpers.Quantifier(info.TotalFilesCount, "file")} from .SuperBookmarks.dat file");
         }
         

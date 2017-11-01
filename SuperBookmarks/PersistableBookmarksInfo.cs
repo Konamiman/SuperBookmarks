@@ -9,16 +9,10 @@ namespace Konamiman.SuperBookmarks
         public class FileWithBookmarks
         {
             public string FileName { get; set; }
-            public int[] LinesWithBookmarks { get; set; }
+            public int[] Lines { get; set; }
         }
 
-        public class BookmarksContext
-        {
-            public string Name { get; set; }
-            public FileWithBookmarks[] FilesWithBookmarks { get; set; }
-        }
-
-        public BookmarksContext[] BookmarksContexts { get; set; }
+        public FileWithBookmarks[] FilesWithBookmarks { get; set; }
 
         public void SerializeTo(Stream stream, bool prettyPrint)
         {
@@ -38,15 +32,14 @@ namespace Konamiman.SuperBookmarks
                 return deserializer.Deserialize<SerializableBookmarksInfo>(jsonReader);
         }
 
+        [JsonIgnore]
         public int TotalBookmarksCount =>
-            BookmarksContexts
-            .SelectMany(c => c.FilesWithBookmarks)
-            .SelectMany(f => f.LinesWithBookmarks)
+            FilesWithBookmarks
+            .SelectMany(f => f.Lines)
             .Count();
 
+        [JsonIgnore]
         public int TotalFilesCount =>
-            BookmarksContexts
-            .SelectMany(c => c.FilesWithBookmarks)
-            .Count();
+            FilesWithBookmarks.Count();
     }
 }

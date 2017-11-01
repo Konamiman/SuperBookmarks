@@ -158,6 +158,8 @@ namespace Konamiman.SuperBookmarks
                 OLEMSGICON.OLEMSGICON_CRITICAL,
                 OLEMSGBUTTON.OLEMSGBUTTON_OK,
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+
+            Debug("Error message: " + message);
         }
 
         public static bool IsTextDocument(ITextBuffer buffer)
