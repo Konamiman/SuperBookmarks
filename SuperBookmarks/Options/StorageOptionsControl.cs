@@ -15,6 +15,7 @@ namespace Konamiman.SuperBookmarks
         public void Initialize()
         {
             rbInOwnFile.Checked = Options.SaveBookmarksToOwnFile;
+            rbInSuo.Checked = !Options.SaveBookmarksToOwnFile;
             chkAutoIncludeInGitignore.Checked = Options.AutoIncludeInGitignore;
 
             rbInOwnFile.CheckedChanged += RbInOwnFile_CheckedChanged;
