@@ -16,6 +16,9 @@ namespace Konamiman.SuperBookmarks
         public void TextViewCreated(IWpfTextView textView)
         {
             var buffer = Helpers.GetRootTextBuffer(textView.TextBuffer);
+            if (buffer == null)
+                return; //that's probably a projection, don't mess with it
+
             if (!documentService.TryGetTextDocument(buffer, out ITextDocument textDocument))
                 return;
 

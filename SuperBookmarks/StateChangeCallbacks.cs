@@ -27,16 +27,21 @@ namespace Konamiman.SuperBookmarks
         public void OnTextDocumentOpen(string path)
         {
             if (!openDocumentPaths.Contains(path))
+            {
                 openDocumentPaths.Add(path);
+                Helpers.Debug("Text document registered open: " + path);
+            }
         }
 
         public void OnTextDocumentClosed(string path)
         {
+            Helpers.Debug("Text document close registered: " + path);
+
             if (openDocumentPaths.Contains(path))
                 openDocumentPaths.Remove(path);
 
-            if (viewsByFilename.ContainsKey(path))
-                UnregisterTextView(path);
+            if (activeViewsByFilename.ContainsKey(path))
+                UnregisterTextViews(path);
 
             CurrentTextDocumentPath = null;
         }
@@ -51,8 +56,10 @@ namespace Konamiman.SuperBookmarks
 
         public void OnCurrentDocumentChanged(string path, string projectFolder)
         {
+            Helpers.Debug("Current document changed: " + path);
+
             currentDocumentFolder = Path.GetDirectoryName(path) + Path.DirectorySeparatorChar;
-            currentProjectFolder = projectFolder + Path.DirectorySeparatorChar;
+            currentProjectFolder = projectFolder == null ? null : projectFolder + Path.DirectorySeparatorChar;
 
             if (openDocumentPaths.Contains(path))
                 CurrentTextDocumentPath = path;
@@ -65,8 +72,8 @@ namespace Konamiman.SuperBookmarks
             if(bookmarksPendingCreation.ContainsKey(filePath))
                 bookmarksPendingCreation.Remove(filePath);
 
-            if (viewsByFilename.ContainsKey(filePath))
-                UnregisterTextView(filePath);
+            if (activeViewsByFilename.ContainsKey(filePath))
+                UnregisterTextViews(filePath);
 
             if(openDocumentPaths.Contains(filePath))
                 openDocumentPaths.Remove(filePath);
@@ -77,10 +84,10 @@ namespace Konamiman.SuperBookmarks
 
         public void OnFileRenamed(string oldPath, string newPath)
         {
-            if (viewsByFilename.ContainsKey(oldPath))
+            if (activeViewsByFilename.ContainsKey(oldPath))
             {
-                viewsByFilename[newPath] = viewsByFilename[oldPath];
-                viewsByFilename.Remove(oldPath);
+                activeViewsByFilename[newPath] = activeViewsByFilename[oldPath];
+                activeViewsByFilename.Remove(oldPath);
             }
 
             if (bookmarksPendingCreation.ContainsKey(oldPath))

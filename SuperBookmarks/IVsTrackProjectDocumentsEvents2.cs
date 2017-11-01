@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
+using System.IO;
+using System.Linq;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -22,7 +24,9 @@ namespace Konamiman.SuperBookmarks
         public int OnAfterRemoveFiles(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices,
             string[] rgpszMkDocuments, VSREMOVEFILEFLAGS[] rgFlags)
         {
-            foreach(var fileName in rgpszMkDocuments)
+            //Check if the file as actually been deleted;
+            //this is invoked also when a file is excluded from a project
+            foreach(var fileName in rgpszMkDocuments.Where(f => !File.Exists(f)))
             {
                 this.BookmarksManager.OnFileDeleted(fileName);
             }

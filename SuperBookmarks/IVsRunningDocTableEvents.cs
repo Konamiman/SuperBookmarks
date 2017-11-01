@@ -84,9 +84,7 @@ namespace Konamiman.SuperBookmarks
             rdEnum.Next(reasonableMaxOpenDocuments, docCookies, out var fetched);
 
             foreach (var docCookie in docCookies.Take((int)fetched))
-            {
                 RegisterOpenDocument(docCookie);
-            }
         }
 
         private void RegisterOpenDocument(uint docCookie, IVsWindowFrame frame = null)
@@ -109,7 +107,7 @@ namespace Konamiman.SuperBookmarks
                 if(isTextDocument)
                     BookmarksManager.OnTextDocumentOpen(documentPath);
 
-                Debug.WriteLine($"Frame Registered: {Path.GetFileName(documentPath)}, isText: {isTextDocument}, total open: {openDocumentFrames.Count}", ">>> SuperBookmarks");
+                Helpers.Debug($"Frame Registered: {Path.GetFileName(documentPath)}, isText: {isTextDocument}, total open: {openDocumentFrames.Count}");
             }
 
             var frameForTextView = GetFrameForTextView(documentPath);
@@ -149,7 +147,7 @@ namespace Konamiman.SuperBookmarks
             openDocumentFrames.Remove(frame);
             UpdateOpenDocumentsState();
 
-            Debug.WriteLine($"Frame Closed: {Path.GetFileName(document.Path)}, isText: {document.IsTextView}, total open: {openDocumentFrames.Count}", ">>> SuperBookmarks");
+            Helpers.Debug($"Frame Closed: {Path.GetFileName(document.Path)}, isText: {document.IsTextView}, total open: {openDocumentFrames.Count}");
         }
 
         void UpdateOpenDocumentsState()
@@ -186,7 +184,7 @@ namespace Konamiman.SuperBookmarks
             ActiveDocumentIsText = document.IsTextView;
             ActiveDocumentIsInProject = document.ProjectRoot != null;
 
-            Debug.WriteLine($"Frame Shown: {Path.GetFileName(document.Path)}, isText: {document.IsTextView}, total open: {openDocumentFrames.Count}", ">>> SuperBookmarks");
+            Helpers.Debug($"Frame Shown: {Path.GetFileName(document.Path)}, isText: {document.IsTextView}, total open: {openDocumentFrames.Count}");
 
             return VSConstants.S_OK;
         }
@@ -203,15 +201,18 @@ namespace Konamiman.SuperBookmarks
                 return (null, null);
 
             string projectRootFolder = null;
-            var projectHierarchy = VsShellUtilities.GetProject(this, documentPath);
-            if (projectHierarchy != null)
+            if (documentPath.StartsWith(CurrentSolutionPath, StringComparison.OrdinalIgnoreCase))
             {
-                projectHierarchy.GetCanonicalName((uint) VSConstants.VSITEMID.Root, out string canonicalName);
-                if (canonicalName != null &&
-                    //For projectless solution items GetCanonicalName returns a guid
-                    !Guid.TryParse(canonicalName, out var dummyGuid))
+                var projectHierarchy = VsShellUtilities.GetProject(this, documentPath);
+                if (projectHierarchy != null)
                 {
-                    projectRootFolder = Helpers.GetProperlyCasedPath(canonicalName);
+                    projectHierarchy.GetCanonicalName((uint)VSConstants.VSITEMID.Root, out string canonicalName);
+                    if (canonicalName != null &&
+                        //For projectless solution items GetCanonicalName returns a guid
+                        !Guid.TryParse(canonicalName, out var dummyGuid))
+                    {
+                        projectRootFolder = Helpers.GetProperlyCasedPath(canonicalName);
+                    }
                 }
             }
 

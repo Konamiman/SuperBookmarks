@@ -19,14 +19,24 @@ namespace Konamiman.SuperBookmarks
 
         public string SolutionPath { get; set; }
 
-        public readonly Dictionary<string, ITextView> viewsByFilename =
+        //The currently active (or the last active) view for each file.
+        //A file will have more than one registered view if the window is split vertically.
+        public readonly Dictionary<string, ITextView> activeViewsByFilename =
             new Dictionary<string, ITextView>();
 
+        //All the registered views for each file (includes the active view as well).
+        public readonly Dictionary<string, List<ITextView>> allViewsByFilename =
+            new Dictionary<string, List<ITextView>>();
+
+        //Bookmarks lists for each view. There's only one list for each file, but
+        //there's one dictionary entry for each registered view
+        //(so files with multiple registered views will have multiple keys
+        //pointing to the same value).
         private readonly Dictionary<ITextView, List<Bookmark>> bookmarksByView =
             new Dictionary<ITextView, List<Bookmark>>();
 
         //Files that have bookmarks but aren't currently open.
-        //Key is filename, value is line number.
+        //Key is filename, value is line numbers.
         private readonly Dictionary<string, int[]> bookmarksPendingCreation =
             new Dictionary<string, int[]>();
 
@@ -55,6 +65,21 @@ namespace Konamiman.SuperBookmarks
 
         public void RegisterTextView(string fileName, ITextView newView)
         {
+            void RegisterInAllViewsList(ITextView view)
+            {
+                if (!allViewsByFilename.ContainsKey(fileName))
+                    allViewsByFilename.Add(fileName, new List<ITextView>());
+
+                allViewsByFilename[fileName].Add(view);
+
+                //Yep, we want to reference the same list, that's on purpose.
+                bookmarksByView[view] = bookmarksByView[activeViewsByFilename[fileName]];
+
+                view.Closed += OnViewClosed;
+                view.GotAggregateFocus += OnViewGotFocus;
+                view.LostAggregateFocus += OnViewLostFocus;
+            }
+
             var currentBuffer = Helpers.GetRootTextBuffer(newView.TextBuffer);
 
             if (bookmarksPendingCreation.ContainsKey(fileName))
@@ -65,18 +90,22 @@ namespace Konamiman.SuperBookmarks
                 foreach (var lineNumber in bookmarksPendingCreation[fileName])
                     RegisterAndCreateBookmark(bookmarks, currentBuffer, fileName, lineNumber);
 
-                viewsByFilename[fileName] = newView;
+                activeViewsByFilename[fileName] = newView;
                 bookmarksByView[newView] = bookmarks;
                 bookmarksPendingCreation.Remove(fileName);
             }
-            else
+            else if(!activeViewsByFilename.ContainsKey(fileName))
             {
                 //File had no previous bookmarks
 
-                viewsByFilename[fileName] = newView;
+                activeViewsByFilename[fileName] = newView;
                 bookmarksByView[newView] = new List<Bookmark>();
             }
 
+            RegisterInAllViewsList(newView);
+            Helpers.Debug($"Register text view {newView.GetHashCode()} for {fileName}, total: {allViewsByFilename[fileName].Count}");
+
+            newView.Properties.AddProperty("fileName", fileName);
             if (currentBuffer.Properties.ContainsProperty("view"))
             {
                 currentBuffer.Properties["view"] = newView;
@@ -91,9 +120,11 @@ namespace Konamiman.SuperBookmarks
             currentBuffer.Properties["fileName"] = fileName;
         }
 
-        private void UnregisterTextView(string fileName)
+        private void UnregisterTextViews(string fileName)
         {
-            var view = viewsByFilename[fileName];
+            Helpers.Debug("UNregister text views request: " + fileName);
+
+            var view = activeViewsByFilename[fileName];
             var bookmarks = bookmarksByView[view];
             var buffer = view.TextBuffer;
             var lineNumbers = bookmarks.Select(b => b.GetRow(buffer)).ToArray();
@@ -106,16 +137,66 @@ namespace Konamiman.SuperBookmarks
                 bookmarksPendingCreation[fileName] = lineNumbers;
             }
 
-            viewsByFilename.Remove(fileName);
+            foreach(var registeredView in allViewsByFilename[fileName])
+            {
+                registeredView.Closed -= OnViewClosed;
+                registeredView.GotAggregateFocus -= OnViewGotFocus;
+                registeredView.LostAggregateFocus -= OnViewLostFocus;
+            }
+
+            activeViewsByFilename.Remove(fileName);
+            allViewsByFilename.Remove(fileName);
             bookmarksByView.Remove(view);
+        }
+
+        private string GetFilenameOfView(ITextView view)
+        {
+            if (!view.Properties.TryGetProperty<string>("fileName", out string fileName))
+            {
+                Helpers.LogError("I couldn't get the filename for an ITextView");
+                return null;
+            }
+
+            return fileName;
+        }
+
+        private void OnViewGotFocus(object sender, EventArgs e)
+        {
+            var view = (ITextView)sender;
+            var fileName = GetFilenameOfView(view);
+            if (fileName == null) return;
+
+            Helpers.Debug($"View got focus: {view.GetHashCode()} for {fileName}");
+
+            activeViewsByFilename[fileName] = view;
+        }
+
+        private void OnViewLostFocus(object sender, EventArgs e)
+        {
+            var view = (ITextView)sender;
+            var fileName = GetFilenameOfView(view);
+            if (fileName == null) return;
+
+            Helpers.Debug($"View lost focus: {view.GetHashCode()} for {fileName}");
+        }
+
+        private void OnViewClosed(object sender, EventArgs e)
+        {
+            var view = (ITextView)sender;
+            var fileName = GetFilenameOfView(view);
+            if (fileName == null) return;
+
+            allViewsByFilename[fileName].Remove(view);
+
+            Helpers.Debug($"View closed: {view.GetHashCode()} for {fileName}, remaning: {allViewsByFilename[fileName].Count}");
         }
 
         public void SetOrRemoveBookmarkInCurrentDocument()
         {
-            if (!viewsByFilename.ContainsKey(currentTextDocumentPath))
+            if (!activeViewsByFilename.ContainsKey(currentTextDocumentPath))
                 return;
 
-            var view = viewsByFilename[currentTextDocumentPath];
+            var view = activeViewsByFilename[currentTextDocumentPath];
             var bookmarks = bookmarksByView[view];
             var buffer = view.TextBuffer;
 

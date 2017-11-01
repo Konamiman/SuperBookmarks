@@ -34,8 +34,8 @@ namespace Konamiman.SuperBookmarks
         {
             return 
                 openDocumentPaths.Where(p =>
-                    viewsByFilename.ContainsKey(p) ?
-                        bookmarksByView[viewsByFilename[p]].Count > 0 :
+                    activeViewsByFilename.ContainsKey(p) ?
+                        bookmarksByView[activeViewsByFilename[p]].Count > 0 :
                         bookmarksPendingCreation.ContainsKey(p)
                 ).ToList();
         }
@@ -43,7 +43,7 @@ namespace Konamiman.SuperBookmarks
         private List<string> GetDocumentsWithBookmarks()
         {
             return
-                viewsByFilename.Keys.Where(p => bookmarksByView[viewsByFilename[p]].Count > 0)
+                activeViewsByFilename.Keys.Where(p => bookmarksByView[activeViewsByFilename[p]].Count > 0)
                 .Union(bookmarksPendingCreation.Keys)
                 .ToList();
         }
@@ -53,8 +53,8 @@ namespace Konamiman.SuperBookmarks
             bool IsInFolder(string path) =>
                 path.StartsWith(folder);
 
-            var openFiles = viewsByFilename.Keys
-                .Where(path => bookmarksByView[viewsByFilename[path]].Count > 0 && IsInFolder(path));
+            var openFiles = activeViewsByFilename.Keys
+                .Where(path => bookmarksByView[activeViewsByFilename[path]].Count > 0 && IsInFolder(path));
             var pendingFiles = bookmarksPendingCreation.Keys
                 .Where(IsInFolder);
 
@@ -84,6 +84,17 @@ namespace Konamiman.SuperBookmarks
                     return;
             }
 
+            if(!targetDocuments.Any())
+            {
+                Helpers.LogError("I have been asked to navigate to the previous bookmark in another file, but the list of target files I got is empty. Try closing and reopening the affected file(s).");
+                return;
+            }
+            if (targetDocuments.Contains(null))
+            {
+                Helpers.LogError("I have been asked to navigate to the previous bookmark in another file, but the list of target files contains \"null\".");
+                return;
+            }
+
             int prevDocIndex;
             if (currentDocIndex == 0)
                 prevDocIndex = targetDocuments.Count - 1;
@@ -94,7 +105,7 @@ namespace Konamiman.SuperBookmarks
 
             var prevDocPath = targetDocuments[prevDocIndex];
 
-            if (!viewsByFilename.ContainsKey(prevDocPath) || //Doc is still in the "pending bookmarks" list...
+            if (!activeViewsByFilename.ContainsKey(prevDocPath) || //Doc is still in the "pending bookmarks" list...
                 !openDocumentPaths.Contains(prevDocPath))    //...or doc was once open but now is closed?
             {
                 VsShellUtilities.OpenDocument(this.serviceProvider,
@@ -107,7 +118,7 @@ namespace Konamiman.SuperBookmarks
 
             // Convert stuff around and finally, navigate to the desired line!
 
-            var prevDocView = viewsByFilename[prevDocPath];
+            var prevDocView = activeViewsByFilename[prevDocPath];
             var prevDocBuffer = Helpers.GetRootTextBuffer(prevDocView.TextBuffer);
             var lastBookmarkLine = bookmarksByView[prevDocView].Select(b => b.GetRow(prevDocBuffer)).Max();
             var vsBuffer = editorAdaptersFactoryService.GetBufferAdapter(prevDocBuffer);
@@ -122,7 +133,7 @@ namespace Konamiman.SuperBookmarks
         //from the current point to the start of the document
         private bool GoToPrevInDocument(string fileName, bool cycle)
         {
-            var view = viewsByFilename[fileName];
+            var view = activeViewsByFilename[fileName];
             var buffer = view.TextBuffer;
             var bookmarks = bookmarksByView[view];
             
@@ -162,6 +173,18 @@ namespace Konamiman.SuperBookmarks
                 if (success)
                     return;
             }
+
+            if (!targetDocuments.Any())
+            {
+                Helpers.LogError("I have been asked to navigate to the previous bookmark in another file, but the list of target files I got is empty. Try closing and reopening the affected file(s).");
+                return;
+            }
+            if (targetDocuments.Contains(null))
+            {
+                Helpers.LogError("I have been asked to navigate to the next bookmark in another file, but the list of target files contains \"null\".");
+                return;
+            }
+
             int nextDocIndex;
             if (currentDocIndex == targetDocuments.Count - 1)
                 nextDocIndex = 0;
@@ -172,7 +195,7 @@ namespace Konamiman.SuperBookmarks
 
             var nextDocPath = targetDocuments[nextDocIndex];
 
-            if (!viewsByFilename.ContainsKey(nextDocPath) || //Doc is still in the "pending bookmarks" list...
+            if (!activeViewsByFilename.ContainsKey(nextDocPath) || //Doc is still in the "pending bookmarks" list...
                 !openDocumentPaths.Contains(nextDocPath))    //...or doc was once open but now is closed?
             {
                 VsShellUtilities.OpenDocument(this.serviceProvider,
@@ -185,7 +208,7 @@ namespace Konamiman.SuperBookmarks
 
             // Convert stuff around and finally, navigate to the desired line!
 
-            var nextDocView = viewsByFilename[nextDocPath];
+            var nextDocView = activeViewsByFilename[nextDocPath];
             var nextDocBuffer = Helpers.GetRootTextBuffer(nextDocView.TextBuffer);
             var lastBookmarkLine = bookmarksByView[nextDocView].Select(b => b.GetRow(nextDocBuffer)).Min();
             var vsBuffer = editorAdaptersFactoryService.GetBufferAdapter(nextDocBuffer);
@@ -200,7 +223,7 @@ namespace Konamiman.SuperBookmarks
         //from the current point to the end of the document
         private bool GoToNextInDocument(string fileName, bool cycle)
         {
-            var view = viewsByFilename[fileName];
+            var view = activeViewsByFilename[fileName];
             var buffer = view.TextBuffer;
             var bookmarks = bookmarksByView[view];
 

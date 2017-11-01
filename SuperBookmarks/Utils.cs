@@ -14,7 +14,7 @@ namespace Konamiman.SuperBookmarks
             bool EqualsIgnoreCase(string value1) =>
                 value1.Equals(fileNameWithMismatchingCase, StringComparison.OrdinalIgnoreCase);
 
-            return viewsByFilename.Keys.SingleOrDefault(EqualsIgnoreCase) ??
+            return activeViewsByFilename.Keys.SingleOrDefault(EqualsIgnoreCase) ??
                 bookmarksPendingCreation.Keys.SingleOrDefault(EqualsIgnoreCase);
         }
 
@@ -24,7 +24,7 @@ namespace Konamiman.SuperBookmarks
             if (path == null) return false;
 
             return bookmarksPendingCreation.ContainsKey(path) ||
-                    bookmarksByView[viewsByFilename[path]].Any();
+                    bookmarksByView[activeViewsByFilename[path]].Any();
         }
 
         public int GetBookmarksCount(BookmarkActionTarget target)
@@ -32,8 +32,8 @@ namespace Konamiman.SuperBookmarks
             var count = 0;
             foreach (var path in filesSelectors[target]())
             {
-                if (viewsByFilename.ContainsKey(path))
-                    count += bookmarksByView[viewsByFilename[path]].Count;
+                if (activeViewsByFilename.ContainsKey(path))
+                    count += bookmarksByView[activeViewsByFilename[path]].Count;
                 else if (bookmarksPendingCreation.ContainsKey(path))
                     count += bookmarksPendingCreation[path].Length;
             }
@@ -50,8 +50,8 @@ namespace Konamiman.SuperBookmarks
             var targetFiles = filesSelectors[target]();
 
             var pendingCreationCount = bookmarksPendingCreation.Keys.Intersect(targetFiles).Count();
-            var registeredCount = viewsByFilename.Keys.Intersect(targetFiles)
-                .Where(f => bookmarksByView[viewsByFilename[f]].Any()).Count();
+            var registeredCount = activeViewsByFilename.Keys.Intersect(targetFiles)
+                .Where(f => bookmarksByView[activeViewsByFilename[f]].Any()).Count();
 
             return pendingCreationCount + registeredCount;
         }

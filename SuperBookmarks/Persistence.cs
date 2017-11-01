@@ -8,8 +8,10 @@ namespace Konamiman.SuperBookmarks
     {
         public SerializableBookmarksInfo GetSerializableInfo()
         {
-            string RelativePath(string fullPath) =>
-                fullPath.Substring(SolutionPath.Length);
+            string ConvertPath(string fullPath) =>
+                fullPath.StartsWith(SolutionPath) ?
+                fullPath.Substring(SolutionPath.Length) :
+                fullPath;
 
             var filesWithBookmarks = new List<SerializableBookmarksInfo.FileWithBookmarks>();
             var lineNumbers = new List<int>();
@@ -17,9 +19,9 @@ namespace Konamiman.SuperBookmarks
             //We shouldn't have any duplicate bookmark, but let's play safe
             var usedLineNumbers = new List<int>();
 
-            foreach (var fileName in viewsByFilename.Keys)
+            foreach (var fileName in activeViewsByFilename.Keys)
             {
-                var view = viewsByFilename[fileName];
+                var view = activeViewsByFilename[fileName];
                 if (bookmarksByView[view].Count == 0) continue;
 
                 lineNumbers.Clear();
@@ -36,7 +38,7 @@ namespace Konamiman.SuperBookmarks
 
                 filesWithBookmarks.Add(new SerializableBookmarksInfo.FileWithBookmarks
                 {
-                    FileName = RelativePath(fileName),
+                    FileName = ConvertPath(fileName),
                     LinesWithBookmarks = lineNumbers.ToArray()
                 });
             }
@@ -45,7 +47,7 @@ namespace Konamiman.SuperBookmarks
             {
                 filesWithBookmarks.Add(new SerializableBookmarksInfo.FileWithBookmarks
                 {
-                    FileName = RelativePath(fileName),
+                    FileName = ConvertPath(fileName),
                     LinesWithBookmarks = bookmarksPendingCreation[fileName].ToArray()
                 });
             }
@@ -65,14 +67,14 @@ namespace Konamiman.SuperBookmarks
         {
             foreach (var item in info.BookmarksContexts[0].FilesWithBookmarks)
             {
-                var fileName = Path.Combine(SolutionPath, item.FileName);
+                var fileName = Path.Combine(SolutionPath, item.FileName); //Filename could be absolute, then this is a NOP, that's ok
                 if (!File.Exists(fileName)) continue;
 
                 var lineNumbers = item.LinesWithBookmarks;
 
-                if (viewsByFilename.ContainsKey(fileName))
+                if (activeViewsByFilename.ContainsKey(fileName))
                 {
-                    var view = viewsByFilename[fileName];
+                    var view = activeViewsByFilename[fileName];
                     var buffer = view.TextBuffer;
                     var bookmarks = bookmarksByView[view];
                     foreach (var lineNumber in lineNumbers)

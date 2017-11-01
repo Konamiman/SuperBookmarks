@@ -261,6 +261,8 @@ namespace Konamiman.SuperBookmarks
             StatusBar.SetText(message);
 
             StatusBar.FreezeOutput(1);
+
+            Debug("StatusBar: " + message);
         }
 
         private static string activityLogFilePath = null;
@@ -290,7 +292,7 @@ namespace Konamiman.SuperBookmarks
                 ShowErrorMessage("SuperBookmarks - Error:\r\n\r\n" + message, showHeader: false);
 
             if (SuperBookmarksPackage.Instance.DebugOptions.ShowErrorsInOutputWindow)
-                WriteToOutputWindow("*** SuperBookmarks: " + message);
+                WriteToOutputWindow("*** SuperBookmarks: " + message + "\r\n");
         }
 
         public static void LogException(Exception exception)
@@ -335,6 +337,12 @@ namespace Konamiman.SuperBookmarks
 
             pane.OutputString(message);
             pane.Activate();
+        }
+
+        [Conditional("DEBUG")]
+        public static void Debug(string message)
+        {
+            WriteToOutputWindow($"[SuperBookmarks] {DateTime.Now:H:mm:ss} {message} \r\n");
         }
     }
 }

@@ -4,20 +4,20 @@
     {
         public void ClearAllBookmarks()
         {
-            foreach (var fileName in viewsByFilename.Keys)
+            foreach (var fileName in activeViewsByFilename.Keys)
             {
                 DeleteAllBookmarksInFile(fileName);
             }
             bookmarksByView.Clear();
-            viewsByFilename.Clear();
+            activeViewsByFilename.Clear();
             bookmarksPendingCreation.Clear();
         }
 
         private void DeleteAllBookmarksInFile(string path)
         {
-            if (viewsByFilename.ContainsKey(path))
+            if (activeViewsByFilename.ContainsKey(path))
             {
-                var view = viewsByFilename[path];
+                var view = activeViewsByFilename[path];
                 var bookmarks = bookmarksByView[view];
                 foreach (var bookmark in bookmarks.ToArray())
                     UnregisterAndDeleteBookmark(bookmarks, bookmark, view.TextBuffer);

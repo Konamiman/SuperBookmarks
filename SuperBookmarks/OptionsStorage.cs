@@ -1,7 +1,6 @@
 ﻿using Konamiman.SuperBookmarks.Options;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Settings;
-using Microsoft.VisualStudio.Shell.Settings;
 
 namespace Konamiman.SuperBookmarks
 {
@@ -46,7 +45,7 @@ namespace Konamiman.SuperBookmarks
             if(cachedLastUsedImportExportFolder == null)
             {
                 cachedLastUsedImportExportFolder = 
-                    settingsStore.GetString(SettingsStoreName, "LastUsedExportImportFolder", "")
+                    SettingsStore.GetString(SettingsStoreName, "LastUsedExportImportFolder", "")
                     .WithTrailingDirectorySeparator();
             }
             return cachedLastUsedImportExportFolder;
@@ -55,7 +54,7 @@ namespace Konamiman.SuperBookmarks
         public void SetLastUsedExportImportFolder(string value)
         {
             value = value.WithTrailingDirectorySeparator();
-            settingsStore.SetString(SettingsStoreName, "LastUsedExportImportFolder", value);
+            SettingsStore.SetString(SettingsStoreName, "LastUsedExportImportFolder", value);
         }
     }
 }
