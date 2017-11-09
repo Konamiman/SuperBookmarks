@@ -8,7 +8,10 @@ namespace Konamiman.SuperBookmarks
     public partial class SuperBookmarksPackage
     {
         public int OnAfterRenameFiles(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices,
-            string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEFILEFLAGS[] rgFlags)
+            string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEFILEFLAGS[] rgFlags) =>
+            Helpers.SafeInvoke(() => _OnAfterRenameFiles(cFiles, rgszMkOldNames, rgszMkNewNames, rgFlags));
+
+        private int _OnAfterRenameFiles(int cFiles, string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEFILEFLAGS[] rgFlags)
         {
             for (var i = 0; i < cFiles; i++)
             {
@@ -22,7 +25,10 @@ namespace Konamiman.SuperBookmarks
         }
 
         public int OnAfterRemoveFiles(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices,
-            string[] rgpszMkDocuments, VSREMOVEFILEFLAGS[] rgFlags)
+            string[] rgpszMkDocuments, VSREMOVEFILEFLAGS[] rgFlags) =>
+            Helpers.SafeInvoke(() => _OnAfterRemoveFiles(rgpszMkDocuments));
+
+        private int _OnAfterRemoveFiles(string[] rgpszMkDocuments)
         {
             //Check if the file as actually been deleted;
             //this is invoked also when a file is excluded from a project

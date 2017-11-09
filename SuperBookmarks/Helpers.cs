@@ -31,37 +31,14 @@ namespace Konamiman.SuperBookmarks
             statusBar ?? (statusBar = (IVsStatusbar)ServiceProvider.GetService(typeof(SVsStatusbar)));
 
 
-        //https://msdn.microsoft.com/en-us/library/dd884850.aspx (AddAdornmentHandler)
-        public static ITextView GetTextViewForActiveDocument()
-        {
-            IVsTextManager txtMgr = (IVsTextManager)ServiceProvider.GetService(typeof(SVsTextManager));
-            IVsTextView vTextView = null;
-            int mustHaveFocus = 1;
-            var x = txtMgr.GetActiveView(mustHaveFocus, null, out vTextView);
-            IVsUserData userData = vTextView as IVsUserData;
-            if (userData == null)
-                return null;
+        public static SimpleTagger<BookmarkTag> GetTaggerFor(ITextBuffer buffer) =>
+            buffer.Properties.GetOrCreateSingletonProperty("tagger", () => new SimpleTagger<BookmarkTag>(buffer));
 
-            Guid guidViewHost = DefGuidList.guidIWpfTextViewHost;
-            userData.GetData(ref guidViewHost, out var holder);
-            IWpfTextViewHost viewHost = (IWpfTextViewHost)holder;
-            return viewHost.TextView;
-        }
-
-        public static SimpleTagger<BookmarkTag> GetTaggerFor(ITextBuffer buffer)
-        {
-            return buffer.Properties.GetOrCreateSingletonProperty("tagger", () => new SimpleTagger<BookmarkTag>(buffer));
-        }
-
-        public static bool PathIsInGitRepository(string path)
-        {
-            return RunGitCommand("rev-parse --is-inside-work-tree", path) == "true";
-        }
-
-        public static string GetGitRepositoryRoot(string path)
-        {
-            return RunGitCommand("rev-parse --show-toplevel", path);
-        }
+        public static bool PathIsInGitRepository(string path) =>
+            RunGitCommand("rev-parse --is-inside-work-tree", path) == "true";
+        
+        public static string GetGitRepositoryRoot(string path) =>
+            RunGitCommand("rev-parse --show-toplevel", path);
 
         public static bool AddFileToGitignore(string gitignorePath, string fileToAdd, bool createGitignoreFile)
         {
@@ -162,10 +139,8 @@ namespace Konamiman.SuperBookmarks
             Debug("Error message: " + message);
         }
 
-        public static bool IsTextDocument(ITextBuffer buffer)
-        {
-            return buffer.ContentType.IsOfType("text");
-        }
+        public static bool IsTextDocument(ITextBuffer buffer) =>
+            buffer.ContentType.IsOfType("text");
 
         public static ITextBuffer GetRootTextBuffer(ITextBuffer buffer)
         {
@@ -273,7 +248,10 @@ namespace Konamiman.SuperBookmarks
             activityLogFilePath ??
             (activityLogFilePath = GetActivityLogFilePath());
 
-        private static string GetActivityLogFilePath()
+        private static string GetActivityLogFilePath() =>
+            SafeInvoke(_GetActivityLogFilePath);
+
+        private static string _GetActivityLogFilePath()
         {
             var shell = (IVsShell)((IServiceProvider)SuperBookmarksPackage.Instance).GetService(typeof(SVsShell));
 
@@ -287,14 +265,21 @@ namespace Konamiman.SuperBookmarks
 
         public static void LogError(string message)
         {
-            if (SuperBookmarksPackage.Instance.DebugOptions.ShowErrorsInMessageBox)
-                WriteErrorToActivityLog(message);
+            try
+            {
+                if (SuperBookmarksPackage.Instance.DebugOptions.ShowErrorsInMessageBox)
+                    WriteErrorToActivityLog(message);
 
-            if (SuperBookmarksPackage.Instance.DebugOptions.ShowErrorsInMessageBox)
-                ShowErrorMessage("SuperBookmarks - Error:\r\n\r\n" + message, showHeader: false);
+                if (SuperBookmarksPackage.Instance.DebugOptions.ShowErrorsInMessageBox)
+                    ShowErrorMessage("SuperBookmarks - Error:\r\n\r\n" + message, showHeader: false);
 
-            if (SuperBookmarksPackage.Instance.DebugOptions.ShowErrorsInOutputWindow)
-                WriteToOutputWindow("*** SuperBookmarks: " + message + "\r\n");
+                if (SuperBookmarksPackage.Instance.DebugOptions.ShowErrorsInOutputWindow)
+                    WriteToOutputWindow("*** SuperBookmarks: " + message + "\r\n");
+            }
+            catch
+            {
+                //¯\_(ツ)_/¯
+            }
         }
 
         public static void LogException(Exception exception)
@@ -345,6 +330,45 @@ namespace Konamiman.SuperBookmarks
         public static void Debug(string message)
         {
             WriteToOutputWindow($"[SuperBookmarks] {DateTime.Now:H:mm:ss} {message} \r\n");
+        }
+
+        public static void SafeInvoke(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch(Exception ex)
+            {
+                try
+                {
+                    LogException(ex);
+                }
+                catch
+                {
+                    //¯\_(ツ)_/¯
+                }
+            }
+        }
+
+        public static T SafeInvoke<T>(Func<T> func, T defaultValue = default(T))
+        {
+            try
+            {
+                return func();
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    LogException(ex);
+                }
+                catch
+                {
+                    //¯\_(ツ)_/¯
+                }
+                return defaultValue;
+            }
         }
     }
 }

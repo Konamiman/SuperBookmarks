@@ -18,7 +18,7 @@ namespace Konamiman.SuperBookmarks
             this.Frame = frame;
             (frame as IVsWindowFrame2)?.Advise(this, out adviseCookie);
         }
-
+    
         private uint adviseCookie;
 
         public IVsWindowFrame Frame { get; }
@@ -27,10 +27,15 @@ namespace Konamiman.SuperBookmarks
         
         public int OnClose(ref uint pgrfSaveOptions)
         {
-            (Frame as IVsWindowFrame2)?.Unadvise(adviseCookie);
-            FrameClosed?.Invoke(this, EventArgs.Empty);
+            Helpers.SafeInvoke(_OnClose);
 
             return VSConstants.S_OK;
+        }
+
+        private void _OnClose()
+        {
+            (Frame as IVsWindowFrame2)?.Unadvise(adviseCookie);
+            FrameClosed?.Invoke(this, EventArgs.Empty);
         }
 
         #region Unused members

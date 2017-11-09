@@ -26,6 +26,9 @@ namespace Konamiman.SuperBookmarks
         public bool AutoIncludeInGitignore { get; set; }
 
         private void OnIncludeFileInCurrentGitignoreRequested(object sender, EventArgs eventArgs)
+            => Helpers.SafeInvoke(_OnIncludeFileInCurrentGitignoreRequested);
+        
+        private void _OnIncludeFileInCurrentGitignoreRequested()
         {
             var gitignorePath = Path.Combine(
                 Helpers.GetGitRepositoryRoot(SuperBookmarksPackage.Instance.CurrentSolutionPath),
@@ -45,13 +48,14 @@ namespace Konamiman.SuperBookmarks
         
         private void OnOpenSuoFolderRequested(object sender, EventArgs eventArgs)
         {
-            Process.Start(Path.GetDirectoryName(SuperBookmarksPackage.Instance.CurrentSolutionSuoPath));
+            Helpers.SafeInvoke(() =>
+                Process.Start(Path.GetDirectoryName(SuperBookmarksPackage.Instance.CurrentSolutionSuoPath)));
         }
 
 
         protected override void OnActivate(CancelEventArgs e)
         {
-            control.Initialize();
+            Helpers.SafeInvoke(control.Initialize);
             base.OnActivate(e);
         }
 

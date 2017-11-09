@@ -15,10 +15,11 @@ namespace Konamiman.SuperBookmarks
         {
             if (buffer == null)
             {
-                throw new ArgumentNullException("buffer");
+                Helpers.LogError("BookmarkTaggerProvider.CreateTagger invoked for null buffer");
+                return null;
             }
 
-            return (ITagger<T>)Helpers.GetTaggerFor(buffer);
+            return (ITagger<T>)Helpers.SafeInvoke(() => Helpers.GetTaggerFor(buffer));
         }
     }
 }

@@ -22,7 +22,10 @@ namespace Konamiman.SuperBookmarks
             UpdateMenuVisibilityAndText();
         }
 
-        private void UpdateMenuVisibilityAndText()
+        private void UpdateMenuVisibilityAndText() =>
+            Helpers.SafeInvoke(_UpdateMenuVisibilityAndText);
+
+        private void _UpdateMenuVisibilityAndText()
         {
             var commandService = this.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             var menu = (OleMenuCommand)commandService.FindCommand(menuCommandId);

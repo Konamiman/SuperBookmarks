@@ -23,7 +23,7 @@ namespace Konamiman.SuperBookmarks.Options
 
         protected override void OnActivate(CancelEventArgs e)
         {
-            control.Initialize();
+            Helpers.SafeInvoke(control.Initialize);
             base.OnActivate(e);
         }
 

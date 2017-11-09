@@ -9,7 +9,10 @@ namespace Konamiman.SuperBookmarks
         public string DataFilePath =>
             Path.Combine(Path.GetDirectoryName(CurrentSolutionSuoPath), ".SuperBookmarks.dat");
 
-        public int OnAfterCloseSolution(object pUnkReserved)
+        public int OnAfterCloseSolution(object pUnkReserved) =>
+            Helpers.SafeInvoke(_OnAfterCloseSolution);
+
+        private int _OnAfterCloseSolution()
         {
             SaveBookmarksToDatFile();
             this.BookmarksManager.ClearAllBookmarks();
@@ -38,7 +41,10 @@ namespace Konamiman.SuperBookmarks
             Helpers.WriteToStatusBar($"Saved {Helpers.Quantifier(info.TotalBookmarksCount, "bookmark")} from {Helpers.Quantifier(info.TotalFilesCount, "file")} to .SuperBookmarks.dat file");
         }
 
-        public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
+        public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution) =>
+            Helpers.SafeInvoke(_OnAfterOpenSolution);
+
+        private int _OnAfterOpenSolution()
         {
             InitializeSolutionInfo();
             LoadBookmarksFromDatFile();

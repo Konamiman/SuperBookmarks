@@ -76,7 +76,10 @@ namespace Konamiman.SuperBookmarks
         public event EventHandler GlyphColorChanged;
         public event EventHandler ShowMenuOptionChanged;
 
-        protected override void OnApply(PageApplyEventArgs e)
+        protected override void OnApply(PageApplyEventArgs e) =>
+            Helpers.SafeInvoke(() => _OnApply(e));
+
+        private void _OnApply(PageApplyEventArgs e)
         {
             if (e.ApplyBehavior == ApplyKind.Apply)
             {

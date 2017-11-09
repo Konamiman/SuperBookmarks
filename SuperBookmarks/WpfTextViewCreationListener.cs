@@ -13,7 +13,10 @@ namespace Konamiman.SuperBookmarks
         [Import]
         public ITextDocumentFactoryService documentService = null;
 
-        public void TextViewCreated(IWpfTextView textView)
+        public void TextViewCreated(IWpfTextView textView) =>
+            Helpers.SafeInvoke(() => _TextViewCreated(textView));
+        
+        private void _TextViewCreated(IWpfTextView textView)
         {
             var buffer = Helpers.GetRootTextBuffer(textView.TextBuffer);
             if (buffer == null)

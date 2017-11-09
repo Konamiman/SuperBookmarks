@@ -23,6 +23,7 @@ using System.Windows.Forms;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Konamiman.SuperBookmarks;
 
 namespace Microsoft.VisualStudioTools
 {
@@ -34,6 +35,13 @@ namespace Microsoft.VisualStudioTools
         }
 
         public static string BrowseForFileOpen(
+            IntPtr owner,
+            string filter,
+            string initialPath = null,
+            string title = null
+        ) => Helpers.SafeInvoke(() => _BrowseForFileOpen(owner, filter, initialPath, title));
+        
+        private static string _BrowseForFileOpen(
             IntPtr owner,
             string filter,
             string initialPath = null,
@@ -114,6 +122,13 @@ namespace Microsoft.VisualStudioTools
         }
 
         public static string BrowseForFileSave(
+            IntPtr owner,
+            string filter,
+            string initialPath = null,
+            string title = null
+        ) => Helpers.SafeInvoke(() => _BrowseForFileOpen(owner, filter, initialPath, title));
+
+        private static string _BrowseForFileSave(
             IntPtr owner,
             string filter,
             string initialPath = null,

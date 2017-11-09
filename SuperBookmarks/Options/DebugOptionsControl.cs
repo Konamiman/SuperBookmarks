@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Diagnostics;
-using Microsoft.VisualStudio.Shell;
 using System.IO;
 
 namespace Konamiman.SuperBookmarks.Options
@@ -66,18 +65,7 @@ namespace Konamiman.SuperBookmarks.Options
 
         private void btnThrowTestException_Click(object sender, EventArgs e)
         {
-#if DEBUG
-            try
-            {
-                throw new TestException();
-            }
-            catch(Exception ex)
-            {
-                Helpers.LogException(ex);
-            }
-#else
-            throw new TestException();
-#endif
+            Helpers.SafeInvoke(() => throw new TestException());
         }
 
         private class TestException : Exception

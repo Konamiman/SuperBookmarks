@@ -132,7 +132,10 @@ namespace Konamiman.SuperBookmarks
             UpdateOpenDocumentsState();
         }
 
-        private void OnFrameClosed(object sender, EventArgs eventArgs)
+        private void OnFrameClosed(object sender, EventArgs eventArgs) =>
+            Helpers.SafeInvoke(() => _OnFrameClosed(sender));
+
+        private void _OnFrameClosed(object sender)
         {
             var frame = ((IWindowFrameEventsNotifier)sender).Frame;
             if (!openDocumentFrames.ContainsKey(frame))
@@ -162,7 +165,10 @@ namespace Konamiman.SuperBookmarks
             }
         }
 
-        public int OnBeforeDocumentWindowShow(uint docCookie, int fFirstShow, IVsWindowFrame pFrame)
+        public int OnBeforeDocumentWindowShow(uint docCookie, int fFirstShow, IVsWindowFrame pFrame) =>
+            Helpers.SafeInvoke(() => _OnBeforeDocumentWindowShow(docCookie, fFirstShow, pFrame));
+
+        private int _OnBeforeDocumentWindowShow(uint docCookie, int fFirstShow, IVsWindowFrame pFrame)
         {
             if(openDocumentFrames.Count == 0)
                 InitializeRunningDocumentsInfo();

@@ -244,14 +244,14 @@ namespace Konamiman.SuperBookmarks
             var line = snapshot.GetLineFromLineNumber(lineNumber - 1);
             var span = snapshot.CreateTrackingSpan(new SnapshotSpan(line.Start, 0), SpanTrackingMode.EdgeExclusive);
             var tagger = Helpers.GetTaggerFor(buffer);
-            var trackingSpan = tagger.CreateTagSpan(span, new BookmarkTag());
+            var trackingSpan = tagger?.CreateTagSpan(span, new BookmarkTag());
             return trackingSpan;
         }
 
         private void UnregisterAndDeleteBookmark(List<Bookmark> bookmarks, Bookmark bookmark, ITextBuffer buffer, bool notifyIfLastBookmark = true)
         {
             var tagger = Helpers.GetTaggerFor(buffer);
-            tagger.RemoveTagSpan(bookmark.TrackingSpan);
+            tagger?.RemoveTagSpan(bookmark.TrackingSpan);
             bookmarks.Remove(bookmark);
 
             if (bookmarks.Count == 0 && notifyIfLastBookmark)

@@ -19,9 +19,9 @@ namespace Konamiman.SuperBookmarks.Commands
 
         protected abstract int CommandId { get; }
 
-        protected BookmarksManager BookmarksManager { get; }
+        protected BookmarksManager BookmarksManager { get; private set; }
 
-        protected SuperBookmarksPackage Package { get; }
+        protected SuperBookmarksPackage Package { get; private set; }
 
         protected virtual bool RequiresActiveTextDocument => false;
 
@@ -33,30 +33,36 @@ namespace Konamiman.SuperBookmarks.Commands
 
         protected virtual bool RequiresActiveDocumentToBeInProject => false;
 
-        public CommandBase()
+        public CommandBase() =>
+            Helpers.SafeInvoke(Constructor);
+
+        private void Constructor()
         {
             this.Package = SuperBookmarksPackage.Instance;
             this.BookmarksManager = this.Package.BookmarksManager;
 
-            var commandService = 
+            var commandService =
                 ((IServiceProvider)SuperBookmarksPackage.Instance)
                 .GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService == null)
                 return;
 
             var menuCommandID = new CommandID(CommandsGuid, CommandId);
-            var menuItem = new OleMenuCommand((sender, eventArgs) => CommandCallback((OleMenuCommand)sender), menuCommandID);
+            var menuItem = new OleMenuCommand((sender, eventArgs) => SafeCommandCallback((OleMenuCommand)sender), menuCommandID);
             menuItem.BeforeQueryStatus += MenuItemOnBeforeQueryStatus;
             commandService.AddCommand(menuItem);
         }
 
-        private void MenuItemOnBeforeQueryStatus(object sender, EventArgs eventArgs)
+        private void MenuItemOnBeforeQueryStatus(object sender, EventArgs eventArgs) =>
+            Helpers.SafeInvoke(() => _MenuItemOnBeforeQueryStatus(sender, eventArgs));
+
+        private void _MenuItemOnBeforeQueryStatus(object sender, EventArgs eventArgs)
         {
             var command = (OleMenuCommand) sender;
 
             command.Visible = true;
             command.Enabled = true;
-            QueryStatusCallback(command);
+            SafeQueryStatusCallback(command);
             if (!command.Enabled || !command.Visible)
                 return;
 
@@ -71,9 +77,15 @@ namespace Konamiman.SuperBookmarks.Commands
             }
         }
 
+        private void SafeQueryStatusCallback(OleMenuCommand command) =>
+            Helpers.SafeInvoke(() => QueryStatusCallback(command));
+
         protected virtual void QueryStatusCallback(OleMenuCommand command)
         {
         }
+
+        private void SafeCommandCallback(OleMenuCommand command)
+            => Helpers.SafeInvoke(() => CommandCallback(command));
 
         protected abstract void CommandCallback(OleMenuCommand command);
     }

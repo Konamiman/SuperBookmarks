@@ -10,7 +10,10 @@ namespace Konamiman.SuperBookmarks
     {
         private const string persistenceKey = "Konamiman.SuperBookmarks";
 
-        public int SaveUserOptions(IVsSolutionPersistence pPersistence)
+        public int SaveUserOptions(IVsSolutionPersistence pPersistence) =>
+            Helpers.SafeInvoke(() => _SaveUserOptions(pPersistence));
+
+        private int _SaveUserOptions(IVsSolutionPersistence pPersistence)
         {
             return
                 StorageOptions.SaveBookmarksToOwnFile ?
@@ -18,7 +21,10 @@ namespace Konamiman.SuperBookmarks
                 pPersistence.SavePackageUserOpts(this, persistenceKey);
         }
 
-        public int LoadUserOptions(IVsSolutionPersistence pPersistence, uint grfLoadOpts)
+        public int LoadUserOptions(IVsSolutionPersistence pPersistence, uint grfLoadOpts) =>
+            Helpers.SafeInvoke(() => _LoadUserOptions(pPersistence, grfLoadOpts));
+
+        private int _LoadUserOptions(IVsSolutionPersistence pPersistence, uint grfLoadOpts)
         {
             solutionService.GetSolutionInfo(out string solutionPath, out string solutionFilePath, out string suoPath);
             this.BookmarksManager.SolutionPath = solutionPath;
@@ -29,7 +35,10 @@ namespace Konamiman.SuperBookmarks
                 pPersistence.LoadPackageUserOpts(this, persistenceKey);
         }
 
-        public int WriteUserOptions(IStream pOptionsStream, string pszKey)
+        public int WriteUserOptions(IStream pOptionsStream, string pszKey) =>
+            Helpers.SafeInvoke(() => _WriteUserOptions(pOptionsStream, pszKey));
+
+        private int _WriteUserOptions(IStream pOptionsStream, string pszKey)
         {
             if(pszKey != persistenceKey)
                 throw new InvalidOperationException("SuperBookmarks: WriteUserOptions was called for unknown key " + pszKey);
@@ -41,7 +50,10 @@ namespace Konamiman.SuperBookmarks
             return VSConstants.S_OK;
         }
 
-        public int ReadUserOptions(IStream pOptionsStream, string pszKey)
+        public int ReadUserOptions(IStream pOptionsStream, string pszKey) =>
+            Helpers.SafeInvoke(() => _ReadUserOptions(pOptionsStream, pszKey));
+
+        private int _ReadUserOptions(IStream pOptionsStream, string pszKey)
         {
             if (pszKey != persistenceKey)
                 throw new InvalidOperationException("SuperBookmarks: ReadUserOptions was called for unknown key " + pszKey);
