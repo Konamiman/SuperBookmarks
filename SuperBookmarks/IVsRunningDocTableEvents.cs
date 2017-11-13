@@ -203,7 +203,13 @@ namespace Konamiman.SuperBookmarks
                 out var dummyHierarchy,
                 out var dummyItemId, out var dummyData);
 
-            if (((int)flags & ((int)VsRdtFlags.VirtualDocument | (int)VsRdtFlags.ProjSlnDocument)) != 0)
+            const int excludeFlags =
+                (int)VsRdtFlags.VirtualDocument |
+                (int)VsRdtFlags.ProjSlnDocument |
+                (int)VsRdtFlags.DontSaveAs |
+                (int)VsRdtFlags.DontAddToMRU;
+
+            if (((int)flags & excludeFlags) != 0)
                 return (null, null);
 
             string projectRootFolder = null;

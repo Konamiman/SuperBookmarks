@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudioTools
             string filter,
             string initialPath = null,
             string title = null
-        ) => Helpers.SafeInvoke(() => _BrowseForFileOpen(owner, filter, initialPath, title));
+        ) => Helpers.SafeInvoke(() => _BrowseForFileSave(owner, filter, initialPath, title));
 
         private static string _BrowseForFileSave(
             IntPtr owner,
