@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperBookmarks", "SuperBookmarks\SuperBookmarks.csproj", "{85045B86-D5B6-45AE-A6BF-72214B2B20C5}"
 EndProject
@@ -9,6 +9,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ReadmeImages", "ReadmeImages", "{21D4A123-A7CC-4CCA-AFE0-31227ABEB096}"
+	ProjectSection(SolutionItems) = preProject
+		ReadmeImages\ConfirmationOptions.png = ReadmeImages\ConfirmationOptions.png
+		ReadmeImages\DebugOptions.png = ReadmeImages\DebugOptions.png
+		ReadmeImages\GeneralOptions.png = ReadmeImages\GeneralOptions.png
+		ReadmeImages\Menu.png = ReadmeImages\Menu.png
+		ReadmeImages\SolutionExplorerFilter.png = ReadmeImages\SolutionExplorerFilter.png
+		ReadmeImages\StorageOptions.png = ReadmeImages\StorageOptions.png
 	EndProjectSection
 EndProject
 Global
@@ -24,6 +34,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{21D4A123-A7CC-4CCA-AFE0-31227ABEB096} = {474C29A3-D0EB-4651-9D01-2081C198E917}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {60D7E9DB-62E7-479A-85C8-1992497DEB98}
